@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-background: 255 255 255; /* #FFFFFF */
+    --color-background-secondary: 249 249 249; /* #F9F9F9 */
+    --color-text-primary: 28 28 28; /* #1C1C1C */
+    --color-text-secondary: 110 110 110; /* #6E6E6E */
+    --color-text-high: 0 0 0; /* #000000 */
+    --color-button-primary: 224 88 61; /* #E0583D */
+    --color-button-secondary: 245 245 245; /* #F5F5F5 */
+    --color-button-disabled: 209 209 209; /* #D1D1D1 */
+    --color-input-bg: 255 255 255; /* #FFFFFF */
+    --color-input-border: 229 229 229; /* #E5E5E5 */
+    --color-input-placeholder: 154 154 154; /* #9A9A9A */
+    --color-accent: 224 88 61; /* #E0583D */
+    --color-highlight: 254 198 78; /* #FEC64E */
+    --color-error: 230 69 69; /* #E64545 */
+    --color-success: 76 175 80; /* #4CAF50 */
+    --color-warning: 255 152 0; /* #FF9800 */
+    --color-border: 229 229 229; /* #E5E5E5 */
+    --color-shadow: 0 0 0 / 0.1; /* rgba(0,0,0,0.1) */
+  }
+  
+  .dark {
+    --color-background: 18 18 18; /* #121212 */
+    --color-background-secondary: 30 30 30; /* #1E1E1E */
+    --color-text-primary: 237 237 237; /* #EDEDED */
+    --color-text-secondary: 154 154 154; /* #9A9A9A */
+    --color-text-high: 255 255 255; /* #FFFFFF */
+    --color-button-primary: 224 88 61; /* #E0583D */
+    --color-button-secondary: 225 225 225; /* #2C2C2C */
+    --color-button-disabled: 58 58 58; /* #3A3A3A */
+    --color-input-bg: 30 30 30; /* #1E1E1E */
+    --color-input-border: 58 58 58; /* #3A3A3A */
+    --color-input-placeholder: 117 117 117; /* #757575 */
+    --color-accent: 224 88 61; /* #E0583D */
+    --color-highlight: 254 198 78; /* #FEC64E */
+    --color-error: 230 69 69; /* #E64545 */
+    --color-success: 76 175 80; /* #4CAF50 */
+    --color-warning: 255 152 0; /* #FF9800 */
+    --color-border: 44 44 44; /* #2C2C2C */
+    --color-shadow: 0 0 0 / 0.6; /* rgba(0,0,0,0.6) */
+  }
+}
