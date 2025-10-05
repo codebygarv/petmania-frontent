@@ -1,15 +1,15 @@
-import SafeScreen from "@/components/SafeScreen";
 import { Stack } from "expo-router";
-import { SafeAreaProvider } from "react-native-safe-area-context";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import "../css/global.css";
 
 export default function RootLayout() {
   return (
     <SafeAreaProvider>
-      <SafeScreen>
+      <SafeAreaView style={{ flex: 1 }}>
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="(auth)" />
         </Stack>
-      </SafeScreen>
+      </SafeAreaView>
     </SafeAreaProvider>
   );
 }

@@ -25,6 +25,8 @@ module.exports = {
         warning: "rgb(var(--color-warning))",
         border: "rgb(var(--color-border))",
         shadow: "rgb(var(--color-shadow))",
+        loginSigcnupImageBg: "rgb(var(--color-login-singup-image-bg))",
+        SocialBg: "rgb(var(--bg-Social-button))",
       },
     },
   },
