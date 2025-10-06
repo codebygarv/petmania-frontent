@@ -10,8 +10,14 @@ const SocialLoginButtons = () => {
         className="bg-SocialBg rounded-xl py-4 px-4 items-center justify-center w-[48%]"
       >
         <View className="flex flex-row items-center gap-2">
-          <Ionicons name="logo-google" size={22} color="#444" />
-          <Text className="text-black text-base font-semibold">Google</Text>
+          <Ionicons
+            name="logo-google"
+            size={22}
+            className="color-inputIconColor"
+          />
+          <Text className="color-textPrimary text-base font-semibold">
+            Google
+          </Text>
         </View>
       </TouchableOpacity>
 
@@ -20,8 +26,14 @@ const SocialLoginButtons = () => {
         className="bg-SocialBg rounded-xl py-4 px-4 items-center justify-center w-[48%]"
       >
         <View className="flex flex-row items-center gap-2">
-          <Ionicons name="logo-apple" size={22} color="#444" />
-          <Text className="text-black text-base font-semibold">Apple</Text>
+          <Ionicons
+            name="logo-apple"
+            size={22}
+            className="color-inputIconColor"
+          />
+          <Text className="color-textPrimary text-base font-semibold">
+            Apple
+          </Text>
         </View>
       </TouchableOpacity>
     </View>

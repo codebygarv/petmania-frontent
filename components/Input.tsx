@@ -8,6 +8,7 @@ interface InputProps {
   textValue?: string;
   icon?: keyof typeof Ionicons.glyphMap;
   placeholder?: string;
+  onChangeText?: (value: string) => void;
 }
 
 const Input: React.FC<InputProps> = ({
@@ -16,27 +17,27 @@ const Input: React.FC<InputProps> = ({
   textValue = "",
   icon = "mail-outline",
   placeholder = "",
+  onChangeText,
 }) => {
-  const [value, setValue] = useState(textValue);
   const [showPassword, setShowPassword] = useState(false);
 
+
   return (
-    <View className="flex-row items-center bg-white rounded-2xl border border-gray-200 overflow-hidden w-full ">
+    <View className="flex-row items-center rounded-2xl border border-inputBorder overflow-hidden w-full ">
       {/* Left Icon Section */}
-      <View className="p-4 border-r border-gray-200 justify-center items-center">
-        <Ionicons name={icon} size={22} color="#444" />
+      <View className="p-4 border-r border-inputBorder justify-center items-center">
+        <Ionicons name={icon} size={22} className="color-inputIconColor" />
       </View>
 
       {/* Text Section */}
       <View className="flex-1 px-4 py-3">
-        <Text className="text-gray-400 text-sm mb-1">{label}</Text>
+        <Text className="text-inputPlaceholder text-sm mb-1">{label}</Text>
         <TextInput
-          className="text-black text-base font-semibold p-0 m-0 outline-none"
+          className=" text-base font-semibold p-0 m-0 outline-none"
           placeholder={placeholder}
-          placeholderTextColor="#999"
           secureTextEntry={type === "password" && !showPassword}
-          value={value}
-          onChangeText={setValue}
+          value={textValue}
+          onChangeText={onChangeText}
         />
       </View>
 
@@ -49,7 +50,7 @@ const Input: React.FC<InputProps> = ({
           <Ionicons
             name={showPassword ? "eye-outline" : "eye-off-outline"}
             size={22}
-            color="#444"
+            className="color-inputIconColor"
           />
         </TouchableOpacity>
       )}

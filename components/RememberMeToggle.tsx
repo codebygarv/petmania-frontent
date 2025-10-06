@@ -29,14 +29,14 @@ const RememberMeToggle: React.FC<RememberMeToggleProps> = ({
           onValueChange={handleToggle}
           value={remember}
         />
-        <Text className="ml-2 text-base font-medium text-gray-800">
+        <Text className="ml-2 text-base font-medium color-textPrimary">
           Remember me
         </Text>
       </View>
 
       {/* Right Side: Forgot Password */}
       <TouchableOpacity onPress={onForgotPassword} activeOpacity={0.7}>
-        <Text className="text-sm font-semibold text-orange-500">
+        <Text className="text-sm font-semibold color-textOrange">
           Forgot password?
         </Text>
       </TouchableOpacity>
