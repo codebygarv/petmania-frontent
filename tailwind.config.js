@@ -29,6 +29,7 @@ module.exports = {
         shadow: "rgb(var(--color-shadow))",
         loginSigcnupImageBg: "rgb(var(--color-login-singup-image-bg))",
         SocialBg: "rgb(var(--bg-Social-button))",
+        inputIconColorDark:"rgb(var(--color-input-icon-dark))"
       },
     },
   },
