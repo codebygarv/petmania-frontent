@@ -7,6 +7,8 @@ import Button from "@/components/Button";
 import SocialLoginButtons from "@/components/SocialLoginButtons";
 import { useColorScheme } from "nativewind";
 import { Alert } from "react-native";
+import { router } from "expo-router";
+import { TouchableOpacity } from "react-native";
 
 const { width, height } = Dimensions.get("window");
 
@@ -15,6 +17,7 @@ const getImageDimensions = () => {
   const IMAGE_HEIGHT = IMAGE_WIDTH * 0.9;
   return { IMAGE_WIDTH, IMAGE_HEIGHT };
 };
+
 const Index = () => {
   const { colorScheme, setColorScheme } = useColorScheme();
   const { IMAGE_WIDTH, IMAGE_HEIGHT } = getImageDimensions();
@@ -34,6 +37,10 @@ const Index = () => {
     }
     console.log(formData);
     Alert.alert("Form Submitted", JSON.stringify(formData, null, 2));
+  };
+
+  const handleSignup = () => {
+    router.push("/signup");
   };
 
   return (
@@ -69,7 +76,9 @@ const Index = () => {
             icon="lock-closed-outline"
             placeholder="******"
             textValue={formData.password}
-            onChangeText={(value) => setFormData({ ...formData, password: value })}
+            onChangeText={(value) =>
+              setFormData({ ...formData, password: value })
+            }
           />
           <RememberMeToggle />
         </View>
@@ -77,17 +86,23 @@ const Index = () => {
           <Button text="Sign In" onPress={changeColor} />
           <View className="flex flex-row items-center my-4">
             <View className="flex-1 h-[1px] bg-textPrimary" />
-            <Text className="text-sm text-center color-textPrimary mx-3">OR</Text>
+            <Text className="text-sm text-center color-textPrimary mx-3">
+              OR
+            </Text>
             <View className="flex-1 h-[1px] bg-textPrimary" />
           </View>
 
           <SocialLoginButtons />
-          <Text className="text-center color-textPrimary text-sm font-semibold">
-            Don&apos;t Have an Account{"  "}
-            <Text className="text-sm font-semibold text-orange-500">
-              signup
+          <View className="flex-row justify-center items-center">
+            <Text className="text-sm font-semibold color-textPrimary">
+              Don’t have an account?
             </Text>
-          </Text>
+            <TouchableOpacity onPress={handleSignup}>
+              <Text className="text-sm font-semibold text-orange-500 ml-1">
+                Signup
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
       <View
