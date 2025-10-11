@@ -30,9 +30,11 @@ const Input: React.FC<InputProps> = ({
   return (
     <View className="flex-row items-center rounded-2xl border border-inputBorder overflow-hidden w-full">
       {/* Left Icon */}
-      <View className="p-4 border-r border-inputBorder justify-center items-center">
-        <Ionicons name={icon} size={22} color={iconColor} />
-      </View>
+      {icon && (
+        <View className="p-4 border-r border-inputBorder justify-center items-center">
+          <Ionicons name={icon} size={22} color={iconColor} />
+        </View>
+      )}
 
       {/* Text Field */}
       <View className="flex-1 px-4 py-3">

@@ -1,3 +1,4 @@
+import { Link, router } from "expo-router";
 import React, { useState } from "react";
 import { View, Text, Switch, TouchableOpacity } from "react-native";
 
@@ -18,6 +19,11 @@ const RememberMeToggle: React.FC<RememberMeToggleProps> = ({
     onToggle?.(newValue);
   };
 
+  const handleForgotPassword = () => {
+    onForgotPassword?.();
+    router.push("/forgotPassword");
+  };
+
   return (
     <View className="flex flex-row justify-between items-center mt-1">
       {/* Left Side: Toggle + Label */}
@@ -35,11 +41,13 @@ const RememberMeToggle: React.FC<RememberMeToggleProps> = ({
       </View>
 
       {/* Right Side: Forgot Password */}
-      <TouchableOpacity onPress={onForgotPassword} activeOpacity={0.7}>
-        <Text className="text-sm font-semibold color-textOrange">
-          Forgot password?
-        </Text>
-      </TouchableOpacity>
+      <Link href="/forgotPassword">
+        <TouchableOpacity onPress={handleForgotPassword} >
+          <Text className="text-[14px] font-semibold color-textOrange">
+            Forgot password?
+          </Text>
+        </TouchableOpacity>
+      </Link>
     </View>
   );
 };
