@@ -38,7 +38,7 @@ const Input: React.FC<InputProps> = ({
 
       {/* Text Field */}
       <View className="flex-1 px-4 py-3">
-        <Text className="text-inputPlaceholder  text-sm mb-1">{label}</Text>
+        {/* <Text className="text-inputPlaceholder  text-sm mb-1">{label}</Text>  */}
         <TextInput
           className="text-base font-semibold p-0 m-0 outline-none color-textPrimary"
           placeholder={placeholder}

@@ -25,18 +25,19 @@ const forgotPassword = () => {
       </View>
       <View className="flex gap-4">
         <View className="flex gap-3 mt-4">
-          <Text className=" color-textSecondary text-sm leading-6">
+          <Text className="color-textSecondary text-sm leading-6">
             We'll send you a 4 digit code on your email to reset your password.
-            By continuing, you agree to our Terms of Service and Privacy Policy.
-            We respect your privacy and will only use your email for password
-            reset purposes. If you don't receive an email within 5 minutes,
-            please check your spam folder or contact our support team.
+          </Text>
+
+          <Text className="color-textSecondary text-sm leading-6">
+            If you don't receive an email within 5 minutes, please check your
+            spam folder or contact our support team.
           </Text>
 
           <View className="flex gap-4">
             <Input
               label="Email"
-              placeholder="abc@gmail.com"
+              placeholder="Enter Your Registered Email Address"
               textValue={formData.email}
               onChangeText={(value) =>
                 setFormData({ ...formData, email: value })
