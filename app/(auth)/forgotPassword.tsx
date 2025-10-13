@@ -4,6 +4,7 @@ import BackButton from "@/components/BackButton";
 import Input from "@/components/Input";
 import Button from "@/components/Button";
 import { useColorScheme } from "nativewind";
+import { router } from "expo-router";
 
 const forgotPassword = () => {
   const { colorScheme, setColorScheme } = useColorScheme();
@@ -14,6 +15,10 @@ const forgotPassword = () => {
   const changeColor = () => {
     setColorScheme(colorScheme === "dark" ? "light" : "dark");
   };
+
+  const goToVerificationScreen = () =>{
+    router.push('/verification')
+  }
 
   return (
     <View className="flex gap-4 pt-7 pl-6 pr-6 h-screen bg-background">
@@ -43,8 +48,8 @@ const forgotPassword = () => {
                 setFormData({ ...formData, email: value })
               }
             />
-
             <Button text="Send" onPress={changeColor} />
+            <Button text="Temperory Verifi" onPress={goToVerificationScreen} />
           </View>
         </View>
       </View>
