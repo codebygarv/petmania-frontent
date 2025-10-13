@@ -43,31 +43,37 @@ const signup = () => {
         />
       </View>
 
-      <View className="flex gap-2">
+      <View className="flex gap-4">
         <View className="flex gap-3 ">
-          <Text className="text-3xl text-center font-semibold color-textPrimary">
+          <Text className="text-2xl text-center font-semibold color-textPrimary">
             Sign Up
           </Text>
           <Text className="text-sm text-center opacity-55 color-textSecondary">
             Let&apos;s Create an Account
           </Text>
         </View>
-        <View className="flex gap-4">
-          <Input
-            label="Name"
-            placeholder="John Doe"
-            textValue={formData.name}
-            onChangeText={(value) => setFormData({ ...formData, name: value })}
-          />
+        <View className="flex gap-3">
           <Input
             label="Email"
-            placeholder="abc@gmail.com"
+            placeholder="Enter Your Email Address"
             textValue={formData.email}
             onChangeText={(value) => setFormData({ ...formData, email: value })}
           />
           <Input
             label="Password"
-            placeholder="******"
+            type="password"
+            icon="lock-closed-outline"
+            placeholder="Enter Your Password"
+            textValue={formData.password}
+            onChangeText={(value) =>
+              setFormData({ ...formData, password: value })
+            }
+          />
+          <Input
+            label="Confirm Password"
+            type="password"
+            icon="lock-closed-outline"
+            placeholder="Enter Your Confirm Password"
             textValue={formData.password}
             onChangeText={(value) =>
               setFormData({ ...formData, password: value })
@@ -94,6 +100,9 @@ const signup = () => {
             </Text>
           </TouchableOpacity>
         </View>
+        <Text className="color-textSecondary text-center text-[11px] leading-6">
+          By Registering, you accept our Terms & Conditions and Privacy Policy.
+        </Text>
       </View>
       <View
         className="flex justify-center items-center p-2 mx-auto rounded-3xl overflow-hidden"
