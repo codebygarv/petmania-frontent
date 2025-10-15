@@ -44,7 +44,7 @@ const OtpInputBox: React.FC<OtpInputBoxProps> = ({
   };
 
   return (
-    <View className="flex-row justify-center items-center space-x-3">
+    <View className="flex-row justify-center items-center space-x-3 gap-3">
       {Array.from({ length }).map((_, i) => (
         <TextInput
           key={i}
