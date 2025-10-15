@@ -20,6 +20,10 @@ const forgotPassword = () => {
     router.push('/verification')
   }
 
+  const goToResetPassword = () =>{
+    router.push('/resetPassword')
+  }
+
   return (
     <View className="flex gap-4 pt-7 pl-6 pr-6 h-screen bg-background">
       <View className="flex flex-row align-center">
@@ -50,6 +54,7 @@ const forgotPassword = () => {
             />
             <Button text="Send" onPress={changeColor} />
             <Button text="Temperory Verifi" onPress={goToVerificationScreen} />
+            <Button text="Reset password" onPress={goToResetPassword} />
           </View>
         </View>
       </View>
