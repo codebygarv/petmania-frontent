@@ -32,7 +32,7 @@ const resetPassword = () => {
         <View className="gap-4">
           <Input
             type="password"
-            placeholder="Enter Your Old password"
+            placeholder="Enter your old password"
             icon="lock-closed-outline"
             textValue={formData.oldPassword}
             onChangeText={(value) =>
@@ -41,7 +41,7 @@ const resetPassword = () => {
           />
           <Input
             type="password"
-            placeholder="Enter Your Old password"
+            placeholder="Enter your new password"
             icon="lock-closed-outline"
             textValue={formData.newPassword}
             onChangeText={(value) =>
