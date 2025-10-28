@@ -2,43 +2,35 @@ import { View, Text } from "react-native";
 import React, { useState } from "react";
 import BackButton from "@/components/BackButton";
 import Input from "@/components/Input";
-import Button from "@/components/Button";
 import { useColorScheme } from "nativewind";
+import Button from "@/components/Button";
 
-const resetPassword = () => {
+const forgotPasswordChange = () => {
   const [formData, setFormData] = useState({
-    oldPassword: "",
     newPassword: "",
     confirmNewPassword: "",
   });
+
   const { toggleColorScheme } = useColorScheme();
 
   const changeColor = () => {
     toggleColorScheme();
   };
   return (
-    <View className="flex gap-5 pt-7 pl-6 pr-6 h-screen bg-background">
+    <View className="flex gap-4 pt-7 pl-6 pr-6 h-screen bg-background">
       <View className="flex flex-row align-center">
         <BackButton />
         <Text className="text-center mx-20 color-textPrimary my-auto color-textPrimary font-semibold text-xl">
-          Reset Password
+          Forgot Password
         </Text>
       </View>
+
       <View className="gap-5">
         <Text className="color-textSecondary text-sm leading-6">
-          You can reset Password by enter old password and new passowrd .
+          After Verifying Your identity Now you can Change Password.
         </Text>
 
         <View className="gap-4">
-          <Input
-            type="password"
-            placeholder="Enter your old password"
-            icon="lock-closed-outline"
-            textValue={formData.oldPassword}
-            onChangeText={(value) =>
-              setFormData({ ...formData, oldPassword: value })
-            }
-          />
           <Input
             type="password"
             placeholder="Enter your new password"
@@ -64,4 +56,4 @@ const resetPassword = () => {
   );
 };
 
-export default resetPassword;
+export default forgotPasswordChange;

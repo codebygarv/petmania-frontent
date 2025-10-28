@@ -16,13 +16,17 @@ const forgotPassword = () => {
     setColorScheme(colorScheme === "dark" ? "light" : "dark");
   };
 
-  const goToVerificationScreen = () =>{
-    router.push('/verification')
-  }
+  const goToVerificationScreen = () => {
+    router.push("/verification");
+  };
 
-  const goToResetPassword = () =>{
-    router.push('/resetPassword')
-  }
+  const goToResetPassword = () => {
+    router.push("/resetPassword");
+  };
+
+  const goToForgotPasswordChange = () => {
+    router.push("/forgotPasswordChange");
+  };
 
   return (
     <View className="flex gap-4 pt-7 pl-6 pr-6 h-screen bg-background">
@@ -55,6 +59,10 @@ const forgotPassword = () => {
             <Button text="Send" onPress={changeColor} />
             <Button text="Temperory Verifi" onPress={goToVerificationScreen} />
             <Button text="Reset password" onPress={goToResetPassword} />
+            <Button
+              text="Forgot password Ch"
+              onPress={goToForgotPasswordChange}
+            />
           </View>
         </View>
       </View>
