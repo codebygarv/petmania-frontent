@@ -1,11 +1,16 @@
-import { View, Text, Image, TouchableOpacity, Dimensions } from "react-native";
-import React, { useState } from "react";
+import { View, Text, Image, TouchableOpacity, Dimensions, ActivityIndicator } from "react-native";
+import React from "react";
 import { config } from "@/constants/config";
 import Input from "@/components/Input";
 import Button from "@/components/Button";
 import SocialLoginButtons from "@/components/SocialLoginButtons";
 import { router } from "expo-router";
 import { useColorScheme } from "nativewind";
+import { Formik } from "formik";
+import * as Yup from "yup";
+import { useDispatch, useSelector } from "react-redux";
+import { signupAction } from "@/redux/actions/userActions";
+import Toast from "react-native-toast-message";
 
 const { width, height } = Dimensions.get("window");
 
@@ -15,17 +20,50 @@ const getImageDimensions = () => {
   return { IMAGE_WIDTH, IMAGE_HEIGHT };
 };
 
-const signup = () => {
-  const { colorScheme, setColorScheme } = useColorScheme();
-  const { IMAGE_WIDTH, IMAGE_HEIGHT } = getImageDimensions();
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-  });
+const validationSchema = Yup.object().shape({
+  email: Yup.string()
+    .email("Invalid email format")
+    .required("Email is required"),
+  password: Yup.string()
+    .min(6, "Password must be at least 6 characters")
+    .required("Password is required"),
+  confirmPassword: Yup.string()
+    .oneOf([Yup.ref("password")], "Passwords must match")
+    .required("Confirm Password is required"),
+});
 
-  const changeColor = () => {
-    setColorScheme(colorScheme === "dark" ? "light" : "dark");
+interface SignupFormValues {
+  email: string;
+  password: string;
+  confirmPassword: string;
+}
+
+const Signup = () => {
+  const { colorScheme } = useColorScheme();
+  const { IMAGE_WIDTH, IMAGE_HEIGHT } = getImageDimensions();
+  const dispatch = useDispatch<any>();
+  const loading = useSelector((state: any) => state.user.loading);
+
+  const isDark = colorScheme === "dark";
+
+  const handleSubmit = async (values: SignupFormValues) => {
+    console.log("Signup Data:", values);
+
+    // Example: you can dispatch signup action or navigate
+    const res = await dispatch(signupAction(values));
+
+    if (res.error) {
+      // Toast or Alert can go here
+    } else {
+      Toast.show({
+        type: 'success',
+        text1: 'Signup Successful',
+        text2: 'We have sent a verification code to your email.'
+      });
+      router.push("/verification");
+    }
+
+    // Toast or Alert can go here
   };
 
   const handleLogin = () => {
@@ -34,77 +72,119 @@ const signup = () => {
 
   return (
     <View className="flex gap-4 pt-7 pl-6 pr-6 h-screen bg-background">
+      {/* Top Icon */}
       <View className="flex justify-center items-center w-20 h-20 p-2 mx-auto rounded-3xl overflow-hidden bg-loginSigcnupImageBg">
         <Image
           source={config.loginSignupImageBg}
-          // className="h-[100%] w-[100%]"
           style={{ width: "100%", height: "100%" }}
           resizeMode="cover"
         />
       </View>
 
-      <View className="flex gap-4">
-        <View className="flex gap-3 ">
-          <Text className="text-2xl text-center font-semibold color-textPrimary">
-            Sign Up
-          </Text>
-          <Text className="text-sm text-center opacity-55 color-textSecondary">
-            Let&apos;s Create an Account
-          </Text>
-        </View>
-        <View className="flex gap-3">
-          <Input
-            label="Email"
-            placeholder="Enter Your Email Address"
-            textValue={formData.email}
-            onChangeText={(value) => setFormData({ ...formData, email: value })}
-          />
-          <Input
-            label="Password"
-            type="password"
-            icon="lock-closed-outline"
-            placeholder="Enter Your Password"
-            textValue={formData.password}
-            onChangeText={(value) =>
-              setFormData({ ...formData, password: value })
-            }
-          />
-          <Input
-            label="Confirm Password"
-            type="password"
-            icon="lock-closed-outline"
-            placeholder="Enter Your Confirm Password"
-            textValue={formData.password}
-            onChangeText={(value) =>
-              setFormData({ ...formData, password: value })
-            }
-          />
-          <Button text="Sign Up" onPress={changeColor} />
-        </View>
+      {/* Formik Setup */}
+      <Formik
+        initialValues={{ email: "", password: "", confirmPassword: "" }}
+        validationSchema={validationSchema}
+        onSubmit={handleSubmit}
+      >
+        {({
+          handleChange,
+          handleSubmit,
+          values,
+          errors,
+          touched,
+        }) => (
+          <View className="flex gap-5">
+            {/* Header */}
+            <View className="flex gap-3">
+              <Text className="text-3xl text-center font-semibold color-textPrimary">
+                Create Account
+              </Text>
+              <Text className="text-sm text-center opacity-55 color-textSecondary">
+                Let&apos;s get started!
+              </Text>
+            </View>
 
-        <View className="flex flex-row items-center my-4">
-          <View className="flex-1 h-[1px] bg-textPrimary" />
-          <Text className="text-sm text-center color-textPrimary mx-3">OR</Text>
-          <View className="flex-1 h-[1px] bg-textPrimary" />
-        </View>
+            {/* Input Fields */}
+            <View className="flex gap-4">
+              <Input
+                label="Email"
+                icon="mail-outline"
+                placeholder="Enter your email"
+                textValue={values.email}
+                onChangeText={handleChange("email")}
+              />
+              {touched.email && errors.email && (
+                <Text className="text-red-500 text-xs">{errors.email}</Text>
+              )}
 
-        <SocialLoginButtons />
+              <Input
+                label="Password"
+                type="password"
+                icon="lock-closed-outline"
+                placeholder="Enter password"
+                textValue={values.password}
+                onChangeText={handleChange("password")}
+              />
+              {touched.password && errors.password && (
+                <Text className="text-red-500 text-xs">{errors.password}</Text>
+              )}
 
-        <View className="flex-row justify-center items-center">
-          <Text className="text-sm font-semibold color-textPrimary">
-            Don’t have an account?
-          </Text>
-          <TouchableOpacity onPress={handleLogin}>
-            <Text className="text-sm font-semibold text-orange-500 ml-1">
-              SignIn
+              <Input
+                label="Confirm Password"
+                type="password"
+                icon="lock-closed-outline"
+                placeholder="Confirm your password"
+                textValue={values.confirmPassword}
+                onChangeText={handleChange("confirmPassword")}
+              />
+              {touched.confirmPassword && errors.confirmPassword && (
+                <Text className="text-red-500 text-xs">
+                  {errors.confirmPassword}
+                </Text>
+              )}
+            </View>
+
+            {/* Signup Button */}
+            <View className="flex gap-2">
+              <Button text={loading ? <ActivityIndicator color={"#fff"} /> : 'Sign In'} onPress={handleSubmit} />
+
+              {/* Divider */}
+              <View className="flex flex-row items-center my-4">
+                <View className="flex-1 h-[1px] bg-textPrimary" />
+                <Text className="text-sm text-center color-textPrimary mx-3">
+                  OR
+                </Text>
+                <View className="flex-1 h-[1px] bg-textPrimary" />
+              </View>
+
+              {/* Social Buttons */}
+              <SocialLoginButtons />
+
+              {/* Navigate to Login */}
+              <View className="flex-row justify-center items-center">
+                <Text className="text-sm font-semibold color-textPrimary">
+                  Already have an account?
+                </Text>
+                <TouchableOpacity onPress={handleLogin}>
+                  <Text className="text-sm font-semibold text-orange-500 ml-1">
+                    Sign In
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Terms & Conditions */}
+            <Text className="color-textSecondary text-center text-[11px] leading-6">
+              By registering, you accept our Terms & Conditions and Privacy
+              Policy.
             </Text>
-          </TouchableOpacity>
-        </View>
-        <Text className="color-textSecondary text-center text-[11px] leading-6">
-          By Registering, you accept our Terms & Conditions and Privacy Policy.
-        </Text>
-      </View>
-      <View
+          </View>
+        )}
+      </Formik>
+
+      {/* Bottom Image */}
+      {/* <View
         className="flex justify-center items-center p-2 mx-auto rounded-3xl overflow-hidden"
         style={{
           width: IMAGE_WIDTH,
@@ -116,9 +196,9 @@ const signup = () => {
           style={{ width: "100%", height: "100%", borderRadius: 24 }}
           resizeMode="cover"
         />
-      </View>
+      </View> */}
     </View>
   );
 };
 
-export default signup;
+export default Signup;
