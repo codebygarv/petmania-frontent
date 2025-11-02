@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: "https://petmania-backend.onrender.com/api",
+  baseURL: "http://localhost:8080/api",
   timeout: 10000,
   withCredentials: true, // allows cookies (like tokens) to be sent automatically
 });

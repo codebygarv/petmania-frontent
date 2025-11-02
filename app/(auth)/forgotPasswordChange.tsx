@@ -1,59 +1,118 @@
-import { View, Text } from "react-native";
-import React, { useState } from "react";
+import { View, Text, ActivityIndicator } from "react-native";
+import React from "react";
 import BackButton from "@/components/BackButton";
 import Input from "@/components/Input";
-import { useColorScheme } from "nativewind";
 import Button from "@/components/Button";
+import { Formik } from "formik";
+import * as Yup from "yup";
+import Toast from "react-native-toast-message";
+import { useDispatch, useSelector } from "react-redux";
+import { updatePasswordAction } from "@/redux/actions/userActions";  // example action for changing password
+import { router } from "expo-router";
 
-const forgotPasswordChange = () => {
-  const [formData, setFormData] = useState({
-    newPassword: "",
-    confirmNewPassword: "",
-  });
+const validationSchema = Yup.object().shape({
+  password: Yup.string()
+    .min(6, "Password must be at least 6 characters")
+    .required("New password is required"),
+  confirmPassword: Yup.string()
+    .oneOf([Yup.ref("password")], "Passwords must match")
+    .required("Confirm password is required"),
+});
 
-  const { toggleColorScheme } = useColorScheme();
+interface ChangePasswordFormValues {
+  password: string;
+  confirmPassword: string;
+}
 
-  const changeColor = () => {
-    toggleColorScheme();
+const ForgotPasswordChange = () => {
+  const dispatch = useDispatch<any>();
+  const loading = useSelector((state: any) => state.user.loading);
+
+  const handlePasswordChange = async (values: ChangePasswordFormValues) => {
+    console.log("Password Change Data:", values);  // remove in production
+    
+    const res = await dispatch(updatePasswordAction(values));
+
+    if (res?.error?.success === false) {
+      Toast.show({
+        type: 'error',
+        text1: 'Password Update Failed',
+        text2: res?.error?.error?.message,
+      });
+    } else if (res?.success === true) {
+      Toast.show({
+        type: 'success',
+        text1: 'Password Updated',
+        text2: 'Your password has been successfully updated.',
+      });
+      // redirect to login or home
+      router.push("/(auth)");
+    } else {
+      Toast.show({
+        type: 'error',
+        text1: 'Password Update Failed',
+        text2: 'An unexpected error occurred. Please try again.',
+      });
+    }
   };
+
   return (
     <View className="flex gap-4 pt-7 pl-6 pr-6 h-screen bg-background">
       <View className="flex flex-row align-center">
         <BackButton />
-        <Text className="text-center mx-20 color-textPrimary my-auto color-textPrimary font-semibold text-xl">
+        <Text className="text-center mx-20 color-textPrimary my-auto font-semibold text-xl">
           Forgot Password
         </Text>
       </View>
 
-      <View className="gap-5">
-        <Text className="color-textSecondary text-sm leading-6">
-          After Verifying Your identity Now you can Change Password.
-        </Text>
+      <Text className="color-textSecondary text-sm leading-6">
+        After verifying your identity, you can now change your password.
+      </Text>
 
-        <View className="gap-4">
-          <Input
-            type="password"
-            placeholder="Enter your new password"
-            icon="lock-closed-outline"
-            textValue={formData.newPassword}
-            onChangeText={(value) =>
-              setFormData({ ...formData, newPassword: value })
-            }
-          />
-          <Input
-            type="password"
-            placeholder="Enter Your confirm new password"
-            icon="lock-closed-outline"
-            textValue={formData.confirmNewPassword}
-            onChangeText={(value) =>
-              setFormData({ ...formData, confirmNewPassword: value })
-            }
-          />
-        </View>
-        <Button text="Verify Now" onPress={changeColor} />
-      </View>
+      <Formik
+        initialValues={{ password: "", confirmPassword: "" }}
+        validationSchema={validationSchema}
+        onSubmit={handlePasswordChange}
+      >
+        {({
+          handleChange,
+          handleSubmit,
+          values,
+          errors,
+          touched,
+        }) => (
+          <View className="gap-5">
+            <Input
+              type="password"
+              placeholder="Enter your new password"
+              icon="lock-closed-outline"
+              textValue={values.password}
+              onChangeText={handleChange("password")}
+            />
+            {touched.password && errors.password && (
+              <Text className="text-red-500 text-xs">{errors.password}</Text>
+            )}
+
+            <Input
+              type="password"
+              placeholder="Confirm your new password"
+              icon="lock-closed-outline"
+              textValue={values.confirmPassword}
+              onChangeText={handleChange("confirmPassword")}
+            />
+            {touched.confirmPassword && errors.confirmPassword && (
+              <Text className="text-red-500 text-xs">{errors.confirmPassword}</Text>
+            )}
+
+            <Button
+              text={loading ? <ActivityIndicator color={"#fff"} /> : "Update Password"}
+              onPress={handleSubmit}
+            />
+          </View>
+        )}
+      </Formik>
     </View>
   );
 };
 
-export default forgotPasswordChange;
+export default ForgotPasswordChange;
