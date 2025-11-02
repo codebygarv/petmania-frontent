@@ -50,16 +50,26 @@ const Index = () => {
     console.log("Login response:", res);
     Alert.alert("Login Response", JSON.stringify(res));
 
-    if (res.error) {
-      Alert.alert("Login Failed", res.error);
+
+    if (res?.error?.success === false) {
+      Toast.show({
+        type: "error",
+        text1: "Login Failed",
+        text2: res?.error?.error?.message,
+      });
+    } else if (res?.success === true) {
+      Toast.show({
+        type: "success",
+        text1: "Login Successful",
+        text2: res?.message,
+      });
+      router.push("/");
     } else {
       Toast.show({
-        type: "custom",
-        text1: "✅ Login Successful ",
-        position: "top",
-        visibilityTime: 2000,
+        type: "error",
+        text1: "Login Failed",
+        text2: "An unexpected error occurred. Please try again.",
       });
-      // router.push("/"); // Navigate to home on successful login
     }
   }
   // const changeColor = () => {
