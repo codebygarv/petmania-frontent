@@ -1,4 +1,4 @@
-import { Stack } from "expo-router";
+import { Stack, router, useRootNavigationState } from "expo-router";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { View, StatusBar } from "react-native";
 import "../css/global.css";
@@ -12,6 +12,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import queryClient from "../query/queryClient";
 import Toast from "react-native-toast-message";
 import { toastConfig } from "../config/toastConfig";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function RootLayout() {
   const { colorScheme } = useColorScheme();
@@ -20,6 +21,24 @@ export default function RootLayout() {
   useEffect(() => {
     SystemUI.setBackgroundColorAsync(isDark ? "#000000" : "#ffffff");
   }, [isDark]);
+
+  const navigationState = useRootNavigationState();
+
+  useEffect(() => {
+    if (!navigationState?.key) return;
+
+    const redirectToHome = async () => {
+      const token = await AsyncStorage.getItem("token");
+
+      if (token) {
+        router.replace("/(tab)");
+      } else {
+        router.replace("/(auth)");
+      }
+    };
+
+    redirectToHome();
+  }, [navigationState]);
 
   return (
     <Provider store={store}>
@@ -45,6 +64,7 @@ export default function RootLayout() {
                   }}
                 >
                   <Stack.Screen name="(auth)" />
+                  <Stack.Screen name="(tab)" />
                 </Stack>
               </View>
               <Toast config={toastConfig} />

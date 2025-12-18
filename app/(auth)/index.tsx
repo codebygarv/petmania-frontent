@@ -20,6 +20,7 @@ import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import { loginAction } from "@/redux/actions/userActions";
 import Toast from "react-native-toast-message";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const { width, height } = Dimensions.get("window");
 
@@ -56,7 +57,7 @@ const Index = () => {
   const handleSubmit = async (values: LoginFormValues) => {
     const res = await dispatch(loginAction(values));
     console.log("Login response:", res);
-    Alert.alert("Login Response", JSON.stringify(res));
+
 
     if (res?.error?.success === false) {
       Toast.show({
@@ -70,7 +71,15 @@ const Index = () => {
         text1: "Login Successful",
         text2: res?.message,
       });
-      router.push("/");
+      // AsyncStorage only accepts string values – ensure we store strings
+      if (res?.data?.token != null) {
+        await AsyncStorage.setItem("token", String(res.data.token));
+      }
+      if (res?.data?.user != null) {
+        await AsyncStorage.setItem("user", JSON.stringify(res.data.user));
+      }
+      // Navigate to the tab layout after saving the token
+      router.replace("/(tab)");
     } else {
       Toast.show({
         type: "error",
