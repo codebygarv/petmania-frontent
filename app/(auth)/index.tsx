@@ -1,4 +1,12 @@
-import { View, Image, Text, Dimensions, Alert, TouchableOpacity, ActivityIndicator } from "react-native";
+import {
+  View,
+  Image,
+  Text,
+  Dimensions,
+  Alert,
+  TouchableOpacity,
+  ActivityIndicator,
+} from "react-native";
 import React from "react";
 import { config } from "@/constants/config";
 import Input from "@/components/Input";
@@ -43,13 +51,12 @@ const Index = () => {
   const loading = useSelector((state: any) => state.user.loading);
 
   const isDark = colorScheme === "dark";
-  // const activityIndicator = isDark ? "#EDEDED" : "#1C1C1C"; 
+  // const activityIndicator = isDark ? "#EDEDED" : "#1C1C1C";
 
   const handleSubmit = async (values: LoginFormValues) => {
     const res = await dispatch(loginAction(values));
     console.log("Login response:", res);
     Alert.alert("Login Response", JSON.stringify(res));
-
 
     if (res?.error?.success === false) {
       Toast.show({
@@ -71,7 +78,7 @@ const Index = () => {
         text2: "An unexpected error occurred. Please try again.",
       });
     }
-  }
+  };
   // const changeColor = () => {
   //   setColorScheme(colorScheme === "dark" ? "light" : "dark");
   // };
@@ -95,13 +102,7 @@ const Index = () => {
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
-        {({
-          handleChange,
-          handleSubmit,
-          values,
-          errors,
-          touched,
-        }) => (
+        {({ handleChange, handleSubmit, values, errors, touched }) => (
           <View className="flex gap-5">
             <View className="flex gap-3">
               <Text className="text-3xl text-center font-semibold color-textPrimary">
@@ -140,7 +141,13 @@ const Index = () => {
             </View>
 
             <View className="flex gap-2">
-              <Button text={loading ? <ActivityIndicator color={"#fff"} /> : 'Sign In'} onPress={handleSubmit} />
+              <Button
+                text={
+                  loading ? <ActivityIndicator color={"#fff"} /> : "Sign In"
+                }
+                onPress={handleSubmit}
+                disabled={!!(errors.email || errors.password) || loading}
+              />
 
               <View className="flex flex-row items-center my-4">
                 <View className="flex-1 h-[1px] bg-textPrimary" />
@@ -157,7 +164,9 @@ const Index = () => {
                   Don’t have an account?
                 </Text>
                 <TouchableOpacity onPress={handleSignup}>
-                  <Text className="text-sm font-semibold text-orange-500 ml-1">
+                  <Text
+                    className={`text-sm font-semibold text-orange-500 ml-1`}
+                  >
                     Signup
                   </Text>
                 </TouchableOpacity>

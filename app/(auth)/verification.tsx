@@ -9,7 +9,10 @@ import * as Yup from "yup";
 import Toast from "react-native-toast-message";
 import { router } from "expo-router";
 import { useDispatch, useSelector } from "react-redux";
-import { forgotPasswordOtpAction, verifyOtpAction } from "@/redux/actions/userActions";
+import {
+  forgotPasswordOtpAction,
+  verifyOtpAction,
+} from "@/redux/actions/userActions";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useLocalSearchParams } from "expo-router";
 
@@ -27,53 +30,53 @@ const Verification = () => {
   const handleVerify = async (values: { otp: string }) => {
     console.log("OTP Submitted:", values.otp);
 
-    if (type === 'forgot-password') {
-
+    if (type === "forgot-password") {
       const email = await AsyncStorage.getItem("forgotPasswordemail");
 
       if (!email) {
         Toast.show({
-          type: 'error',
-          text1: 'Error',
-          text2: 'Email not found. Please restart the verification process.'
+          type: "error",
+          text1: "Error",
+          text2: "Email not found. Please restart the verification process.",
         });
         return;
       }
 
-      const res = await dispatch(forgotPasswordOtpAction({ email, otp: values.otp }));
+      const res = await dispatch(
+        forgotPasswordOtpAction({ email, otp: values.otp })
+      );
 
-      console.log("Forgot Password Verify Response:", res);
+      console.log("Forgot Password Verify Response:", res?.data?.token);
 
       if (res?.error?.success === false) {
         Toast.show({
-          type: 'error',
-          text1: 'Verification Failed',
-          text2: res?.error?.error?.message
+          type: "error",
+          text1: "Verification Failed",
+          text2: res?.error?.error?.message,
         });
-      }
-      else if (res?.success === true) {
+      } else if (res?.success === true) {
         Toast.show({
-          type: 'success',
-          text1: 'Verification Successful',
-          text2: res?.message
+          type: "success",
+          text1: "Verification Successful",
+          text2: res?.message,
         });
-        router.push('/forgotPasswordChange');
+        await AsyncStorage.setItem("verifyChangePassword", res?.data?.token);
+        router.push("/forgotPasswordChange");
       } else {
         Toast.show({
-          type: 'error',
-          text1: 'Verification Failed',
-          text2: 'An unexpected error occurred. Please try again.'
+          type: "error",
+          text1: "Verification Failed",
+          text2: "An unexpected error occurred. Please try again.",
         });
       }
-
     } else {
       const email = await AsyncStorage.getItem("email");
 
       if (!email) {
         Toast.show({
-          type: 'error',
-          text1: 'Error',
-          text2: 'Email not found. Please restart the verification process.'
+          type: "error",
+          text1: "Error",
+          text2: "Email not found. Please restart the verification process.",
         });
         return;
       }
@@ -81,29 +84,26 @@ const Verification = () => {
       console.log("Verify Response:", res);
       if (res?.error?.success === false) {
         Toast.show({
-          type: 'error',
-          text1: 'Verification Failed',
-          text2: res?.error?.error?.message
+          type: "error",
+          text1: "Verification Failed",
+          text2: res?.error?.error?.message,
         });
       } else if (res?.success === true) {
         Toast.show({
-          type: 'success',
-          text1: 'Verification Successful',
-          text2: res?.message
+          type: "success",
+          text1: "Verification Successful",
+          text2: res?.message,
         });
-        router.push('/');
+        router.push("/");
       } else {
         Toast.show({
-          type: 'error',
-          text1: 'Verification Failed',
-          text2: 'An unexpected error occurred. Please try again.'
+          type: "error",
+          text1: "Verification Failed",
+          text2: "An unexpected error occurred. Please try again.",
         });
       }
     }
-
-
   };
-
 
   return (
     <View className="flex gap-5 pt-7 pl-6 pr-6 h-screen bg-background">
@@ -116,21 +116,22 @@ const Verification = () => {
 
       <View className="gap-7">
         <View>
-          {
-            type === 'forgot-password' ? (
-              <Text className="color-textSecondary text-sm leading-6">
-                Please enter the 4-digit recovery code sent to your email to reset your password.
-              </Text>
-            ) : (
-              <Text className="color-textSecondary text-sm leading-6">
-                Please enter the 4-digit verification code sent to your email to complete your registration.
-              </Text>
-            )
-          }
+          {type === "forgot-password" ? (
+            <Text className="color-textSecondary text-sm leading-6">
+              Please enter the 4-digit recovery code sent to your email to reset
+              your password.
+            </Text>
+          ) : (
+            <Text className="color-textSecondary text-sm leading-6">
+              Please enter the 4-digit verification code sent to your email to
+              complete your registration.
+            </Text>
+          )}
         </View>
 
         <Text className="color-textSecondary text-sm leading-6">
-          The code has been shared on your registered email. If you didn’t receive it, please check your spam folder.
+          The code has been shared on your registered email. If you didn’t
+          receive it, please check your spam folder.
         </Text>
 
         <Formik
@@ -147,7 +148,11 @@ const Verification = () => {
                 </Text>
               )}
 
-              <Button text={loading ? <ActivityIndicator color={"#fff"} /> : 'Verify'} onPress={handleSubmit} />
+              <Button
+                text={loading ? <ActivityIndicator color={"#fff"} /> : "Verify"}
+                onPress={handleSubmit}
+                disabled={!!errors.otp || loading}
+              />
 
               <View>
                 <Text className="color-textSecondary text-sm text-center">
