@@ -71,7 +71,7 @@ const Signup = () => {
       Toast.show({
         type: 'error',
         text1: 'Signup Failed',
-        text2: res?.error?.error?.message || 'An unexpected error occurred. Please try again.'
+        text2: res?.error?.error?.message 
       });
     }
 
@@ -158,7 +158,11 @@ const Signup = () => {
 
             {/* Signup Button */}
             <View className="flex gap-2">
-              <Button text={loading ? <ActivityIndicator color={"#fff"} /> : 'Sign Up'} onPress={handleSubmit} />
+              <Button 
+                text={loading ? <ActivityIndicator color={"#fff"} /> : 'Sign Up'} 
+                onPress={handleSubmit}
+                disabled={!!(errors.email || errors.password || errors.confirmPassword) || loading}
+              />
 
               {/* Divider */}
               <View className="flex flex-row items-center my-4">

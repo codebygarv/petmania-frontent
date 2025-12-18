@@ -107,6 +107,7 @@ const ForgotPasswordChange = () => {
             <Button
               text={loading ? <ActivityIndicator color={"#fff"} /> : "Update Password"}
               onPress={handleSubmit}
+              disabled={!!(errors.password || errors.confirmPassword) || loading}
             />
           </View>
         )}

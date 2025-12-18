@@ -87,12 +87,16 @@ const ForgotPassword = () => {
                   onChangeText={handleChange("email")}
                 />
                 {touched.email && errors.email && (
-                  <Text className="text-red-500 text-xs text-center">
+                  <Text className="text-red-500 text-xs ">
                     {errors.email}
                   </Text>
                 )}
 
-                <Button text={loading ? <ActivityIndicator color={"#fff"} /> : 'Send'} onPress={handleSubmit} />
+                <Button 
+                  text={loading ? <ActivityIndicator color={"#fff"} /> : 'Send'} 
+                  onPress={handleSubmit}
+                  disabled={!!errors.email || loading}
+                />
               </View>
             )}
           </Formik>
