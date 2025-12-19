@@ -8,7 +8,7 @@ import { config } from "@/constants/config";
 
 const Index = () => {
   const [user, setUser] = useState(null);
-  const [activeIndex, setActiveIndex] = useState(null);
+  const [activeIndex, setActiveIndex] = useState(0);
   const [activeCategory, setActiveCategory] = useState("dog");
 
   useEffect(() => {
@@ -183,34 +183,49 @@ const Index = () => {
     return "Good Evening 🌙";
   };
 
+  const getUserInitials = () => {
+    if (!user) return "U";
+  
+    let text = "";
+    if (user.name) {
+      text = user.name.trim();
+    } else if (user.email) {
+      text = user.email.split("@")[0].trim();
+    } else {
+      return "U";
+    }
+
+    if (text.length === 0) return "U";
+    
+    const firstChar = text.charAt(0).toUpperCase();
+    const lastChar = text.length > 1 ? text.charAt(text.length - 1).toUpperCase() : firstChar;
+    
+    return firstChar + lastChar;
+  };
+
   return (
     <View className="flex-1 bg-background">
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 20 }}
-      >
-        <View className="flex gap-4 pt-7 pl-6 pr-6">
-          <View className="flex flex-row items-center">
-            <View className="flex justify-center items-center w-10 h-10 p-1 rounded-2xl overflow-hidden bg-loginSigcnupImageBg">
-              <Image
-                source={
-                  {
-                    // uri: "",
-                  }
-                }
-                style={{ width: "100%", height: "100%" }}
-              />
-            </View>
-            <Text className="text-center mx-20 text-xl color-textPrimary">
-              <Ionicons name="location-outline" size={20} color={"#E0583D"} />
-              <Text className="font-bold">Kurukshetra</Text>,IN
+      <View className="flex gap-4 pt-7 pl-6 pr-6">
+        <View className="flex flex-row items-center">
+          <View className="flex justify-center items-center w-10 h-10 rounded-2xl overflow-hidden bg-buttonPrimary">
+            <Text className="text-white font-bold text-sm">
+              {getUserInitials()}
             </Text>
-
-            <View className="flex justify-center items-center w-10 h-10 p-1 rounded-2xl overflow-hidden bg-loginSigcnupImageBg">
-              <Ionicons name="search-outline" size={20} color={"#000"} />
-            </View>
           </View>
+          <Text className="text-center mx-20 text-xl color-textPrimary">
+            <Ionicons name="location-outline" size={20} color={"#E0583D"} />
+            <Text className="font-bold">Kurukshetra</Text>,IN
+          </Text>
 
+          <View className="flex justify-center items-center w-10 h-10 p-1 rounded-2xl overflow-hidden bg-loginSigcnupImageBg">
+            <Ionicons name="search-outline" size={20} color={"#000"} />
+          </View>
+        </View>
+
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 20 }}
+        >
           <View className="flex gap-4 pt-5">
             <Text className="text-xl font-bold color-textPrimary">
               Hi {user?.email?.split("@")[0]?.split("+")[0]?.trim()}
@@ -230,12 +245,10 @@ const Index = () => {
                   }}
                   className="mr-6 items-center"
                 >
-                  {/* Pill */}
                   <View
                     className={`h-24 w-16 rounded-full items-center justify-center
               ${isActive ? "bg-buttonPrimary" : "bg-backgroundSecondary"}`}
                   >
-                    {/* Image circle */}
                     <View className="h-10 w-10 bg-white rounded-full items-center justify-center">
                       <Image
                         source={categ.ImageSrc}
@@ -243,8 +256,6 @@ const Index = () => {
                         resizeMode="contain"
                       />
                     </View>
-
-                    {/* Text inside pill */}
                     <Text
                       className={`text-xs text-center mt-2
                 ${isActive ? "text-white" : "text-gray-600"}`}
@@ -261,12 +272,10 @@ const Index = () => {
             {petData[activeCategory]?.map((pet) => (
               <View key={pet.id} className="w-[48%] mb-4">
                 <View className={`rounded-3xl p-4 ${pet.bg}`}>
-                  {/* Heart */}
                   <View className="absolute top-3 right-3">
                     <Ionicons name="heart" size={18} color="#E0583D" />
                   </View>
 
-                  {/* Image */}
                   <Image
                     source={pet.image}
                     className="w-full h-28"
@@ -274,7 +283,6 @@ const Index = () => {
                   />
                 </View>
 
-                {/* Info */}
                 <View className="mt-2">
                   <Text className="font-bold text-base color-textPrimary">
                     {pet.name}
@@ -294,8 +302,8 @@ const Index = () => {
               </View>
             ))}
           </View>
-        </View>
-      </ScrollView>
+        </ScrollView>
+      </View>
     </View>
   );
 };
