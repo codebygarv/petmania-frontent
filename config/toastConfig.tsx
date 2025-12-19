@@ -16,7 +16,7 @@ export const toastConfig = {
                         ? "#1E293B"
                         : "#fcfbfbff";
 
-        const color = isDark ? "#ffffff" : "#1C1C1C";
+        const color = isDark ? "#1C1C1C" : "#fcfbfbff";
 
         return (
             <View

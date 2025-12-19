@@ -11,6 +11,8 @@ import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import { signupAction } from "@/redux/actions/userActions";
 import Toast from "react-native-toast-message";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 
 const { width, height } = Dimensions.get("window");
 
@@ -47,23 +49,32 @@ const Signup = () => {
   const isDark = colorScheme === "dark";
 
   const handleSubmit = async (values: SignupFormValues) => {
-    console.log("Signup Data:", values);
-
-    // Example: you can dispatch signup action or navigate
+    console.log("Signup Data:", values);  // remove this line in production
     const res = await dispatch(signupAction(values));
+    console.log("Signup Response:", res);  // remove this line in production
 
-    if (res.error) {
-      // Toast or Alert can go here
-    } else {
+    if (res?.error?.success === false) {
+      Toast.show({
+        type: 'error',
+        text1: 'Signup Failed',
+        text2: res?.error?.error?.message ,
+      });
+    } else if (res?.success === true || res?.data?.success === true) {
       Toast.show({
         type: 'success',
         text1: 'Signup Successful',
         text2: 'We have sent a verification code to your email.'
       });
-      router.push("/verification");
+      await AsyncStorage.setItem('email', values.email); // for next verification step
+      router.push("/verification?type=register");
+    } else {
+      Toast.show({
+        type: 'error',
+        text1: 'Signup Failed',
+        text2: res?.error?.error?.message 
+      });
     }
 
-    // Toast or Alert can go here
   };
 
   const handleLogin = () => {
@@ -147,7 +158,11 @@ const Signup = () => {
 
             {/* Signup Button */}
             <View className="flex gap-2">
-              <Button text={loading ? <ActivityIndicator color={"#fff"} /> : 'Sign In'} onPress={handleSubmit} />
+              <Button 
+                text={loading ? <ActivityIndicator color={"#fff"} /> : 'Sign Up'} 
+                onPress={handleSubmit}
+                disabled={!!(errors.email || errors.password || errors.confirmPassword) || loading}
+              />
 
               {/* Divider */}
               <View className="flex flex-row items-center my-4">
