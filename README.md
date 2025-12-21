@@ -1,50 +1,48 @@
-# Welcome to your Expo app 👋
+## Petmania
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Petmania is a mobile frontend built with Expo and React Native. It provides the UI, navigation, and client-side state for a pet-focused app (authentication, profiles, chat, favorites, etc.). This repository contains the app source, UI components, API wrappers, and client-side state management.
 
-## Get started
+Tech stack
+- Expo + React Native
+- TypeScript / JSX
+- Redux for global state
+- React Query (query/) for server state
+- Axios (api/) for HTTP requests
+- Tailwind / NativeWind for styling
 
+Quick start
 1. Install dependencies
 
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+```
+npm install
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+2. Start the Expo development server
 
-## Learn more
+```
+npx expo start
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+Codebase overview
+- `app/`: Screens and navigation layouts (authentication flow, main tab screens)
+- `api/`: Axios instance and API wrappers
+- `components/`: Reusable UI components (buttons, inputs, OTP, search, etc.)
+- `assets/`: Images and static assets
+- `config/`: App configuration such as toast setup
+- `constants/`: Shared constants and hard-coded text
+- `hooks/`: Custom React hooks (e.g., `useUsers`)
+- `query/`: React Query client setup
+- `redux/`: Redux store, actions, reducers, and persistence config
+- `css/`: Global CSS
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+Environment & notes
+- This project expects a typical Expo workflow. If there are environment variables or API endpoints, check `api/` and `config/` for places to configure them.
+- Run on a simulator or a physical device via the Expo dev tools opened by `npx expo start`.
 
-## Join the community
+Contributing
+- Open an issue or a PR with a clear description and reproduction steps.
 
-Join our community of developers creating universal apps.
+License
+- Add a license file if you intend to open-source this project.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+For more details, explore the folders listed above to find screen implementations, components, and API usage.

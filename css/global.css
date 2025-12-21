@@ -7,6 +7,7 @@
     --color-background: 255 255 255; /* #FFFFFF */
     --color-background-secondary: 249 249 249; /* #F9F9F9 */
     --color-text-primary: 28 28 28; /* #1C1C1C */
+    --color-orange: 249 115 22;
     --color-text-secondary: 110 110 110; /* #6E6E6E */
     --color-text-high: 0 0 0; /* #000000 */
     --color-button-primary: 224 88 61; /* #E0583D */
@@ -15,6 +16,7 @@
     --color-input-bg: 255 255 255; /* #FFFFFF */
     --color-input-border: 229 229 229; /* #E5E5E5 */
     --color-input-placeholder: 154 154 154; /* #9A9A9A */
+    --color-input-icon: 28 28 28;
     --color-accent: 224 88 61; /* #E0583D */
     --color-highlight: 254 198 78; /* #FEC64E */
     --color-error: 230 69 69; /* #E64545 */
@@ -22,12 +24,16 @@
     --color-warning: 255 152 0; /* #FF9800 */
     --color-border: 229 229 229; /* #E5E5E5 */
     --color-shadow: 0 0 0 / 0.1; /* rgba(0,0,0,0.1) */
+    --color-login-singup-image-bg: 224 88 61; /* #E0583D */
+    --bg-Social-button: 240 240 240;
+    --color-input-icon-dark: 237 237 237;
   }
-  
+
   .dark {
     --color-background: 18 18 18; /* #121212 */
     --color-background-secondary: 30 30 30; /* #1E1E1E */
     --color-text-primary: 237 237 237; /* #EDEDED */
+    --color-orange: 251 146 60;
     --color-text-secondary: 154 154 154; /* #9A9A9A */
     --color-text-high: 255 255 255; /* #FFFFFF */
     --color-button-primary: 224 88 61; /* #E0583D */
@@ -36,6 +42,7 @@
     --color-input-bg: 30 30 30; /* #1E1E1E */
     --color-input-border: 58 58 58; /* #3A3A3A */
     --color-input-placeholder: 117 117 117; /* #757575 */
+    --color-input-icon: 237 237 237;
     --color-accent: 224 88 61; /* #E0583D */
     --color-highlight: 254 198 78; /* #FEC64E */
     --color-error: 230 69 69; /* #E64545 */
@@ -43,5 +50,7 @@
     --color-warning: 255 152 0; /* #FF9800 */
     --color-border: 44 44 44; /* #2C2C2C */
     --color-shadow: 0 0 0 / 0.6; /* rgba(0,0,0,0.6) */
+    --color-login-singup-image-bg: 224 88 61; /* #E0583D */
+    --bg-Social-button: 2 2 2;
   }
 }
