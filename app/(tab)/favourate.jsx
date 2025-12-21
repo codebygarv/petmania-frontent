@@ -56,6 +56,7 @@ const favourate = () => {
       updatedUser: "Emma",
       postDate: "20 Jan",
       description: "Energetic Labrador, perfect for active families.",
+      bg: "bg-indigo-100"
     },
     {
       id: 5,
@@ -81,6 +82,7 @@ const favourate = () => {
       updatedUser: "Lisa",
       postDate: "25 Jan",
       description: "Friendly Beagle puppy, loves to play and explore.",
+      bg: "bg-pink-100"
     },
     {
       id: 7,
@@ -106,6 +108,7 @@ const favourate = () => {
       updatedUser: "Jessica",
       postDate: "30 Jan",
       description: "Adorable French Bulldog, great apartment pet.",
+      bg: "bg-yellow-100"
     },
     {
       id: 9,
@@ -118,6 +121,7 @@ const favourate = () => {
       updatedUser: "Chris",
       postDate: "2 Feb",
       description: "Elegant Russian Blue with silky gray coat.",
+      bg: "bg-blue-100"
     },
     {
       id: 10,
@@ -143,6 +147,7 @@ const favourate = () => {
       updatedUser: "Amanda",
       postDate: "8 Feb",
       description: "Playful Tuxedo cat with black and white markings.",
+      bg: "bg-pink-100"
     },
     {
       id: 12,
@@ -193,6 +198,7 @@ const favourate = () => {
       updatedUser: "Robert",
       postDate: "18 Feb",
       description: "Beautiful white Persian with long fluffy coat.",
+      bg: "bg-gray-100"
     },
     {
       id: 16,
@@ -243,6 +249,7 @@ const favourate = () => {
       updatedUser: "Daniel",
       postDate: "28 Feb",
       description: "Gentle Ragdoll cat, loves to be held and cuddled.",
+      bg: "bg-orange-100"
     },
     {
       id: 20,
@@ -255,7 +262,7 @@ const favourate = () => {
       updatedUser: "Patricia",
       postDate: "1 Mar",
       description: "Gentle giant Great Dane, very friendly despite size.",
-      bg: "bg-purple-100"
+      bg: "bg-pink-100"
     }
   ]
   
@@ -274,7 +281,7 @@ const favourate = () => {
               return (
                 <View key={pet.id} className="mb-4">
                   <View className={`rounded-3xl p-4 ${pet.bg || "bg-gray-100"} flex-row items-center`}>
-                    <View className="w-24 h-24 rounded-2xl overflow-hidden bg-white mr-4 ">
+                    <View className="w-24 h-24 rounded-2xl overflow-hidden  mr-4 ">
                       <Image
                         source={pet.image}
                         className="w-full h-full"
