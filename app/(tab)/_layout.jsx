@@ -1,11 +1,13 @@
 import { Tabs } from "expo-router";
 import { useColorScheme } from "nativewind";
 import { TouchableOpacity } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 
 export default function TabLayout() {
   const { colorScheme } = useColorScheme();
   const isDark = colorScheme === "dark";
+  const insets = useSafeAreaInsets();
 
   return (
     <Tabs
@@ -15,7 +17,8 @@ export default function TabLayout() {
         tabBarStyle: {
           backgroundColor: isDark ? "#0B0B0B" : "#FFFFFF",
           borderTopWidth: 0,
-          height: 20,
+          paddingTop: 8,
+          height: 50,
         },
 
         tabBarButton: (props) => (
@@ -23,7 +26,7 @@ export default function TabLayout() {
         ),
 
         tabBarActiveTintColor: isDark
-          ? "#E0583D" // bg-buttonPrimary
+          ? "#E0583D" 
           : "#E0583D",
 
         tabBarInactiveTintColor: isDark ? "#ffffff" : "#6B7280",

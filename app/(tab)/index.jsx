@@ -5,11 +5,14 @@ import { Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { config } from "@/constants/config";
+import { router } from "expo-router";
+import Search from "@/components/Search";
 
 const Index = () => {
   const [user, setUser] = useState(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [activeCategory, setActiveCategory] = useState("dog");
+  const [showSearch, setShowSearch] = useState(false);
 
   useEffect(() => {
     const loadUser = async () => {
@@ -198,14 +201,17 @@ const Index = () => {
     if (text.length === 0) return "U";
     
     const firstChar = text.charAt(0).toUpperCase();
-    const lastChar = text.length > 1 ? text.charAt(text.length - 1).toUpperCase() : firstChar;
+    const firstChar2 = text.charAt(1).toUpperCase();
     
-    return firstChar + lastChar;
+    return firstChar + firstChar2;
   };
 
   return (
     <View className="flex-1 bg-background">
-      <View className="flex gap-4 pt-7 pl-6 pr-6">
+      {showSearch ? (
+        <Search onClose={() => setShowSearch(false)} />
+      ) : (
+        <View className="flex gap-4 pt-7 pl-6 pr-6">
         <View className="flex flex-row items-center">
           <View className="flex justify-center items-center w-10 h-10 rounded-2xl overflow-hidden bg-buttonPrimary">
             <Text className="text-white font-bold text-sm">
@@ -217,9 +223,12 @@ const Index = () => {
             <Text className="font-bold">Kurukshetra</Text>,IN
           </Text>
 
-          <View className="flex justify-center items-center w-10 h-10 p-1 rounded-2xl overflow-hidden bg-loginSigcnupImageBg">
+          <Pressable
+            onPress={() => setShowSearch(true)}
+            className="flex justify-center items-center w-10 h-10 p-1 rounded-2xl overflow-hidden bg-loginSigcnupImageBg"
+          >
             <Ionicons name="search-outline" size={20} color={"#000"} />
-          </View>
+          </Pressable>
         </View>
 
         <ScrollView
@@ -304,6 +313,7 @@ const Index = () => {
           </View>
         </ScrollView>
       </View>
+      )}
     </View>
   );
 };

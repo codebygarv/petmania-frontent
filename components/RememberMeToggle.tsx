@@ -41,13 +41,13 @@ const RememberMeToggle: React.FC<RememberMeToggleProps> = ({
       </View>
 
       {/* Right Side: Forgot Password */}
-      <Link href="/forgotPassword">
+      {/* <Link href="/forgotPassword">  */}
         <TouchableOpacity onPress={handleForgotPassword} >
           <Text className="text-[14px] font-semibold color-textOrange">
             Forgot password?
           </Text>
         </TouchableOpacity>
-      </Link>
+      {/* </Link> */}
     </View>
   );
 };
