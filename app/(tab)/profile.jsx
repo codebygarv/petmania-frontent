@@ -35,7 +35,7 @@ const Profile = () => {
 
     const firstChar = text.charAt(0).toUpperCase();
     const firstChar2 = text.charAt(1).toUpperCase();
-    
+
     return firstChar + firstChar2;
   };
 
@@ -66,12 +66,7 @@ const Profile = () => {
       icon: "person-outline",
       color: "#E0583D",
       onPress: () => {
-        // Navigate to edit profile page
-        Toast.show({
-          type: "info",
-          text1: "Coming Soon",
-          text2: "Edit profile feature will be available soon",
-        });
+        router.push("/EditProfile");
       },
     },
     {
@@ -80,25 +75,11 @@ const Profile = () => {
       icon: "paw-outline",
       color: "#E0583D",
       onPress: () => {
-        Toast.show({
-          type: "info",
-          text1: "Coming Soon",
-          text2: "Edit profile feature will be available soon",
-        });
+        router.push("/AddPets");
       },
     },
     {
       id: 3,
-      title: "My Favorites",
-      icon: "heart-outline",
-      color: "#E0583D",
-      onPress: () => {
-        // Navigate to favorites 
-        router.push("/(tab)/favourate");
-      },
-    },
-    {
-      id: 4,
       title: "Settings",
       icon: "settings-outline",
       color: "#666",
@@ -111,7 +92,7 @@ const Profile = () => {
       },
     },
     {
-      id: 5,
+      id: 4,
       title: "Help & Support",
       icon: "help-circle-outline",
       color: "#666",
@@ -124,7 +105,7 @@ const Profile = () => {
       },
     },
     {
-      id: 6,
+      id: 5,
       title: "About",
       icon: "information-circle-outline",
       color: "#666",
