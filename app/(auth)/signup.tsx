@@ -1,12 +1,219 @@
-import { View, Text } from 'react-native'
-import React from 'react'
+import { View, Text, Image, TouchableOpacity, Dimensions, ActivityIndicator } from "react-native";
+import React from "react";
+import { config } from "@/constants/config";
+import Input from "@/components/Input";
+import Button from "@/components/Button";
+import SocialLoginButtons from "@/components/SocialLoginButtons";
+import { router } from "expo-router";
+import { useColorScheme } from "nativewind";
+import { Formik } from "formik";
+import * as Yup from "yup";
+import { useDispatch, useSelector } from "react-redux";
+import { signupAction } from "@/redux/actions/userActions";
+import Toast from "react-native-toast-message";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const signup = () => {
-  return (
-    <View>
-      <Text>signup Page</Text>
-    </View>
-  )
+
+const { width, height } = Dimensions.get("window");
+
+const getImageDimensions = () => {
+  const IMAGE_WIDTH = height > 850 ? width * 0.5 : width * 0.4;
+  const IMAGE_HEIGHT = IMAGE_WIDTH * 0.9;
+  return { IMAGE_WIDTH, IMAGE_HEIGHT };
+};
+
+const validationSchema = Yup.object().shape({
+  email: Yup.string()
+    .email("Invalid email format")
+    .required("Email is required"),
+  password: Yup.string()
+    .min(6, "Password must be at least 6 characters")
+    .required("Password is required"),
+  confirmPassword: Yup.string()
+    .oneOf([Yup.ref("password")], "Passwords must match")
+    .required("Confirm Password is required"),
+});
+
+interface SignupFormValues {
+  email: string;
+  password: string;
+  confirmPassword: string;
 }
 
-export default signup
+const Signup = () => {
+  const { colorScheme } = useColorScheme();
+  const { IMAGE_WIDTH, IMAGE_HEIGHT } = getImageDimensions();
+  const dispatch = useDispatch<any>();
+  const loading = useSelector((state: any) => state.user.loading);
+
+  const isDark = colorScheme === "dark";
+
+  const handleSubmit = async (values: SignupFormValues) => {
+    console.log("Signup Data:", values);  // remove this line in production
+    const res = await dispatch(signupAction(values));
+    console.log("Signup Response:", res);  // remove this line in production
+
+    if (res?.error?.success === false) {
+      Toast.show({
+        type: 'error',
+        text1: 'Signup Failed',
+        text2: res?.error?.error?.message ,
+      });
+    } else if (res?.success === true || res?.data?.success === true) {
+      Toast.show({
+        type: 'success',
+        text1: 'Signup Successful',
+        text2: 'We have sent a verification code to your email.'
+      });
+      await AsyncStorage.setItem('email', values.email); // for next verification step
+      router.push("/verification?type=register");
+    } else {
+      Toast.show({
+        type: 'error',
+        text1: 'Signup Failed',
+        text2: res?.error?.error?.message 
+      });
+    }
+
+  };
+
+  const handleLogin = () => {
+    router.push("/(auth)");
+  };
+
+  return (
+    <View className="flex gap-4 pt-7 pl-6 pr-6 h-screen bg-background">
+      {/* Top Icon */}
+      <View className="flex justify-center items-center w-20 h-20 p-2 mx-auto rounded-3xl overflow-hidden bg-loginSigcnupImageBg">
+        <Image
+          source={config.loginSignupImageBg}
+          style={{ width: "100%", height: "100%" }}
+          resizeMode="cover"
+        />
+      </View>
+
+      {/* Formik Setup */}
+      <Formik
+        initialValues={{ email: "", password: "", confirmPassword: "" }}
+        validationSchema={validationSchema}
+        onSubmit={handleSubmit}
+      >
+        {({
+          handleChange,
+          handleSubmit,
+          values,
+          errors,
+          touched,
+        }) => (
+          <View className="flex gap-5">
+            {/* Header */}
+            <View className="flex gap-3">
+              <Text className="text-3xl text-center font-semibold color-textPrimary">
+                Create Account
+              </Text>
+              <Text className="text-sm text-center opacity-55 color-textSecondary">
+                Let&apos;s get started!
+              </Text>
+            </View>
+
+            {/* Input Fields */}
+            <View className="flex gap-4">
+              <Input
+                label="Email"
+                icon="mail-outline"
+                placeholder="Enter your email"
+                textValue={values.email}
+                onChangeText={handleChange("email")}
+              />
+              {touched.email && errors.email && (
+                <Text className="text-red-500 text-xs">{errors.email}</Text>
+              )}
+
+              <Input
+                label="Password"
+                type="password"
+                icon="lock-closed-outline"
+                placeholder="Enter password"
+                textValue={values.password}
+                onChangeText={handleChange("password")}
+              />
+              {touched.password && errors.password && (
+                <Text className="text-red-500 text-xs">{errors.password}</Text>
+              )}
+
+              <Input
+                label="Confirm Password"
+                type="password"
+                icon="lock-closed-outline"
+                placeholder="Confirm your password"
+                textValue={values.confirmPassword}
+                onChangeText={handleChange("confirmPassword")}
+              />
+              {touched.confirmPassword && errors.confirmPassword && (
+                <Text className="text-red-500 text-xs">
+                  {errors.confirmPassword}
+                </Text>
+              )}
+            </View>
+
+            {/* Signup Button */}
+            <View className="flex gap-2">
+              <Button 
+                text={loading ? <ActivityIndicator color={"#fff"} /> : 'Sign Up'} 
+                onPress={handleSubmit}
+                disabled={!!(errors.email || errors.password || errors.confirmPassword) || loading}
+              />
+
+              {/* Divider */}
+              <View className="flex flex-row items-center my-4">
+                <View className="flex-1 h-[1px] bg-textPrimary" />
+                <Text className="text-sm text-center color-textPrimary mx-3">
+                  OR
+                </Text>
+                <View className="flex-1 h-[1px] bg-textPrimary" />
+              </View>
+
+              {/* Social Buttons */}
+              <SocialLoginButtons />
+
+              {/* Navigate to Login */}
+              <View className="flex-row justify-center items-center">
+                <Text className="text-sm font-semibold color-textPrimary">
+                  Already have an account?
+                </Text>
+                <TouchableOpacity onPress={handleLogin}>
+                  <Text className="text-sm font-semibold text-orange-500 ml-1">
+                    Sign In
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Terms & Conditions */}
+            <Text className="color-textSecondary text-center text-[11px] leading-6">
+              By registering, you accept our Terms & Conditions and Privacy
+              Policy.
+            </Text>
+          </View>
+        )}
+      </Formik>
+
+      {/* Bottom Image */}
+      {/* <View
+        className="flex justify-center items-center p-2 mx-auto rounded-3xl overflow-hidden"
+        style={{
+          width: IMAGE_WIDTH,
+          height: IMAGE_HEIGHT,
+        }}
+      >
+        <Image
+          source={config.SignupBottomImage}
+          style={{ width: "100%", height: "100%", borderRadius: 24 }}
+          resizeMode="cover"
+        />
+      </View> */}
+    </View>
+  );
+};
+
+export default Signup;
