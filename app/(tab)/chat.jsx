@@ -130,18 +130,6 @@ const Chat = () => {
         <View className="flex gap-4 pt-7 pl-6 pr-6">
           <View className="flex-row items-center justify-between mb-2">
             <Text className="text-2xl font-bold color-textPrimary">Messages</Text>
-            <TouchableOpacity
-              onPress={() => {
-                Toast.show({
-                  type: "info",
-                  text1: "Coming Soon",
-                  text2: "New message feature will be available soon",
-                });
-              }}
-              className="w-10 h-10 rounded-full bg-buttonPrimary items-center justify-center"
-            >
-              <Ionicons name="add" size={24} color="#FFFFFF" />
-            </TouchableOpacity>
           </View>
 
           <View className="flex-row items-center bg-backgroundSecondary rounded-2xl px-4 py-3 mb-2">
