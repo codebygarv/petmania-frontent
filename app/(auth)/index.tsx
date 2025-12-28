@@ -18,9 +18,13 @@ import { router } from "expo-router";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
-import { loginAction } from "@/redux/actions/userActions";
+import { googleLoginAction, loginAction } from "@/redux/actions/userActions";
 import Toast from "react-native-toast-message";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
+import * as AuthSession from "expo-auth-session";
+
+// console.log("AuthSession.makeRedirectUri()", AuthSession.makeRedirectUri({ useProxy: true })); 
 
 const { width, height } = Dimensions.get("window");
 
@@ -91,6 +95,7 @@ const Index = () => {
   // const changeColor = () => {
   //   setColorScheme(colorScheme === "dark" ? "light" : "dark");
   // };
+
 
   const handleSignup = () => {
     router.push("/signup");
