@@ -8,6 +8,13 @@ const initalState = {
 
 export const userReducer = (state = initalState, action) => {
     switch (action.type) {
+        case 'persist/REHYDRATE':
+            // When redux-persist restores state, ensure transient flags like
+            // `loading` are reset to false to avoid UI showing spinners.
+            return {
+                ...state,
+                loading: false,
+            };
         case userConstants.USER_LOGIN_REQUEST:
             return {
                 ...state,
