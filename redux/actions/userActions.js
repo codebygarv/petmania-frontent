@@ -40,11 +40,11 @@ export const loginAction = (userData) => {
     };
 };
 
-export const googleLoginAction = (idToken) => {
+export const googleLoginAction = (accessToken) => {
     return async (dispatch) => {
         dispatch({ type: userConstants.USER_GOOGLE_LOGIN_REQUEST });
         try {
-            const res = await axiosInstance.post('/user/googleLogin', { idToken });
+            const res = await axiosInstance.post('/user/google', { accessToken });
             if (res.status === 200) {
                 dispatch({
                     type: userConstants.USER_GOOGLE_LOGIN_ACCEPT,
