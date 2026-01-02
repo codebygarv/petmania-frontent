@@ -67,6 +67,7 @@ export default function RootLayout() {
                   <Stack.Screen name="(tab)" />
                   <Stack.Screen name="AddPets" />
                   <Stack.Screen name="EditProfile" />
+                  <Stack.Screen name="HelpSupport" />
                 </Stack>
               </View>
               <Toast config={toastConfig} />

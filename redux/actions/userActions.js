@@ -1,5 +1,13 @@
 import axiosInstance from '../../api/axiosInstance'
 import { userConstants } from '../constants/usersConstants';
+import * as WebBrowser from "expo-web-browser";
+import * as Google from "expo-auth-session/providers/google";
+
+WebBrowser.maybeCompleteAuthSession();
+
+const discovery = {
+    authorizationEndpoint: "https://accounts.google.com/o/oauth2/v2/auth",
+};
 
 export const loginAction = (userData) => {
     return async (dispatch) => {
@@ -24,13 +32,42 @@ export const loginAction = (userData) => {
         } catch (error) {
             dispatch({
                 type: userConstants.USER_LOGIN_FAILURE,
-                payload: { error: error?.response?.data   }
+                payload: { error: error?.response?.data }
             });
 
-            return { error: error?.response?.data  };
+            return { error: error?.response?.data };
         }
     };
 };
+
+export const googleLoginAction = (accessToken) => {
+    return async (dispatch) => {
+        dispatch({ type: userConstants.USER_GOOGLE_LOGIN_REQUEST });
+        try {
+            const res = await axiosInstance.post('/user/google', { accessToken });
+            if (res.status === 200) {
+                dispatch({
+                    type: userConstants.USER_GOOGLE_LOGIN_ACCEPT,
+                    payload: { user: res.data.user },
+                });
+                return res.data;
+            } else {
+                dispatch({
+                    type: userConstants.USER_GOOGLE_LOGIN_FAILURE,  
+                    payload: { error: res.data },
+                });
+                return { error: res.data };
+            }
+        } catch (error) {
+            dispatch({
+                type: userConstants.USER_GOOGLE_LOGIN_FAILURE,
+                payload: { error: error?.response?.data }
+            });
+
+            return { error: error?.response?.data };
+        }
+    };
+}
 
 export const signupAction = (userData) => {
     return async (dispatch) => {
@@ -84,7 +121,7 @@ export const verifyOtpAction = (otpData) => {
         } catch (error) {
             dispatch({
                 type: userConstants.USER_OTP_FAILURE,
-                payload: { error: error?.response?.data  }
+                payload: { error: error?.response?.data }
             });
             return { error: error?.response?.data };
         }
@@ -168,7 +205,7 @@ export const updatePasswordAction = (passwordData) => {
             else {
                 dispatch({
                     type: userConstants.USER_UPDATE_PASSWORD_FAILURE,
-                    payload: { error: res.data?.error  },
+                    payload: { error: res.data?.error },
                 });
                 return { error: res.data?.errors };
             }
