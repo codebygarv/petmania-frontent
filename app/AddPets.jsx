@@ -32,8 +32,8 @@ const AddPets = () => {
             if (permissionResult.granted === false) return;
 
             const options = { allowsEditing: true, quality: 0.6 };
-            if (ImagePicker.MediaType) options.mediaTypes = ImagePicker.MediaType.Images;
-            else if (ImagePicker.MediaTypeOptions) options.mediaTypes = ImagePicker.MediaTypeOptions.Images;
+            const mediaType = ImagePicker.MediaType ? ImagePicker.MediaType.Images : undefined;
+            if (mediaType) options.mediaTypes = mediaType;
 
             const result = await ImagePicker.launchImageLibraryAsync(options);
 

@@ -36,25 +36,25 @@ const SocialLoginButtons = () => {
       const { authentication } = response;
       const token = authentication?.accessToken;
       console.log("Google Access Token:", token);
-      // if (authentication?.accessToken) {
-      //   // You can fetch user info here if needed
-      //   const res = await dispatch(googleLoginAction(authentication.accessToken));
-      //   console.log("Google Login Response:", res);
-      //   if (res.success === true) {
-      //     AsyncStorage.setItem("userInfo", JSON.stringify(res.data.user));
-      //     AsyncStorage.setItem("token", res.data.token);
-      //     Toast.show({
-      //       type: "success",
-      //       text1: res.message,
-      //     });
-      //     router.replace("/(tab)");
-      //   } else {
-      //     Toast.show({
-      //       type: "error",
-      //       text1: res.message,
-      //     });
-      //   }
-      // }
+      if (authentication?.accessToken) {
+        // You can fetch user info here if needed
+        const res = await dispatch(googleLoginAction(authentication.accessToken));
+        console.log("Google Login Response:", res);
+        if (res.success === true) {
+          AsyncStorage.setItem("userInfo", JSON.stringify(res.data.user));
+          AsyncStorage.setItem("token", res.data.token);
+          Toast.show({
+            type: "success",
+            text1: res.message,
+          });
+          router.replace("/(tab)");
+        } else {
+          Toast.show({
+            type: "error",
+            text1: res.message,
+          });
+        }
+      }
     }
   };
 

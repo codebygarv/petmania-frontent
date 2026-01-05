@@ -158,6 +158,64 @@ export const forgotPasswordAction = (emailData) => {
 };
 
 
+export const getUserDetailsAction = () => {
+    return async (dispatch) => {
+        dispatch({ type: userConstants.USER_DETAILS_REQUEST });
+        try {
+            const res = await axiosInstance.get('/user/details');
+            if (res.status === 200) {
+                dispatch({
+                    type: userConstants.USER_DETAILS_ACCEPT,
+                    payload: { user: res.data.user },
+                });
+                return res.data;
+            }
+            else {
+                dispatch({
+                    type: userConstants.USER_DETAILS_FAILURE,
+                    payload: { error: res.data?.error },
+                });
+                return { error: res.data?.errors };
+            }
+        } catch (error) {
+            dispatch({
+                type: userConstants.USER_DETAILS_FAILURE,
+                payload: { error: error?.response?.data }
+            });
+            return { error: error?.response?.data };
+        }
+    };
+}
+
+export const updateUserProfileAction = (profileData) => {
+    return async (dispatch) => {
+        dispatch({ type: userConstants.USER_UPDATE_PROFILE_REQUEST });
+        try {
+            const res = await axiosInstance.put('/user/updateDetails', profileData);
+            if (res.status === 200) {
+                dispatch({
+                    type: userConstants.USER_UPDATE_PROFILE_ACCEPT,
+                    payload: { user: res.data.user },
+                });
+                return res.data;
+            }
+            else {
+                dispatch({
+                    type: userConstants.USER_UPDATE_PROFILE_FAILURE,
+                    payload: { error: res.data?.error || 'Updating profile failed' },
+                });
+                return { error: res.data?.errors };
+            }
+        } catch (error) {
+            dispatch({
+                type: userConstants.USER_UPDATE_PROFILE_FAILURE,
+                payload: { error: error?.response?.data || [{ type: "general", message: "Updating profile failed" }] }
+            });
+            return { error: error?.response?.data };
+        }
+    };
+}
+
 export const forgotPasswordOtpAction = (otpData) => {
     return async (dispatch) => {
         dispatch({ type: userConstants.USER_FORGOT_PASSWORD_OTP_REQUEST });
