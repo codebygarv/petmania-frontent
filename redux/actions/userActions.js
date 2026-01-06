@@ -191,6 +191,7 @@ export const updateUserProfileAction = (profileData) => {
     return async (dispatch) => {
         dispatch({ type: userConstants.USER_UPDATE_PROFILE_REQUEST });
         try {
+
             const res = await axiosInstance.put('/user/updateDetails', profileData);
             if (res.status === 200) {
                 dispatch({
