@@ -7,9 +7,13 @@ import BackButton from "@/components/BackButton";
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useColorScheme } from "nativewind";
+import Toast from "react-native-toast-message";
 
 const EditProfile = () => {
     const dispatch = useDispatch();
+    const { colorScheme } = useColorScheme();
+    const isDark = colorScheme === "dark";
 
     const [profileUri, setProfileUri] = useState(null);
     const [profileBase64, setProfileBase64] = useState(null);
@@ -55,10 +59,6 @@ const EditProfile = () => {
         }
     };
 
-    const handleSave = async () => {
-        // kept for compatibility, prefer using Formik's onSubmit instead
-        console.warn('Use the Save button in the form to submit');
-    };
 
     const fetchUserDetails = async () => {
         const res = await dispatch(getUserDetailsAction());
@@ -72,19 +72,19 @@ const EditProfile = () => {
                 phoneNumber: user?.phoneNumber || '',
                 email: user?.email || '',
                 gender: user?.Gender?.toLowerCase() || 'male',
-                dateOfBirth: user?.dateOfBirth ? String(user.dateOfBirth).slice(0,10) : '',
+                dateOfBirth: user?.dateOfBirth ? String(user.dateOfBirth).slice(0, 10) : '',
                 pinCode: user?.pinCode || '',
                 city: user?.city || '',
                 state: user?.state || '',
                 UserManualAddress: user?.UserManualAddress || user?.userManualAddress || '',
             });
-            if(userInfoParsed?.name){
+            if (userInfoParsed?.name) {
                 setInitialValues((prev) => ({ ...prev, name: userInfoParsed.name }));
             }
             if (user.profileImage) {
                 setProfileUri(user.profileImage);
             }
-            if(userInfoParsed?.avatar){
+            if (userInfoParsed?.avatar) {
                 setProfileUri(userInfoParsed?.avatar);
             }
             if (user.adharCardFrontImage) {
@@ -125,7 +125,7 @@ const EditProfile = () => {
         phoneNumber: Yup.string()
             .required('Phone number is required')
             .matches(/^\d{10}$/, 'Phone number must be 10 digits'),
-        gender: Yup.string().oneOf(['male','female','other']),
+        gender: Yup.string().oneOf(['male', 'female', 'other']),
         dateOfBirth: Yup.string()
             .required('Date of birth is required')
             .matches(/^\d{4}-\d{2}-\d{2}$/, 'Use YYYY-MM-DD')
@@ -151,7 +151,7 @@ const EditProfile = () => {
                 </View>
 
                 {/* Profile Image */}
-                <View className="items-center mt-6">
+                <View className="items-center mt-1">
                     <TouchableOpacity onPress={() => pickImage("profile")} className="items-center">
                         {profileUri ? (
                             <Image source={{ uri: profileUri }} className="w-28 h-28 rounded-full" />
@@ -187,19 +187,33 @@ const EditProfile = () => {
                             adharCardFrontImage: aadharFrontBase64 ? `data:image/jpeg;base64,${aadharFrontBase64}` : aadharFrontUri || null,
                             adharCardBackImage: aadharBackBase64 ? `data:image/jpeg;base64,${aadharBackBase64}` : aadharBackUri || null,
                         };
-
-                        console.log('Submitting payload:', payload);
-                        await dispatch(updateUserProfileAction(payload));
+                        const res = await dispatch(updateUserProfileAction(payload));
+                        console.log('Profile update response:', res);
                         setSubmitting(false);
+
+                        if(res?.success === true){
+                            Toast.show({
+                                type: "success",
+                                text1: "Profile Updated",
+                                text2: res?.message,
+                            });
+                        } else {
+                            Toast.show({
+                                type: "error",
+                                text1: "Update Failed",
+                                text2: res?.message,
+                            });
+                        }
                     }}
                 >
                     {({ handleChange, handleBlur, handleSubmit, values, errors, touched, isSubmitting, setFieldValue }) => (
-                        <View className="px-4 mt-6">
-                            <Text className="text-sm color-textPrimary mb-1">Full Name</Text>
+                        <View className="px-4 mt-6 gap-2">
+                            <Text className="text-sm color-textPrimary mb-1 text-extraBold">Full Name</Text>
                             <TextInput
                                 className="bg-backgroundSecondary rounded-xl px-3 py-2 mb-1"
                                 placeholder="Enter your name"
-                                placeholderTextColor="#999"
+                                placeholderTextColor={isDark ? "#888" : "#1a1a1aff"}
+                                color={isDark ? "#e0e0e0ff" : "#1a1a1aff"}
                                 value={values.name}
                                 onChangeText={handleChange('name')}
                                 onBlur={handleBlur('name')}
@@ -210,7 +224,8 @@ const EditProfile = () => {
                             <TextInput
                                 className="bg-backgroundSecondary rounded-xl px-3 py-2 mb-1"
                                 placeholder="Enter phone number"
-                                placeholderTextColor="#999"
+                                placeholderTextColor={isDark ? "#888" : "#1a1a1aff"}
+                                color={isDark ? "#e0e0e0ff" : "#1a1a1aff"}
                                 keyboardType="phone-pad"
                                 value={values.phoneNumber}
                                 onChangeText={handleChange('phoneNumber')}
@@ -222,7 +237,8 @@ const EditProfile = () => {
                             <TextInput
                                 className="bg-backgroundSecondary rounded-xl px-3 py-2 mb-3"
                                 placeholder="Enter email"
-                                placeholderTextColor="#999"
+                                placeholderTextColor={isDark ? "#888" : "#1a1a1aff"}
+                                color={isDark ? "#e0e0e0ff" : "#1a1a1aff"}
                                 keyboardType="email-address"
                                 value={values.email}
                                 editable={false}
@@ -233,7 +249,7 @@ const EditProfile = () => {
                                 {['male', 'female', 'other'].map((item) => (
                                     <TouchableOpacity
                                         key={item}
-                                        className={`px-3 py-2 rounded-md border ${values.gender === item ? 'bg-buttonPrimary border-buttonPrimary' : 'bg-backgroundSecondary border-gray-300'}`}
+                                        className={`px-3 mr-2 py-2 rounded-md border ${values.gender === item ? 'bg-buttonPrimary border-buttonPrimary' : 'bg-backgroundSecondary border-gray-300'}`}
                                         onPress={() => setFieldValue('gender', item)}
                                     >
                                         <Text className={`${values.gender === item ? 'text-white' : 'color-textPrimary'} text-sm`}>{item.toUpperCase()}</Text>
@@ -245,7 +261,8 @@ const EditProfile = () => {
                             <TextInput
                                 className="bg-backgroundSecondary rounded-xl px-3 py-2 mb-1"
                                 placeholder="YYYY-MM-DD"
-                                placeholderTextColor="#999"
+                                placeholderTextColor={isDark ? "#888" : "#1a1a1aff"}
+                                color={isDark ? "#e0e0e0ff" : "#1a1a1aff"}
                                 value={values.dateOfBirth}
                                 onChangeText={handleChange('dateOfBirth')}
                                 onBlur={handleBlur('dateOfBirth')}
@@ -256,7 +273,8 @@ const EditProfile = () => {
                             <TextInput
                                 className="bg-backgroundSecondary rounded-xl px-3 py-2 mb-1"
                                 placeholder="Enter pin code"
-                                placeholderTextColor="#999"
+                                placeholderTextColor={isDark ? "#888" : "#1a1a1aff"}
+                                color={isDark ? "#e0e0e0ff" : "#1a1a1aff"}
                                 keyboardType="number-pad"
                                 value={values.pinCode}
                                 onChangeText={handleChange('pinCode')}
@@ -268,7 +286,8 @@ const EditProfile = () => {
                             <TextInput
                                 className="bg-backgroundSecondary rounded-xl px-3 py-2 mb-1"
                                 placeholder="Enter city"
-                                placeholderTextColor="#999"
+                                placeholderTextColor={isDark ? "#888" : "#1a1a1aff"}
+                                color={isDark ? "#e0e0e0ff" : "#1a1a1aff"}
                                 value={values.city}
                                 onChangeText={handleChange('city')}
                                 onBlur={handleBlur('city')}
@@ -280,7 +299,8 @@ const EditProfile = () => {
                             <TextInput
                                 className="bg-backgroundSecondary rounded-xl px-3 py-2 mb-1"
                                 placeholder="Enter state"
-                                placeholderTextColor="#999"
+                                placeholderTextColor={isDark ? "#888" : "#1a1a1aff"}
+                                color={isDark ? "#e0e0e0ff" : "#1a1a1aff"}
                                 value={values.state}
                                 onChangeText={handleChange('state')}
                                 onBlur={handleBlur('state')}
@@ -292,7 +312,8 @@ const EditProfile = () => {
                             <TextInput
                                 className="bg-backgroundSecondary rounded-xl px-3 py-2 mb-3"
                                 placeholder="Enter address"
-                                placeholderTextColor="#999"
+                                placeholderTextColor={isDark ? "#888" : "#1a1a1aff"}
+                                color={isDark ? "#e0e0e0ff" : "#1a1a1aff"}
                                 value={values.UserManualAddress}
                                 onChangeText={handleChange('UserManualAddress')}
                                 onBlur={handleBlur('UserManualAddress')}
@@ -301,7 +322,7 @@ const EditProfile = () => {
                             {/* Aadhaar Upload */}
                             <Text className="text-base font-semibold color-textPrimary mb-3">Aadhaar Verification</Text>
 
-                            <View className="flex-row justify-between space-x-3 mb-4">
+                            <View className="flex-row justify-between space-x-3 mb-4 gap-4">
                                 <TouchableOpacity
                                     className="flex-1 h-36 bg-loginSigcnupImageBg rounded-md items-center justify-center"
                                     onPress={() => pickImage("aadharFront")}

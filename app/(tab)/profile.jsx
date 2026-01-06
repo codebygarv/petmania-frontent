@@ -43,6 +43,7 @@ const Profile = () => {
     try {
       await AsyncStorage.removeItem("token");
       await AsyncStorage.removeItem("user");
+      await AsyncStorage.removeItem("userInfo");
       await AsyncStorage.removeItem("verifyChangePassword");
       Toast.show({
         type: "success",
