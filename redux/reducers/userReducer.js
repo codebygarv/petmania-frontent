@@ -156,6 +156,45 @@ export const userReducer = (state = initalState, action) => {
                 loading: false,
                 error: action.payload.error,
             };
+        case userConstants.USER_DETAILS_REQUEST:
+            return {
+                ...state,
+                loading: true,
+                error: null,
+            };
+        case userConstants.USER_DETAILS_ACCEPT:
+            return {
+                ...state,
+                loading: false,
+                userInfo: action.payload.user,
+                error: null,
+            };
+        case userConstants.USER_DETAILS_FAILURE:
+            return {
+                ...state,
+                loading: false,
+                error: action.payload.error,
+            };
+
+        case userConstants.USER_UPDATE_PROFILE_REQUEST:
+            return {
+                ...state,
+                loading: true,
+                error: null,
+            };
+        case userConstants.USER_UPDATE_PROFILE_ACCEPT:
+            return {
+                ...state,
+                loading: false,
+                userInfo: action.payload.user,
+                error: null,
+            };
+        case userConstants.USER_UPDATE_PROFILE_FAILURE:
+            return {
+                ...state,
+                loading: false,
+                error: action.payload.error,
+            };
         default:
             return state;
     }
