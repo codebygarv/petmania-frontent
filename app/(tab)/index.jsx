@@ -256,22 +256,25 @@ const Index = () => {
   }, []);
 
   return (
-    <View className="flex-1 bg-background">
+    <View className="flex-1 bg-background overflow-hidden">
       {showSearch ? (
         <Search onClose={() => setShowSearch(false)} />
       ) : (
         <View className="flex gap-4 pt-7 pl-6 pr-6">
-          <View className="flex flex-row items-center">
+          <View className="flex flex-row items-center justify-between">
             <View className="flex justify-center items-center w-10 h-10 rounded-2xl overflow-hidden bg-buttonPrimary">
               <Text className="text-white font-bold text-sm">
                 {getUserInitials()}
               </Text>
             </View>
-            <Text className="text-center mx-20 text-xl color-textPrimary">
-              <Ionicons name="location-outline" size={20} color={"#E0583D"} />
-              <Text className="font-bold">{location?.city || "Unknown Location"}</Text>
-            </Text>
-
+            {
+              location?.city && (
+                <Text className="text-center mx-20 text-xl color-textPrimary">
+                  <Ionicons name="location-outline" size={20} color={"#E0583D"} />
+                  <Text className="font-bold">{location?.city}</Text>
+                </Text>
+              )
+            }
             <Pressable
               onPress={() => setShowSearch(true)}
               className="flex justify-center items-center w-10 h-10 p-1 rounded-2xl overflow-hidden bg-loginSigcnupImageBg"
