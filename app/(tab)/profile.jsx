@@ -4,9 +4,28 @@ import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import Toast from "react-native-toast-message";
+import Tags from "@/components/Tags";
+import { useDispatch } from "react-redux";
+import { getUserDetailsAction } from "@/redux/actions/userActions";
 
 const Profile = () => {
   const [user, setUser] = useState(null);
+  const dispatch = useDispatch();
+  const [userVerified, setUserVerified] = useState(false);
+
+  const fetchUserDetails = async () => {
+    const res = await dispatch(getUserDetailsAction());
+    if (res?.data) {
+      const user = res.data.user;
+      setUserVerified(user.userVerified);
+    }
+  };
+
+  console.log("User Verified Status:", userVerified);
+
+  useEffect(() => {
+    fetchUserDetails();
+  }, []);
 
   useEffect(() => {
     const loadUser = async () => {
@@ -165,6 +184,11 @@ const Profile = () => {
                 <Text className="flex-1 text-base font-medium color-textPrimary">
                   {item.title}
                 </Text>
+                {
+                  item.id === 1 && (
+                    <Tags text={userVerified === true ? "Verified" : "Not Verified"} variant={userVerified === true ? "success" : "warning"} icon={userVerified === true ? "" : "alert-circle-outline"} />
+                  )
+                }
                 <Ionicons
                   name="chevron-forward-outline"
                   size={20}
