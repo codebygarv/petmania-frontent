@@ -193,6 +193,7 @@ const EditProfile = () => {
                                     adharCardBackImage: aadharBackBase64 ? `data:image/jpeg;base64,${aadharBackBase64}` : aadharBackUri || null,
                                 };
                                 const res = await dispatch(updateUserProfileAction(payload));
+                                // console.log('Profile update payload:', payload);
                                 console.log('Profile update response:', res);
                                 setSubmitting(false);
 
