@@ -32,13 +32,11 @@ export default function RootLayout() {
 
       if (token) {
         router.replace("/(tab)");
-      } else {
-        router.replace("/(auth)");
       }
     };
 
     redirectToHome();
-  }, [navigationState]);
+  }, [navigationState?.key]);
 
   return (
     <Provider store={store}>

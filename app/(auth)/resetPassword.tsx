@@ -25,7 +25,6 @@ const resetPassword = () => {
     confirmNewPassword: string;
   }) => {
     console.log("Reset Password Data:", values);
-    // TODO: Implement reset password logic
   };
 
   return (

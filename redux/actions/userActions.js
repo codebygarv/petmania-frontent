@@ -104,6 +104,8 @@ export const verifyOtpAction = (otpData) => {
         dispatch({ type: userConstants.USER_OTP_REQUEST });
         try {
             const res = await axiosInstance.post('/user/resgister/verifyOtp', otpData);
+            console.log('otp   response ', res)
+            console.log('otp   Data ', otpData)
             if (res.status === 200) {
                 dispatch({
                     type: userConstants.USER_OTP_ACCEPT,
@@ -157,6 +159,7 @@ export const forgotPasswordAction = (emailData) => {
     };
 };
 
+<<<<<<< Updated upstream
 
 export const getUserDetailsAction = () => {
     return async (dispatch) => {
@@ -217,6 +220,8 @@ export const updateUserProfileAction = (profileData) => {
     };
 }
 
+=======
+>>>>>>> Stashed changes
 export const forgotPasswordOtpAction = (otpData) => {
     return async (dispatch) => {
         dispatch({ type: userConstants.USER_FORGOT_PASSWORD_OTP_REQUEST });

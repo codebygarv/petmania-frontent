@@ -30,7 +30,7 @@ const ForgotPasswordChange = () => {
 
   const handlePasswordChange = async (values: ChangePasswordFormValues) => {
     console.log("Password Change Data:", values);  // remove in production
-    
+
     const res = await dispatch(updatePasswordAction(values));
 
     if (res?.error?.success === false) {

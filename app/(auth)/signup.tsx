@@ -50,7 +50,7 @@ const Signup = () => {
 
   const handleSubmit = async (values: SignupFormValues) => {
     console.log("Signup Data:", values);  // remove this line in production
-    const res = await dispatch(signupAction(values));
+    const res = await dispatch(signupAction(values)); // sending the data to the backend
     console.log("Signup Response:", res);  // remove this line in production
 
     if (res?.error?.success === false) {
