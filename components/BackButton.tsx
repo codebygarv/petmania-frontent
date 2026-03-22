@@ -25,7 +25,7 @@ const BackButton = ({ onPress }: BackButtonProps) => {
 
   return (
     <TouchableOpacity onPress={goToBack}>
-      <View className="bg-SocialBg dark:bg-SocialBgDark rounded-lg  items-center justify-center w-[40px] h-[40px]">
+      <View className="rounded-lg  items-center justify-center w-[40px] h-[40px]">
         <Ionicons name="chevron-back-outline" size={30} color={BackButtonColor} />
       </View>
     </TouchableOpacity>

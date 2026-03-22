@@ -21,8 +21,17 @@ export default function TabLayout() {
           height: 50,
         },
 
-        tabBarButton: (props) => (
-          <TouchableOpacity activeOpacity={0.9} {...props} />
+        tabBarButton: ({ children, onPress, accessibilityState, accessibilityLabel, testID, style }) => (
+          <TouchableOpacity
+            activeOpacity={0.9}
+            onPress={onPress}
+            accessibilityState={accessibilityState}
+            accessibilityLabel={accessibilityLabel}
+            testID={testID}
+            style={style}
+          >
+            {children}
+          </TouchableOpacity>
         ),
 
         tabBarActiveTintColor: isDark

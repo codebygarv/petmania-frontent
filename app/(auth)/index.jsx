@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { config } from "@/constants/config";
 import Input from "@/components/Input";
 import RememberMeToggle from "@/components/RememberMeToggle";
@@ -18,9 +18,14 @@ import { router } from "expo-router";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
-import { loginAction } from "@/redux/actions/userActions";
+import { googleLoginAction, loginAction } from "@/redux/actions/userActions";
 import Toast from "react-native-toast-message";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Location from 'expo-location';
+
+import * as AuthSession from "expo-auth-session";
+
+// console.log("AuthSession.makeRedirectUri()", AuthSession.makeRedirectUri({ useProxy: true })); 
 
 const { width, height } = Dimensions.get("window");
 
@@ -30,10 +35,6 @@ const getImageDimensions = () => {
   return { IMAGE_WIDTH, IMAGE_HEIGHT };
 };
 
-interface LoginFormValues {
-  email: string;
-  password: string;
-}
 
 const validationSchema = Yup.object().shape({
   email: Yup.string()
@@ -48,49 +49,63 @@ const Index = () => {
   const { colorScheme, setColorScheme } = useColorScheme();
   const { IMAGE_WIDTH, IMAGE_HEIGHT } = getImageDimensions();
 
-  const dispatch = useDispatch<any>();
-  const loading = useSelector((state: any) => state.user.loading);
+
+  const dispatch = useDispatch();
+  const loading = useSelector((state) => state.user.loading);
 
   const isDark = colorScheme === "dark";
   // const activityIndicator = isDark ? "#EDEDED" : "#1C1C1C";
 
-  const handleSubmit = async (values: LoginFormValues) => {
+  const handleSubmit = async (values) => {
     const res = await dispatch(loginAction(values));
-    console.log("Login response:", res);
 
+    try {
+      if (res?.error?.success === false) {
+        Toast.show({
+          type: "error",
+          text1: "Login Failed",
+          text2: res?.error?.error?.message,
+        });
+      } else if (res?.success === true) {
+        if (res.data.user.isOtpSubmitted === false) {
+          Toast.show({
+            type: "error",
+            text1: "Please verify your email",
+          });
+          await AsyncStorage.setItem('email', values.email); // for next verification step
+          router.push("/verification?type=register");
+        } else if (res.data.user.isOtpSubmitted === true) {
+          Toast.show({
+            type: "success",
+            text1: "Login Successful",
+            text2: res?.message,
+          });
+          // AsyncStorage only accepts string values – ensure we store strings
+          if (res?.data?.token != null) {
+            await AsyncStorage.setItem("token", String(res.data.token));
+          }
+          if (res?.data?.user != null) {
+            await AsyncStorage.setItem("user", JSON.stringify(res.data.user));
+          }
+          // Navigate to the tab layout after saving the token
+          router.replace("/(tab)");
+        }
+      } else {
+        Toast.show({
+          type: "error",
+          text1: "Login Failed",
+          text2: "An unexpected error occurred. Please try again.",
+        });
+      }
 
-    if (res?.error?.success === false) {
-      Toast.show({
-        type: "error",
-        text1: "Login Failed",
-        text2: res?.error?.error?.message,
-      });
-    } else if (res?.success === true) {
-      Toast.show({
-        type: "success",
-        text1: "Login Successful",
-        text2: res?.message,
-      });
-      // AsyncStorage only accepts string values – ensure we store strings
-      if (res?.data?.token != null) {
-        await AsyncStorage.setItem("token", String(res.data.token));
-      }
-      if (res?.data?.user != null) {
-        await AsyncStorage.setItem("user", JSON.stringify(res.data.user));
-      }
-      // Navigate to the tab layout after saving the token
-      router.replace("/(tab)");
-    } else {
-      Toast.show({
-        type: "error",
-        text1: "Login Failed",
-        text2: "An unexpected error occurred. Please try again.",
-      });
-    }
+    } catch (error) {
+      console.error("Error fetching location:", error);
+    };
   };
   // const changeColor = () => {
   //   setColorScheme(colorScheme === "dark" ? "light" : "dark");
   // };
+
 
   const handleSignup = () => {
     router.push("/signup");
@@ -151,9 +166,7 @@ const Index = () => {
 
             <View className="flex gap-2">
               <Button
-                text={
-                  loading ? <ActivityIndicator color={"#fff"} /> : "Sign In"
-                }
+                text={loading ? <ActivityIndicator color={"#fff"} /> : "Sign In"}
                 onPress={handleSubmit}
                 disabled={!!(errors.email || errors.password) || loading}
               />

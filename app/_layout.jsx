@@ -32,13 +32,11 @@ export default function RootLayout() {
 
       if (token) {
         router.replace("/(tab)");
-      } else {
-        router.replace("/(auth)");
       }
     };
 
     redirectToHome();
-  }, [navigationState]);
+  }, [navigationState?.key]);
 
   return (
     <Provider store={store}>
@@ -65,6 +63,9 @@ export default function RootLayout() {
                 >
                   <Stack.Screen name="(auth)" />
                   <Stack.Screen name="(tab)" />
+                  <Stack.Screen name="AddPets" />
+                  <Stack.Screen name="EditProfile" />
+                  <Stack.Screen name="HelpSupport" />
                 </Stack>
               </View>
               <Toast config={toastConfig} />

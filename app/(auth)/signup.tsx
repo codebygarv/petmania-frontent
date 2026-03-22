@@ -49,15 +49,13 @@ const Signup = () => {
   const isDark = colorScheme === "dark";
 
   const handleSubmit = async (values: SignupFormValues) => {
-    console.log("Signup Data:", values);  // remove this line in production
-    const res = await dispatch(signupAction(values));
-    console.log("Signup Response:", res);  // remove this line in production
+    const res = await dispatch(signupAction(values)); // sending the data to the backend
 
     if (res?.error?.success === false) {
       Toast.show({
         type: 'error',
         text1: 'Signup Failed',
-        text2: res?.error?.error?.message ,
+        text2: res?.error?.error?.message,
       });
     } else if (res?.success === true || res?.data?.success === true) {
       Toast.show({
@@ -71,7 +69,7 @@ const Signup = () => {
       Toast.show({
         type: 'error',
         text1: 'Signup Failed',
-        text2: res?.error?.error?.message 
+        text2: res?.error?.error?.message
       });
     }
 
@@ -158,8 +156,8 @@ const Signup = () => {
 
             {/* Signup Button */}
             <View className="flex gap-2">
-              <Button 
-                text={loading ? <ActivityIndicator color={"#fff"} /> : 'Sign Up'} 
+              <Button
+                text={loading ? <ActivityIndicator color={"#fff"} /> : 'Sign Up'}
                 onPress={handleSubmit}
                 disabled={!!(errors.email || errors.password || errors.confirmPassword) || loading}
               />

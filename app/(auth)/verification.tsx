@@ -28,7 +28,6 @@ const Verification = () => {
   const { type } = useLocalSearchParams();
 
   const handleVerify = async (values: { otp: string }) => {
-    console.log("OTP Submitted:", values.otp);
 
     if (type === "forgot-password") {
       const email = await AsyncStorage.getItem("forgotPasswordemail");
@@ -45,8 +44,6 @@ const Verification = () => {
       const res = await dispatch(
         forgotPasswordOtpAction({ email, otp: values.otp })
       );
-
-      console.log("Forgot Password Verify Response:", res?.data?.token);
 
       if (res?.error?.success === false) {
         Toast.show({
@@ -81,7 +78,6 @@ const Verification = () => {
         return;
       }
       const res = await dispatch(verifyOtpAction({ email, otp: values.otp }));
-      console.log("Verify Response:", res);
       if (res?.error?.success === false) {
         Toast.show({
           type: "error",

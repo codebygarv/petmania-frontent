@@ -1,13 +1,8 @@
 import { Text, TouchableOpacity } from "react-native";
 import React from "react";
 
-interface ButtonProps {
-  text: React.ReactNode;
-  onPress?: () => void;
-  disabled?: boolean;
-}
 
-const Button: React.FC<ButtonProps> = ({ text, onPress, disabled = false }) => {
+const Button = ({ text, onPress, disabled = false }) => {
   return (
     <TouchableOpacity
       onPress={onPress}

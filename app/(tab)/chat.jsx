@@ -54,7 +54,7 @@ const Chat = () => {
       id: 1,
       name: "Sarah Johnson",
       lastMessage: "Hi! Is Rocky still available?",
-      timestamp: new Date(Date.now() - 30 * 60 * 1000), 
+      timestamp: new Date(Date.now() - 30 * 60 * 1000),
       unreadCount: 2,
       isOnline: true,
     },
@@ -62,7 +62,7 @@ const Chat = () => {
       id: 2,
       name: "Mike Chen",
       lastMessage: "Thank you for the information!",
-      timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000), 
+      timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
       unreadCount: 0,
       isOnline: false,
     },
@@ -70,7 +70,7 @@ const Chat = () => {
       id: 3,
       name: "Emma Wilson",
       lastMessage: "Can we schedule a visit?",
-      timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000), 
+      timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000),
       unreadCount: 1,
       isOnline: true,
     },
@@ -78,7 +78,7 @@ const Chat = () => {
       id: 4,
       name: "David Martinez",
       lastMessage: "The pet looks perfect for our family",
-      timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000), 
+      timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000),
       unreadCount: 0,
       isOnline: false,
     },
@@ -86,7 +86,7 @@ const Chat = () => {
       id: 5,
       name: "Lisa Anderson",
       lastMessage: "I'm interested in adopting Max",
-      timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), 
+      timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
       unreadCount: 3,
       isOnline: true,
     },
@@ -94,7 +94,7 @@ const Chat = () => {
       id: 6,
       name: "Tom Brown",
       lastMessage: "What's the adoption process?",
-      timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), 
+      timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
       unreadCount: 0,
       isOnline: false,
     },
@@ -102,7 +102,7 @@ const Chat = () => {
       id: 7,
       name: "Jessica Lee",
       lastMessage: "Thanks for your help!",
-      timestamp: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000), 
+      timestamp: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000),
       unreadCount: 0,
       isOnline: false,
     },
@@ -110,7 +110,7 @@ const Chat = () => {
       id: 8,
       name: "Ryan Taylor",
       lastMessage: "Is the pet good with kids?",
-      timestamp: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), 
+      timestamp: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
       unreadCount: 1,
       isOnline: true,
     },
@@ -130,18 +130,6 @@ const Chat = () => {
         <View className="flex gap-4 pt-7 pl-6 pr-6">
           <View className="flex-row items-center justify-between mb-2">
             <Text className="text-2xl font-bold color-textPrimary">Messages</Text>
-            <TouchableOpacity
-              onPress={() => {
-                Toast.show({
-                  type: "info",
-                  text1: "Coming Soon",
-                  text2: "New message feature will be available soon",
-                });
-              }}
-              className="w-10 h-10 rounded-full bg-buttonPrimary items-center justify-center"
-            >
-              <Ionicons name="add" size={24} color="#FFFFFF" />
-            </TouchableOpacity>
           </View>
 
           <View className="flex-row items-center bg-backgroundSecondary rounded-2xl px-4 py-3 mb-2">

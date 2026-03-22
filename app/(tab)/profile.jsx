@@ -4,9 +4,28 @@ import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import Toast from "react-native-toast-message";
+import Tags from "@/components/Tags";
+import { useDispatch } from "react-redux";
+import { getUserDetailsAction } from "@/redux/actions/userActions";
 
 const Profile = () => {
   const [user, setUser] = useState(null);
+  const dispatch = useDispatch();
+  const [userVerified, setUserVerified] = useState(false);
+
+  const fetchUserDetails = async () => {
+    const res = await dispatch(getUserDetailsAction());
+    if (res?.data) {
+      const user = res.data.user;
+      setUserVerified(user.userVerified);
+    }
+  };
+
+  console.log("User Verified Status:", userVerified);
+
+  useEffect(() => {
+    fetchUserDetails();
+  }, []);
 
   useEffect(() => {
     const loadUser = async () => {
@@ -35,7 +54,7 @@ const Profile = () => {
 
     const firstChar = text.charAt(0).toUpperCase();
     const firstChar2 = text.charAt(1).toUpperCase();
-    
+
     return firstChar + firstChar2;
   };
 
@@ -43,6 +62,7 @@ const Profile = () => {
     try {
       await AsyncStorage.removeItem("token");
       await AsyncStorage.removeItem("user");
+      await AsyncStorage.removeItem("userInfo");
       await AsyncStorage.removeItem("verifyChangePassword");
       Toast.show({
         type: "success",
@@ -66,12 +86,7 @@ const Profile = () => {
       icon: "person-outline",
       color: "#E0583D",
       onPress: () => {
-        // Navigate to edit profile page
-        Toast.show({
-          type: "info",
-          text1: "Coming Soon",
-          text2: "Edit profile feature will be available soon",
-        });
+        router.push("/EditProfile");
       },
     },
     {
@@ -80,25 +95,11 @@ const Profile = () => {
       icon: "paw-outline",
       color: "#E0583D",
       onPress: () => {
-        Toast.show({
-          type: "info",
-          text1: "Coming Soon",
-          text2: "Edit profile feature will be available soon",
-        });
+        router.push("/AddPets");
       },
     },
     {
       id: 3,
-      title: "My Favorites",
-      icon: "heart-outline",
-      color: "#E0583D",
-      onPress: () => {
-        // Navigate to favorites 
-        router.push("/(tab)/favourate");
-      },
-    },
-    {
-      id: 4,
       title: "Settings",
       icon: "settings-outline",
       color: "#666",
@@ -111,20 +112,16 @@ const Profile = () => {
       },
     },
     {
-      id: 5,
+      id: 4,
       title: "Help & Support",
       icon: "help-circle-outline",
       color: "#666",
       onPress: () => {
-        Toast.show({
-          type: "info",
-          text1: "Coming Soon",
-          text2: "Help & Support feature will be available soon",
-        });
+        router.push("/HelpSupport");
       },
     },
     {
-      id: 6,
+      id: 5,
       title: "About",
       icon: "information-circle-outline",
       color: "#666",
@@ -145,7 +142,6 @@ const Profile = () => {
         contentContainerStyle={{ paddingBottom: 20 }}
       >
         <View className="flex gap-4 pt-7 pl-6 pr-6">
-          {/* Profile Header */}
           <View className="items-center mb-6">
             <View className="flex justify-center items-center w-24 h-24 rounded-full overflow-hidden bg-buttonPrimary mb-4">
               <Text className="text-white font-bold text-3xl">
@@ -160,18 +156,7 @@ const Profile = () => {
             </Text>
           </View>
 
-          {/* Stats Section */}
           <View className="flex-row justify-between mb-6">
-            <View className="flex-1 items-center bg-backgroundSecondary rounded-2xl p-4 mx-1">
-              <Ionicons name="heart" size={24} color="#E0583D" />
-              <Text className="text-2xl font-bold color-textPrimary mt-2">20</Text>
-              <Text className="text-xs text-gray-500 mt-1">Favorites</Text>
-            </View>
-            <View className="flex-1 items-center bg-backgroundSecondary rounded-2xl p-4 mx-1">
-              <Ionicons name="chatbubbles-outline" size={24} color="#E0583D" />
-              <Text className="text-2xl font-bold color-textPrimary mt-2">5</Text>
-              <Text className="text-xs text-gray-500 mt-1">Messages</Text>
-            </View>
             <View className="flex-1 items-center bg-backgroundSecondary rounded-2xl p-4 mx-1">
               <Ionicons name="paw-outline" size={24} color="#E0583D" />
               <Text className="text-2xl font-bold color-textPrimary mt-2">2</Text>
@@ -179,7 +164,6 @@ const Profile = () => {
             </View>
           </View>
 
-          {/* Menu Items */}
           <View className="mb-6">
             <Text className="text-lg font-semibold color-textPrimary mb-4">
               Account
@@ -200,6 +184,11 @@ const Profile = () => {
                 <Text className="flex-1 text-base font-medium color-textPrimary">
                   {item.title}
                 </Text>
+                {
+                  item.id === 1 && (
+                    <Tags text={userVerified === true ? "Verified" : "Not Verified"} variant={userVerified === true ? "success" : "warning"} icon={userVerified === true ? "" : "alert-circle-outline"} />
+                  )
+                }
                 <Ionicons
                   name="chevron-forward-outline"
                   size={20}
