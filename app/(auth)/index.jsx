@@ -67,20 +67,29 @@ const Index = () => {
           text2: res?.error?.error?.message,
         });
       } else if (res?.success === true) {
-        Toast.show({
-          type: "success",
-          text1: "Login Successful",
-          text2: res?.message,
-        });
-        // AsyncStorage only accepts string values – ensure we store strings
-        if (res?.data?.token != null) {
-          await AsyncStorage.setItem("token", String(res.data.token));
+        if (res.data.user.isOtpSubmitted === false) {
+          Toast.show({
+            type: "error",
+            text1: "Please verify your email",
+          });
+          await AsyncStorage.setItem('email', values.email); // for next verification step
+          router.push("/verification?type=register");
+        } else if (res.data.user.isOtpSubmitted === true) {
+          Toast.show({
+            type: "success",
+            text1: "Login Successful",
+            text2: res?.message,
+          });
+          // AsyncStorage only accepts string values – ensure we store strings
+          if (res?.data?.token != null) {
+            await AsyncStorage.setItem("token", String(res.data.token));
+          }
+          if (res?.data?.user != null) {
+            await AsyncStorage.setItem("user", JSON.stringify(res.data.user));
+          }
+          // Navigate to the tab layout after saving the token
+          router.replace("/(tab)");
         }
-        if (res?.data?.user != null) {
-          await AsyncStorage.setItem("user", JSON.stringify(res.data.user));
-        }
-        // Navigate to the tab layout after saving the token
-        router.replace("/(tab)");
       } else {
         Toast.show({
           type: "error",
@@ -93,100 +102,100 @@ const Index = () => {
       console.error("Error fetching location:", error);
     };
   };
-    // const changeColor = () => {
-    //   setColorScheme(colorScheme === "dark" ? "light" : "dark");
-    // };
+  // const changeColor = () => {
+  //   setColorScheme(colorScheme === "dark" ? "light" : "dark");
+  // };
 
 
-    const handleSignup = () => {
-      router.push("/signup");
-    };
+  const handleSignup = () => {
+    router.push("/signup");
+  };
 
-    return (
-      <View className="flex gap-4 pt-7 pl-6 pr-6 h-screen bg-background">
-        <View className="flex justify-center items-center w-20 h-20 p-2 mx-auto rounded-3xl overflow-hidden bg-loginSigcnupImageBg">
-          <Image
-            source={config.loginSignupImageBg}
-            style={{ width: "100%", height: "100%" }}
-            resizeMode="cover"
-          />
-        </View>
+  return (
+    <View className="flex gap-4 pt-7 pl-6 pr-6 h-screen bg-background">
+      <View className="flex justify-center items-center w-20 h-20 p-2 mx-auto rounded-3xl overflow-hidden bg-loginSigcnupImageBg">
+        <Image
+          source={config.loginSignupImageBg}
+          style={{ width: "100%", height: "100%" }}
+          resizeMode="cover"
+        />
+      </View>
 
-        <Formik
-          initialValues={{ email: "", password: "" }}
-          validationSchema={validationSchema}
-          onSubmit={handleSubmit}
-        >
-          {({ handleChange, handleSubmit, values, errors, touched }) => (
-            <View className="flex gap-5">
-              <View className="flex gap-3">
-                <Text className="text-3xl text-center font-semibold color-textPrimary">
-                  Welcome Back!
+      <Formik
+        initialValues={{ email: "", password: "" }}
+        validationSchema={validationSchema}
+        onSubmit={handleSubmit}
+      >
+        {({ handleChange, handleSubmit, values, errors, touched }) => (
+          <View className="flex gap-5">
+            <View className="flex gap-3">
+              <Text className="text-3xl text-center font-semibold color-textPrimary">
+                Welcome Back!
+              </Text>
+              <Text className="text-sm text-center opacity-55 color-textSecondary">
+                Let&apos;s Join Again
+              </Text>
+            </View>
+
+            <View className="flex gap-4">
+              <Input
+                label="Email or username"
+                icon="mail-outline"
+                placeholder="abc@gmail.com"
+                textValue={values.email}
+                onChangeText={handleChange("email")}
+              />
+              {touched.email && errors.email && (
+                <Text className="text-red-500 text-xs">{errors.email}</Text>
+              )}
+
+              <Input
+                label="Password"
+                type="password"
+                icon="lock-closed-outline"
+                placeholder="******"
+                textValue={values.password}
+                onChangeText={handleChange("password")}
+              />
+              {touched.password && errors.password && (
+                <Text className="text-red-500 text-xs">{errors.password}</Text>
+              )}
+
+              <RememberMeToggle />
+            </View>
+
+            <View className="flex gap-2">
+              <Button
+                text={loading ? <ActivityIndicator color={"#fff"} /> : "Sign In"}
+                onPress={handleSubmit}
+                disabled={!!(errors.email || errors.password) || loading}
+              />
+
+              <View className="flex flex-row items-center my-4">
+                <View className="flex-1 h-[1px] bg-textPrimary" />
+                <Text className="text-sm text-center color-textPrimary mx-3">
+                  OR
                 </Text>
-                <Text className="text-sm text-center opacity-55 color-textSecondary">
-                  Let&apos;s Join Again
+                <View className="flex-1 h-[1px] bg-textPrimary" />
+              </View>
+
+              <SocialLoginButtons />
+
+              <View className="flex-row justify-center items-center">
+                <Text className="text-sm font-semibold color-textPrimary">
+                  Don’t have an account?
                 </Text>
-              </View>
-
-              <View className="flex gap-4">
-                <Input
-                  label="Email or username"
-                  icon="mail-outline"
-                  placeholder="abc@gmail.com"
-                  textValue={values.email}
-                  onChangeText={handleChange("email")}
-                />
-                {touched.email && errors.email && (
-                  <Text className="text-red-500 text-xs">{errors.email}</Text>
-                )}
-
-                <Input
-                  label="Password"
-                  type="password"
-                  icon="lock-closed-outline"
-                  placeholder="******"
-                  textValue={values.password}
-                  onChangeText={handleChange("password")}
-                />
-                {touched.password && errors.password && (
-                  <Text className="text-red-500 text-xs">{errors.password}</Text>
-                )}
-
-                <RememberMeToggle />
-              </View>
-
-              <View className="flex gap-2">
-                <Button
-                  text={loading ? <ActivityIndicator color={"#fff"} /> : "Sign In"}
-                  onPress={handleSubmit}
-                  disabled={!!(errors.email || errors.password) || loading}
-                />
-
-                <View className="flex flex-row items-center my-4">
-                  <View className="flex-1 h-[1px] bg-textPrimary" />
-                  <Text className="text-sm text-center color-textPrimary mx-3">
-                    OR
+                <TouchableOpacity onPress={handleSignup}>
+                  <Text
+                    className={`text-sm font-semibold text-orange-500 ml-1`}
+                  >
+                    Signup
                   </Text>
-                  <View className="flex-1 h-[1px] bg-textPrimary" />
-                </View>
-
-                <SocialLoginButtons />
-
-                <View className="flex-row justify-center items-center">
-                  <Text className="text-sm font-semibold color-textPrimary">
-                    Don’t have an account?
-                  </Text>
-                  <TouchableOpacity onPress={handleSignup}>
-                    <Text
-                      className={`text-sm font-semibold text-orange-500 ml-1`}
-                    >
-                      Signup
-                    </Text>
-                  </TouchableOpacity>
-                </View>
+                </TouchableOpacity>
               </View>
+            </View>
 
-              {/* <View
+            {/* <View
               className="flex justify-center items-center p-2 mx-auto rounded-3xl overflow-hidden"
               style={{
                 width: IMAGE_WIDTH,
@@ -199,11 +208,11 @@ const Index = () => {
                 resizeMode="cover"
               />
             </View> */}
-            </View>
-          )}
-        </Formik>
-      </View>
-    );
-  };
+          </View>
+        )}
+      </Formik>
+    </View>
+  );
+};
 
-  export default Index;
+export default Index;

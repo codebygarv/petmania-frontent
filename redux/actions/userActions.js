@@ -159,7 +159,6 @@ export const forgotPasswordAction = (emailData) => {
     };
 };
 
-<<<<<<< Updated upstream
 
 export const getUserDetailsAction = () => {
     return async (dispatch) => {
@@ -220,8 +219,6 @@ export const updateUserProfileAction = (profileData) => {
     };
 }
 
-=======
->>>>>>> Stashed changes
 export const forgotPasswordOtpAction = (otpData) => {
     return async (dispatch) => {
         dispatch({ type: userConstants.USER_FORGOT_PASSWORD_OTP_REQUEST });
