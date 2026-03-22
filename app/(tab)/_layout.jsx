@@ -18,7 +18,7 @@ export default function TabLayout() {
           backgroundColor: isDark ? "#0B0B0B" : "#FFFFFF",
           borderTopWidth: 0,
           paddingTop: 8,
-          height: 50,
+          height: 55,
         },
 
         tabBarButton: ({ children, onPress, accessibilityState, accessibilityLabel, testID, style }) => (
@@ -35,7 +35,7 @@ export default function TabLayout() {
         ),
 
         tabBarActiveTintColor: isDark
-          ? "#E0583D" 
+          ? "#E0583D"
           : "#E0583D",
 
         tabBarInactiveTintColor: isDark ? "#ffffff" : "#6B7280",
@@ -49,8 +49,6 @@ export default function TabLayout() {
             iconName = "person";
           } else if (route.name === "favourate") {
             iconName = "heart";
-          } else if(route.name === "chat") {
-            iconName = 'chatbubbles-outline'
           }
 
           return <Ionicons name={iconName} size={size} color={color} />;
@@ -67,12 +65,6 @@ export default function TabLayout() {
         name="favourate"
         options={{
           title: "favourate",
-        }}
-      /> 
-      <Tabs.Screen
-        name="chat"
-        options={{
-          title: "chat",
         }}
       />
       <Tabs.Screen

@@ -5,7 +5,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 // creating the client asynchronously.
 const axiosInstance = axios.create({
   // baseURL: "https://petmania-backend-six.vercel.app/api",
-  baseURL: "http://10.213.160.130:8080/api",
+  baseURL: "http://10.213.160.130:5050/api",
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",

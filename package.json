@@ -25,6 +25,7 @@
     "axios": "^1.6.8",
     "expo": "~54.0.29",
     "expo-auth-session": "~7.0.10",
+    "expo-blur": "~15.0.8",
     "expo-constants": "~18.0.9",
     "expo-crypto": "~15.0.8",
     "expo-dev-client": "~6.0.20",
