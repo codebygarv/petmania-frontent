@@ -84,9 +84,6 @@ const Index = () => {
           if (res?.data?.token != null) {
             await AsyncStorage.setItem("token", String(res.data.token));
           }
-          if (res?.data?.user != null) {
-            await AsyncStorage.setItem("user", JSON.stringify(res.data.user));
-          }
           // Navigate to the tab layout after saving the token
           router.replace("/(tab)");
         }

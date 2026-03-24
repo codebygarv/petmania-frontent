@@ -9,11 +9,12 @@ import { config } from "@/constants/config";
 import { useFocusEffect } from "expo-router";
 import Search from "@/components/Search";
 import Toast from "react-native-toast-message";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { getPetsAction } from "@/redux/actions/petActions";
+import { getUserDetailsAction } from "@/redux/actions/userActions";
 
 const Index = () => {
-  const [user, setUser] = useState(null);
+  const user = useSelector((state) => state.user.userInfo);
   const [activeIndex, setActiveIndex] = useState(0);
   const [activeCategory, setActiveCategory] = useState("dog");
   const [showSearch, setShowSearch] = useState(false);
@@ -23,16 +24,14 @@ const Index = () => {
   const [petsLoading, setPetsLoading] = useState(false);
   const dispatch = useDispatch();
 
+  const fetchUserDetails = async () => {
+    await dispatch(getUserDetailsAction());
+  };
+
   useEffect(() => {
-    const loadUser = async () => {
-      const stored = await AsyncStorage.getItem("user");
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        setUser(parsed);
-      }
-    };
-    loadUser();
+    fetchUserDetails();
   }, []);
+
 
   const fetchPets = async (city) => {
     try {

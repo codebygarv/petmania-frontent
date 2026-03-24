@@ -19,7 +19,7 @@ export const loginAction = (userData) => {
             if (res.status === 200) {
                 dispatch({
                     type: userConstants.USER_LOGIN_ACCEPT,
-                    payload: { user: res.data.user },
+                    payload: { user: res.data.data.user },
                 });
                 return res.data;
             } else {
@@ -48,7 +48,7 @@ export const googleLoginAction = (accessToken) => {
             if (res.status === 200) {
                 dispatch({
                     type: userConstants.USER_GOOGLE_LOGIN_ACCEPT,
-                    payload: { user: res.data.user },
+                    payload: { user: res.data.data.user },
                 });
                 return res.data;
             } else {
@@ -168,7 +168,7 @@ export const getUserDetailsAction = () => {
             if (res.status === 200) {
                 dispatch({
                     type: userConstants.USER_DETAILS_ACCEPT,
-                    payload: { user: res.data.user },
+                    payload: { user: res.data.data.user },
                 });
                 return res.data;
             }
@@ -198,7 +198,7 @@ export const updateUserProfileAction = (profileData) => {
             if (res.status === 200) {
                 dispatch({
                     type: userConstants.USER_UPDATE_PROFILE_ACCEPT,
-                    payload: { user: res.data.user },
+                    payload: { user: res.data.data.user },
                 });
                 return res.data;
             }

@@ -5,11 +5,11 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import Toast from "react-native-toast-message";
 import Tags from "@/components/Tags";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { getUserDetailsAction } from "@/redux/actions/userActions";
 
 const Profile = () => {
-  const [user, setUser] = useState(null);
+  const user = useSelector((state) => state.user.userInfo);
   const dispatch = useDispatch();
   const [userVerified, setUserVerified] = useState(false);
 
@@ -25,17 +25,6 @@ const Profile = () => {
 
   useEffect(() => {
     fetchUserDetails();
-  }, []);
-
-  useEffect(() => {
-    const loadUser = async () => {
-      const stored = await AsyncStorage.getItem("user");
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        setUser(parsed);
-      }
-    };
-    loadUser();
   }, []);
 
   const getUserInitials = () => {

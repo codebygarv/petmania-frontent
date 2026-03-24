@@ -18,7 +18,7 @@ import { useColorScheme } from "nativewind";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-toast-message";
 import { config } from "@/constants/config";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { createPetAction } from "@/redux/actions/petActions";
 
 const AddPets = () => {
@@ -32,6 +32,7 @@ const AddPets = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [locationLoading, setLocationLoading] = useState(false);
     const dispatch = useDispatch();
+    const userInfo = useSelector((state) => state.user.userInfo);
 
     const { colorScheme } = useColorScheme();
     const isDark = colorScheme === "dark";
@@ -105,7 +106,14 @@ const AddPets = () => {
 
         try {
             setIsSubmitting(true);
-            const token = await AsyncStorage.getItem("token");
+            
+            if (userInfo) {
+                if (!userInfo.userVerified) {
+                    Toast.show({ type: "error", text1: "Error", text2: "Please verify first" });
+                    setIsSubmitting(false);
+                    return;
+                }
+            }
 
             const base64Images = images.map(img => `data:image/jpeg;base64,${img.base64}`);
 
