@@ -14,6 +14,7 @@ import * as Yup from 'yup';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useColorScheme } from "nativewind";
 import Toast from "react-native-toast-message";
+import EditProfileSkeleton from "@/components/EditProfile/EditProfileSkeleton";
 
 const SectionHeader = ({ title, isDark }) => (
     <View style={{ marginBottom: 12, marginTop: 8 }}>
@@ -57,6 +58,7 @@ const EditProfile = () => {
     const [profileUri, setProfileUri] = useState(null);
     const [profileBase64, setProfileBase64] = useState(null);
 
+    const [loading, setLoading] = useState(true);
     const [locationLoading, setLocationLoading] = useState(false);
 
     const [initialValues, setInitialValues] = useState({
@@ -95,24 +97,29 @@ const EditProfile = () => {
     };
 
     const fetchUserDetails = async () => {
-        const res = await dispatch(getUserDetailsAction());
+        try {
+            setLoading(true);
+            const res = await dispatch(getUserDetailsAction());
 
-        if (res?.data?.user) {
-            const u = res.data.user;
-            setInitialValues({
-                name: u?.name || '',
-                phoneNumber: u?.phoneNumber || '',
-                email: u?.email || '',
-                gender: u?.Gender?.toLowerCase() || 'male',
-                dateOfBirth: u?.dateOfBirth ? String(u.dateOfBirth).slice(0, 10) : '',
-                pinCode: u?.pinCode || '',
-                city: u?.city || '',
-                state: u?.state || '',
-                UserManualAddress: u?.UserManualAddress || u?.userManualAddress || '',
-                adharCardNumber: u?.adharCardNumber || '',
-            });
+            if (res?.data?.user) {
+                const u = res.data.user;
+                setInitialValues({
+                    name: u?.name || '',
+                    phoneNumber: u?.phoneNumber || '',
+                    email: u?.email || '',
+                    gender: u?.Gender?.toLowerCase() || 'male',
+                    dateOfBirth: u?.dateOfBirth ? String(u.dateOfBirth).slice(0, 10) : '',
+                    pinCode: u?.pinCode || '',
+                    city: u?.city || '',
+                    state: u?.state || '',
+                    UserManualAddress: u?.UserManualAddress || u?.userManualAddress || '',
+                    adharCardNumber: u?.adharCardNumber || '',
+                });
 
-            if (u?.profileImage) setProfileUri(u.profileImage);
+                if (u?.profileImage) setProfileUri(u.profileImage);
+            }
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -193,6 +200,8 @@ const EditProfile = () => {
     const bg = isDark ? '#121212' : '#ffffff';
     const cardBg = isDark ? '#1a1a1a' : '#fafafa';
     const borderColor = isDark ? '#2a2a2a' : '#ededed';
+
+    if (loading) return <EditProfileSkeleton />;
 
     return (
         <ScrollView style={{ flex: 1, backgroundColor: bg }} showsVerticalScrollIndicator={false}>
