@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import {
     View, Text, Image, TextInput, TouchableOpacity,
-    ScrollView, Pressable, ActivityIndicator
+    ScrollView, Pressable, ActivityIndicator,
+    KeyboardAvoidingView,
+    Platform
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import * as Location from "expo-location";
@@ -11,7 +13,6 @@ import { getUserDetailsAction, updateUserProfileAction } from "@/redux/actions/u
 import BackButton from "@/components/BackButton";
 import { Formik } from 'formik';
 import * as Yup from 'yup';
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useColorScheme } from "nativewind";
 import Toast from "react-native-toast-message";
 import EditProfileSkeleton from "@/components/EditProfile/EditProfileSkeleton";
@@ -204,314 +205,332 @@ const EditProfile = () => {
     if (loading) return <EditProfileSkeleton />;
 
     return (
-        <ScrollView style={{ flex: 1, backgroundColor: bg }} showsVerticalScrollIndicator={false}>
-            <View style={{ paddingHorizontal: 20, paddingTop: 24 }}>
-                {/* Header */}
-                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 24 }}>
-                    <Pressable style={{ padding: 4 }}>
-                        <BackButton />
-                    </Pressable>
-                    <Text style={{ fontSize: 20, fontWeight: '700', color: isDark ? '#e0e0e0' : '#1a1a1a', marginLeft: 10 }}>
-                        Edit Profile
-                    </Text>
-                </View>
-
-                {/* Verification Status Banner */}
-                {!initialValues.adharCardNumber || initialValues.adharCardNumber === "" ? (
-                    <View style={{
-                        backgroundColor: '#FFFBEB', borderRadius: 12, padding: 12, marginBottom: 20,
-                        flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#FEF3C7'
-                    }}>
-                        <Ionicons name="alert-circle" size={20} color="#D97706" />
-                        <Text style={{ marginLeft: 8, fontSize: 13, color: '#92400E', flex: 1 }}>
-                            Your profile is not verified. Please provide your Aadhaar details to enable all features.
+        <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            style={{ flex: 1, backgroundColor: bg }}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 20}
+        >
+            <ScrollView style={{ flex: 1, backgroundColor: bg }} showsVerticalScrollIndicator={false}>
+                <View style={{ paddingHorizontal: 20, paddingTop: 24 }}>
+                    {/* Header */}
+                    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 24 }}>
+                        <Pressable style={{ padding: 4 }}>
+                            <BackButton />
+                        </Pressable>
+                        <Text style={{ fontSize: 20, fontWeight: '700', color: isDark ? '#e0e0e0' : '#1a1a1a', marginLeft: 10 }}>
+                            Edit Profile
                         </Text>
                     </View>
-                ) : (
-                    <View style={{
-                        backgroundColor: '#ECFDF5', borderRadius: 12, padding: 12, marginBottom: 20,
-                        flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#D1FAE5'
-                    }}>
-                        <Ionicons name="checkmark-circle" size={20} color="#059669" />
-                        <Text style={{ marginLeft: 8, fontSize: 13, color: '#065F46', flex: 1 }}>
-                            Your Identity details are submitted for verification.
-                        </Text>
-                    </View>
-                )}
 
-                {/* Profile Photo */}
-                <View style={{ alignItems: 'center', marginBottom: 28 }}>
-                    <TouchableOpacity onPress={() => pickImage("profile")} style={{ position: 'relative' }}>
-                        {profileUri ? (
-                            <Image
-                                source={{ uri: profileUri }}
-                                style={{ width: 100, height: 100, borderRadius: 50, borderWidth: 3, borderColor: '#E0583D' }}
-                            />
+                    {/* Verification Status Banner */}
+                    {!userInfo?.isVerified ? (
+                        <View style={{
+                            backgroundColor: '#FFFBEB', borderRadius: 12, padding: 12, marginBottom: 20,
+                            flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#FEF3C7'
+                        }}>
+                            <Ionicons name="alert-circle" size={20} color="#D97706" />
+                            <Text style={{ marginLeft: 8, fontSize: 13, color: '#92400E', flex: 1 }}>
+                                Your profile is not verified. Please provide your Aadhaar details to enable all features.
+                            </Text>
+                        </View>
+                    ) : (
+                        !userInfo?.isAadhaarVerified ? (
+                            <View style={{
+                                backgroundColor: '#ECFDF5', borderRadius: 12, padding: 12, marginBottom: 20,
+                                flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#D1FAE5'
+                            }}>
+                                <Ionicons name="checkmark-circle" size={20} color="#059669" />
+                                <Text style={{ marginLeft: 8, fontSize: 13, color: '#065F46', flex: 1 }}>
+                                    Your Identity details are submitted for verification.
+                                </Text>
+                            </View>
                         ) : (
                             <View style={{
-                                width: 100, height: 100, borderRadius: 50,
-                                backgroundColor: isDark ? '#1e1e1e' : '#f0f0f0',
-                                alignItems: 'center', justifyContent: 'center',
-                                borderWidth: 2, borderColor: isDark ? '#333' : '#ddd',
+                                backgroundColor: '#ECFDF5', borderRadius: 12, padding: 12, marginBottom: 20,
+                                flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#D1FAE5'
                             }}>
-                                <Ionicons name="person" size={38} color={isDark ? '#555' : '#bbb'} />
+                                <Ionicons name="checkmark-circle" size={20} color="#059669" />
+                                <Text style={{ marginLeft: 8, fontSize: 13, color: '#065F46', flex: 1 }}>
+                                    Your Identity details are verified.
+                                </Text>
+                            </View>
+                        )
+                    )}
+
+                    {/* Profile Photo */}
+                    <View style={{ alignItems: 'center', marginBottom: 28 }}>
+                        <TouchableOpacity onPress={() => pickImage("profile")} style={{ position: 'relative' }}>
+                            {profileUri ? (
+                                <Image
+                                    source={{ uri: profileUri }}
+                                    style={{ width: 100, height: 100, borderRadius: 50, borderWidth: 3, borderColor: '#E0583D' }}
+                                />
+                            ) : (
+                                <View style={{
+                                    width: 100, height: 100, borderRadius: 50,
+                                    backgroundColor: isDark ? '#1e1e1e' : '#f0f0f0',
+                                    alignItems: 'center', justifyContent: 'center',
+                                    borderWidth: 2, borderColor: isDark ? '#333' : '#ddd',
+                                }}>
+                                    <Ionicons name="person" size={38} color={isDark ? '#555' : '#bbb'} />
+                                </View>
+                            )}
+                            <View style={{
+                                position: 'absolute', bottom: 0, right: 0,
+                                backgroundColor: '#E0583D', borderRadius: 14, padding: 5,
+                                borderWidth: 2, borderColor: bg,
+                            }}>
+                                <Ionicons name="camera" size={14} color="#fff" />
+                            </View>
+                        </TouchableOpacity>
+                        <Text style={{ marginTop: 8, fontSize: 13, color: isDark ? '#888' : '#999' }}>
+                            Tap to change photo
+                        </Text>
+                    </View>
+
+                    <Formik
+                        initialValues={initialValues}
+                        enableReinitialize
+                        validationSchema={validationSchema}
+                        onSubmit={async (values, { setSubmitting }) => {
+                            const GenderValue =
+                                values.gender === "male" ? "Male" :
+                                    values.gender === "female" ? "Female" : "Other";
+
+                            const payload = {
+                                name: values.name,
+                                phoneNumber: values.phoneNumber,
+                                Gender: GenderValue,
+                                dateOfBirth: values.dateOfBirth,
+                                pinCode: values.pinCode,
+                                city: values.city,
+                                state: values.state,
+                                UserManualAddress: values.UserManualAddress || null,
+                                adharCardNumber: values.adharCardNumber,
+                                profileImage: profileBase64 ? `data:image/jpeg;base64,${profileBase64}` : profileUri || null,
+                            };
+
+                            const res = await dispatch(updateUserProfileAction(payload));
+                            console.log('Profile update response:', res);
+                            setSubmitting(false);
+
+                            if (res?.success === true) {
+                                Toast.show({ type: "success", text1: "Profile Updated", text2: res?.message });
+                            } else {
+                                Toast.show({ type: "error", text1: "Update Failed", text2: res?.message });
+                            }
+                        }}
+                    >
+                        {({ handleChange, handleBlur, handleSubmit, values, errors, touched, isSubmitting, setFieldValue }) => (
+                            <View style={{ gap: 4 }}>
+
+                                {/* ─── Personal Information ─── */}
+                                <View style={{
+                                    backgroundColor: cardBg,
+                                    borderRadius: 16, padding: 16, marginBottom: 16,
+                                    borderWidth: 1, borderColor,
+                                }}>
+                                    <SectionHeader title="Personal Information" isDark={isDark} />
+
+                                    <FieldLabel label="Full Name" isDark={isDark} />
+                                    <InputField
+                                        isDark={isDark}
+                                        placeholder="Enter your name"
+                                        value={values.name}
+                                        onChangeText={handleChange('name')}
+                                        onBlur={handleBlur('name')}
+                                    />
+                                    {touched.name && errors.name && <Text style={{ color: '#E0583D', fontSize: 12, marginBottom: 8 }}>{errors.name}</Text>}
+
+                                    <FieldLabel label="Phone Number" isDark={isDark} />
+                                    <InputField
+                                        isDark={isDark}
+                                        placeholder="10-digit phone number"
+                                        keyboardType="phone-pad"
+                                        value={values.phoneNumber}
+                                        onChangeText={handleChange('phoneNumber')}
+                                        onBlur={handleBlur('phoneNumber')}
+                                        maxLength={10}
+                                    />
+                                    {touched.phoneNumber && errors.phoneNumber && <Text style={{ color: '#E0583D', fontSize: 12, marginBottom: 8 }}>{errors.phoneNumber}</Text>}
+
+                                    <FieldLabel label="Email" isDark={isDark} />
+                                    <InputField
+                                        isDark={isDark}
+                                        placeholder="Email address"
+                                        keyboardType="email-address"
+                                        value={values.email}
+                                        editable={false}
+                                        style={{ opacity: 0.5 }}
+                                    />
+
+                                    <FieldLabel label="Gender" isDark={isDark} />
+                                    <View style={{ flexDirection: 'row', gap: 10, marginBottom: 4 }}>
+                                        {['male', 'female', 'other'].map((item) => (
+                                            <TouchableOpacity
+                                                key={item}
+                                                onPress={() => setFieldValue('gender', item)}
+                                                style={{
+                                                    flex: 1, paddingVertical: 10, borderRadius: 10,
+                                                    alignItems: 'center',
+                                                    backgroundColor: values.gender === item ? '#E0583D' : (isDark ? '#2a2a2a' : '#f0f0f0'),
+                                                    borderWidth: 1,
+                                                    borderColor: values.gender === item ? '#E0583D' : (isDark ? '#333' : '#e0e0e0'),
+                                                }}
+                                            >
+                                                <Text style={{
+                                                    fontSize: 13, fontWeight: '600',
+                                                    color: values.gender === item ? '#fff' : (isDark ? '#aaa' : '#555'),
+                                                }}>
+                                                    {item.charAt(0).toUpperCase() + item.slice(1)}
+                                                </Text>
+                                            </TouchableOpacity>
+                                        ))}
+                                    </View>
+
+                                    <FieldLabel label="Date of Birth (YYYY-MM-DD)" isDark={isDark} />
+                                    <InputField
+                                        isDark={isDark}
+                                        placeholder="YYYY-MM-DD"
+                                        value={values.dateOfBirth}
+                                        onChangeText={handleChange('dateOfBirth')}
+                                        onBlur={handleBlur('dateOfBirth')}
+                                    />
+                                    {touched.dateOfBirth && errors.dateOfBirth && <Text style={{ color: '#E0583D', fontSize: 12, marginBottom: 8 }}>{errors.dateOfBirth}</Text>}
+                                </View>
+
+                                {/* ─── Location Details ─── */}
+                                <View style={{
+                                    backgroundColor: cardBg,
+                                    borderRadius: 16, padding: 16, marginBottom: 16,
+                                    borderWidth: 1, borderColor,
+                                }}>
+                                    <SectionHeader title="Location Details" isDark={isDark} />
+
+                                    <FieldLabel label="Pin Code" isDark={isDark} />
+                                    <View style={{
+                                        flexDirection: 'row', alignItems: 'center', overflow: 'hidden',
+                                        backgroundColor: isDark ? '#1e1e1e' : '#f5f5f5',
+                                        borderRadius: 12, borderWidth: 1,
+                                        borderColor: isDark ? '#2e2e2e' : '#e8e8e8', marginBottom: 4,
+                                    }}>
+                                        <TextInput
+                                            placeholderTextColor={isDark ? "#666" : "#aaa"}
+                                            style={{
+                                                flex: 1, paddingHorizontal: 14, paddingVertical: 12,
+                                                fontSize: 14, color: isDark ? '#e0e0e0' : '#1a1a1a',
+                                            }}
+                                            placeholder="6-digit pin code"
+                                            keyboardType="number-pad"
+                                            maxLength={6}
+                                            value={values.pinCode}
+                                            onChangeText={handleChange('pinCode')}
+                                            onBlur={() => { handleBlur('pinCode'); fetchPinDetails(values.pinCode, setFieldValue); }}
+                                        />
+                                        <Pressable
+                                            onPress={() => getLocation(setFieldValue)}
+                                            disabled={locationLoading}
+                                            style={{ paddingHorizontal: 14, paddingVertical: 12 }}
+                                        >
+                                            {locationLoading
+                                                ? <ActivityIndicator size="small" color="#E0583D" />
+                                                : <Ionicons name="locate" size={20} color="#E0583D" />
+                                            }
+                                        </Pressable>
+                                    </View>
+                                    {touched.pinCode && errors.pinCode && <Text style={{ color: '#E0583D', fontSize: 12, marginBottom: 8 }}>{errors.pinCode}</Text>}
+
+                                    <View style={{ flexDirection: 'row', gap: 10 }}>
+                                        <View style={{ flex: 1 }}>
+                                            <FieldLabel label="City" isDark={isDark} />
+                                            <InputField
+                                                isDark={isDark}
+                                                placeholder="City"
+                                                value={values.city}
+                                                onChangeText={handleChange('city')}
+                                                onBlur={handleBlur('city')}
+                                                editable={false}
+                                                style={{ opacity: 0.7 }}
+                                            />
+                                            {touched.city && errors.city && <Text style={{ color: '#E0583D', fontSize: 12 }}>{errors.city}</Text>}
+                                        </View>
+                                        <View style={{ flex: 1 }}>
+                                            <FieldLabel label="State" isDark={isDark} />
+                                            <InputField
+                                                isDark={isDark}
+                                                placeholder="State"
+                                                value={values.state}
+                                                onChangeText={handleChange('state')}
+                                                onBlur={handleBlur('state')}
+                                                editable={false}
+                                                style={{ opacity: 0.7 }}
+                                            />
+                                            {touched.state && errors.state && <Text style={{ color: '#E0583D', fontSize: 12 }}>{errors.state}</Text>}
+                                        </View>
+                                    </View>
+
+                                    <FieldLabel label="Full Address (optional)" isDark={isDark} />
+                                    <InputField
+                                        isDark={isDark}
+                                        placeholder="e.g. Flat 4B, Green Valley Apartments"
+                                        value={values.UserManualAddress}
+                                        onChangeText={handleChange('UserManualAddress')}
+                                        onBlur={handleBlur('UserManualAddress')}
+                                        multiline
+                                        numberOfLines={2}
+                                        style={{ minHeight: 52 }}
+                                    />
+                                </View>
+
+                                {/* ─── Identity Verification ─── */}
+                                <View style={{
+                                    backgroundColor: cardBg,
+                                    borderRadius: 16, padding: 16, marginBottom: 24,
+                                    borderWidth: 1, borderColor,
+                                }}>
+                                    <SectionHeader title="Identity Verification" isDark={isDark} />
+
+                                    <FieldLabel label="Aadhaar Card Number *" isDark={isDark} />
+                                    <InputField
+                                        isDark={isDark}
+                                        placeholder="12-digit Aadhaar number"
+                                        keyboardType="number-pad"
+                                        maxLength={12}
+                                        value={values.adharCardNumber}
+                                        onChangeText={handleChange('adharCardNumber')}
+                                        onBlur={handleBlur('adharCardNumber')}
+                                        secureTextEntry={false}
+                                    />
+                                    {touched.adharCardNumber && errors.adharCardNumber
+                                        ? <Text style={{ color: '#E0583D', fontSize: 12, marginBottom: 8 }}>{errors.adharCardNumber}</Text>
+                                        : <Text style={{ color: isDark ? '#666' : '#aaa', fontSize: 11, marginBottom: 8 }}>
+                                            Your Aadhaar number is stored securely and never shared.
+                                        </Text>
+                                    }
+                                </View>
+
+                                {/* Save Button */}
+                                <TouchableOpacity
+                                    onPress={handleSubmit}
+                                    disabled={isSubmitting}
+                                    style={{
+                                        backgroundColor: isSubmitting ? '#aaa' : '#E0583D',
+                                        borderRadius: 14, paddingVertical: 15,
+                                        alignItems: 'center', marginBottom: 40,
+                                        shadowColor: '#E0583D', shadowOffset: { width: 0, height: 4 },
+                                        shadowOpacity: 0.35, shadowRadius: 8, elevation: 6,
+                                    }}
+                                >
+                                    <Text style={{ color: '#fff', fontSize: 16, fontWeight: '700', letterSpacing: 0.5 }}>
+                                        {isSubmitting ? 'Saving...' : 'Save Changes'}
+                                    </Text>
+                                </TouchableOpacity>
                             </View>
                         )}
-                        <View style={{
-                            position: 'absolute', bottom: 0, right: 0,
-                            backgroundColor: '#E0583D', borderRadius: 14, padding: 5,
-                            borderWidth: 2, borderColor: bg,
-                        }}>
-                            <Ionicons name="camera" size={14} color="#fff" />
-                        </View>
-                    </TouchableOpacity>
-                    <Text style={{ marginTop: 8, fontSize: 13, color: isDark ? '#888' : '#999' }}>
-                        Tap to change photo
-                    </Text>
+                    </Formik>
                 </View>
-
-                <Formik
-                    initialValues={initialValues}
-                    enableReinitialize
-                    validationSchema={validationSchema}
-                    onSubmit={async (values, { setSubmitting }) => {
-                        const GenderValue =
-                            values.gender === "male" ? "Male" :
-                                values.gender === "female" ? "Female" : "Other";
-
-                        const payload = {
-                            name: values.name,
-                            phoneNumber: values.phoneNumber,
-                            Gender: GenderValue,
-                            dateOfBirth: values.dateOfBirth,
-                            pinCode: values.pinCode,
-                            city: values.city,
-                            state: values.state,
-                            UserManualAddress: values.UserManualAddress || null,
-                            adharCardNumber: values.adharCardNumber,
-                            profileImage: profileBase64 ? `data:image/jpeg;base64,${profileBase64}` : profileUri || null,
-                        };
-
-                        const res = await dispatch(updateUserProfileAction(payload));
-                        console.log('Profile update response:', res);
-                        setSubmitting(false);
-
-                        if (res?.success === true) {
-                            Toast.show({ type: "success", text1: "Profile Updated", text2: res?.message });
-                        } else {
-                            Toast.show({ type: "error", text1: "Update Failed", text2: res?.message });
-                        }
-                    }}
-                >
-                    {({ handleChange, handleBlur, handleSubmit, values, errors, touched, isSubmitting, setFieldValue }) => (
-                        <View style={{ gap: 4 }}>
-
-                            {/* ─── Personal Information ─── */}
-                            <View style={{
-                                backgroundColor: cardBg,
-                                borderRadius: 16, padding: 16, marginBottom: 16,
-                                borderWidth: 1, borderColor,
-                            }}>
-                                <SectionHeader title="Personal Information" isDark={isDark} />
-
-                                <FieldLabel label="Full Name" isDark={isDark} />
-                                <InputField
-                                    isDark={isDark}
-                                    placeholder="Enter your name"
-                                    value={values.name}
-                                    onChangeText={handleChange('name')}
-                                    onBlur={handleBlur('name')}
-                                />
-                                {touched.name && errors.name && <Text style={{ color: '#E0583D', fontSize: 12, marginBottom: 8 }}>{errors.name}</Text>}
-
-                                <FieldLabel label="Phone Number" isDark={isDark} />
-                                <InputField
-                                    isDark={isDark}
-                                    placeholder="10-digit phone number"
-                                    keyboardType="phone-pad"
-                                    value={values.phoneNumber}
-                                    onChangeText={handleChange('phoneNumber')}
-                                    onBlur={handleBlur('phoneNumber')}
-                                    maxLength={10}
-                                />
-                                {touched.phoneNumber && errors.phoneNumber && <Text style={{ color: '#E0583D', fontSize: 12, marginBottom: 8 }}>{errors.phoneNumber}</Text>}
-
-                                <FieldLabel label="Email" isDark={isDark} />
-                                <InputField
-                                    isDark={isDark}
-                                    placeholder="Email address"
-                                    keyboardType="email-address"
-                                    value={values.email}
-                                    editable={false}
-                                    style={{ opacity: 0.5 }}
-                                />
-
-                                <FieldLabel label="Gender" isDark={isDark} />
-                                <View style={{ flexDirection: 'row', gap: 10, marginBottom: 4 }}>
-                                    {['male', 'female', 'other'].map((item) => (
-                                        <TouchableOpacity
-                                            key={item}
-                                            onPress={() => setFieldValue('gender', item)}
-                                            style={{
-                                                flex: 1, paddingVertical: 10, borderRadius: 10,
-                                                alignItems: 'center',
-                                                backgroundColor: values.gender === item ? '#E0583D' : (isDark ? '#2a2a2a' : '#f0f0f0'),
-                                                borderWidth: 1,
-                                                borderColor: values.gender === item ? '#E0583D' : (isDark ? '#333' : '#e0e0e0'),
-                                            }}
-                                        >
-                                            <Text style={{
-                                                fontSize: 13, fontWeight: '600',
-                                                color: values.gender === item ? '#fff' : (isDark ? '#aaa' : '#555'),
-                                            }}>
-                                                {item.charAt(0).toUpperCase() + item.slice(1)}
-                                            </Text>
-                                        </TouchableOpacity>
-                                    ))}
-                                </View>
-
-                                <FieldLabel label="Date of Birth (YYYY-MM-DD)" isDark={isDark} />
-                                <InputField
-                                    isDark={isDark}
-                                    placeholder="YYYY-MM-DD"
-                                    value={values.dateOfBirth}
-                                    onChangeText={handleChange('dateOfBirth')}
-                                    onBlur={handleBlur('dateOfBirth')}
-                                />
-                                {touched.dateOfBirth && errors.dateOfBirth && <Text style={{ color: '#E0583D', fontSize: 12, marginBottom: 8 }}>{errors.dateOfBirth}</Text>}
-                            </View>
-
-                            {/* ─── Location Details ─── */}
-                            <View style={{
-                                backgroundColor: cardBg,
-                                borderRadius: 16, padding: 16, marginBottom: 16,
-                                borderWidth: 1, borderColor,
-                            }}>
-                                <SectionHeader title="Location Details" isDark={isDark} />
-
-                                <FieldLabel label="Pin Code" isDark={isDark} />
-                                <View style={{
-                                    flexDirection: 'row', alignItems: 'center', overflow: 'hidden',
-                                    backgroundColor: isDark ? '#1e1e1e' : '#f5f5f5',
-                                    borderRadius: 12, borderWidth: 1,
-                                    borderColor: isDark ? '#2e2e2e' : '#e8e8e8', marginBottom: 4,
-                                }}>
-                                    <TextInput
-                                        placeholderTextColor={isDark ? "#666" : "#aaa"}
-                                        style={{
-                                            flex: 1, paddingHorizontal: 14, paddingVertical: 12,
-                                            fontSize: 14, color: isDark ? '#e0e0e0' : '#1a1a1a',
-                                        }}
-                                        placeholder="6-digit pin code"
-                                        keyboardType="number-pad"
-                                        maxLength={6}
-                                        value={values.pinCode}
-                                        onChangeText={handleChange('pinCode')}
-                                        onBlur={() => { handleBlur('pinCode'); fetchPinDetails(values.pinCode, setFieldValue); }}
-                                    />
-                                    <Pressable
-                                        onPress={() => getLocation(setFieldValue)}
-                                        disabled={locationLoading}
-                                        style={{ paddingHorizontal: 14, paddingVertical: 12 }}
-                                    >
-                                        {locationLoading
-                                            ? <ActivityIndicator size="small" color="#E0583D" />
-                                            : <Ionicons name="locate" size={20} color="#E0583D" />
-                                        }
-                                    </Pressable>
-                                </View>
-                                {touched.pinCode && errors.pinCode && <Text style={{ color: '#E0583D', fontSize: 12, marginBottom: 8 }}>{errors.pinCode}</Text>}
-
-                                <View style={{ flexDirection: 'row', gap: 10 }}>
-                                    <View style={{ flex: 1 }}>
-                                        <FieldLabel label="City" isDark={isDark} />
-                                        <InputField
-                                            isDark={isDark}
-                                            placeholder="City"
-                                            value={values.city}
-                                            onChangeText={handleChange('city')}
-                                            onBlur={handleBlur('city')}
-                                            editable={false}
-                                            style={{ opacity: 0.7 }}
-                                        />
-                                        {touched.city && errors.city && <Text style={{ color: '#E0583D', fontSize: 12 }}>{errors.city}</Text>}
-                                    </View>
-                                    <View style={{ flex: 1 }}>
-                                        <FieldLabel label="State" isDark={isDark} />
-                                        <InputField
-                                            isDark={isDark}
-                                            placeholder="State"
-                                            value={values.state}
-                                            onChangeText={handleChange('state')}
-                                            onBlur={handleBlur('state')}
-                                            editable={false}
-                                            style={{ opacity: 0.7 }}
-                                        />
-                                        {touched.state && errors.state && <Text style={{ color: '#E0583D', fontSize: 12 }}>{errors.state}</Text>}
-                                    </View>
-                                </View>
-
-                                <FieldLabel label="Full Address (optional)" isDark={isDark} />
-                                <InputField
-                                    isDark={isDark}
-                                    placeholder="e.g. Flat 4B, Green Valley Apartments"
-                                    value={values.UserManualAddress}
-                                    onChangeText={handleChange('UserManualAddress')}
-                                    onBlur={handleBlur('UserManualAddress')}
-                                    multiline
-                                    numberOfLines={2}
-                                    style={{ minHeight: 52 }}
-                                />
-                            </View>
-
-                            {/* ─── Identity Verification ─── */}
-                            <View style={{
-                                backgroundColor: cardBg,
-                                borderRadius: 16, padding: 16, marginBottom: 24,
-                                borderWidth: 1, borderColor,
-                            }}>
-                                <SectionHeader title="Identity Verification" isDark={isDark} />
-
-                                <FieldLabel label="Aadhaar Card Number *" isDark={isDark} />
-                                <InputField
-                                    isDark={isDark}
-                                    placeholder="12-digit Aadhaar number"
-                                    keyboardType="number-pad"
-                                    maxLength={12}
-                                    value={values.adharCardNumber}
-                                    onChangeText={handleChange('adharCardNumber')}
-                                    onBlur={handleBlur('adharCardNumber')}
-                                    secureTextEntry={false}
-                                />
-                                {touched.adharCardNumber && errors.adharCardNumber
-                                    ? <Text style={{ color: '#E0583D', fontSize: 12, marginBottom: 8 }}>{errors.adharCardNumber}</Text>
-                                    : <Text style={{ color: isDark ? '#666' : '#aaa', fontSize: 11, marginBottom: 8 }}>
-                                        Your Aadhaar number is stored securely and never shared.
-                                    </Text>
-                                }
-                            </View>
-
-                            {/* Save Button */}
-                            <TouchableOpacity
-                                onPress={handleSubmit}
-                                disabled={isSubmitting}
-                                style={{
-                                    backgroundColor: isSubmitting ? '#aaa' : '#E0583D',
-                                    borderRadius: 14, paddingVertical: 15,
-                                    alignItems: 'center', marginBottom: 40,
-                                    shadowColor: '#E0583D', shadowOffset: { width: 0, height: 4 },
-                                    shadowOpacity: 0.35, shadowRadius: 8, elevation: 6,
-                                }}
-                            >
-                                <Text style={{ color: '#fff', fontSize: 16, fontWeight: '700', letterSpacing: 0.5 }}>
-                                    {isSubmitting ? 'Saving...' : 'Save Changes'}
-                                </Text>
-                            </TouchableOpacity>
-                        </View>
-                    )}
-                </Formik>
-            </View>
-        </ScrollView>
+            </ScrollView>
+        </KeyboardAvoidingView>
     );
 };
 

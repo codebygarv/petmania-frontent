@@ -12,6 +12,7 @@ import Toast from "react-native-toast-message";
 import { useDispatch, useSelector } from "react-redux";
 import { getPetsAction } from "@/redux/actions/petActions";
 import { getUserDetailsAction } from "@/redux/actions/userActions";
+import HomeSkeleton from "@/components/HomeSkeleton/HomeSkeleton";
 
 const Index = () => {
   const user = useSelector((state) => state.user.userInfo);
@@ -232,9 +233,7 @@ const Index = () => {
 
             <View className="flex flex-row flex-wrap justify-between mt-6">
               {petsLoading ? (
-                <View className="w-full py-10 items-center">
-                  <Text className="color-textPrimary">Loading pets near you...</Text>
-                </View>
+                <HomeSkeleton />
               ) : petData[activeCategory]?.length === 0 ? (
                 <View className="w-full py-10 items-center">
                   <Text className="color-textSecondary">No pets found in your area. Add some!</Text>
@@ -242,15 +241,15 @@ const Index = () => {
               ) : (
                 petData[activeCategory]?.map((pet) => (
                   <View key={pet.id} className="w-[48%] mb-4">
-                    <View className={`rounded-3xl p-4 ${pet.bg}`}>
+                    <View className={`rounded-3xl p-2 ${pet.bg}`}>
                       <View className="absolute top-3 right-3 z-10">
                         <Ionicons name="heart" size={18} color="#E0583D" />
                       </View>
 
                       <Image
                         source={pet.image}
-                        className="w-full h-28"
-                        resizeMode="contain"
+                        className="w-full h-40 rounded-2xl"
+                        resizeMode="cover"
                       />
                     </View>
 
@@ -265,7 +264,7 @@ const Index = () => {
                           size={14}
                           color="#E0583D"
                         />
-                        <Text className="text-xs ml-1 ext-gray-500 overflow-hidden line-clamp-1 w-[80%]">
+                        <Text className="text-xs ml-1 text-gray-500 overflow-hidden line-clamp-1 w-[80%]">
                           {pet.distance}
                         </Text>
                       </View>

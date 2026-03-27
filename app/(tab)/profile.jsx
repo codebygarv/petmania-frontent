@@ -1,40 +1,24 @@
 import { View, Text, ScrollView, TouchableOpacity } from "react-native";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import Toast from "react-native-toast-message";
 import Tags from "@/components/Tags";
-import { useDispatch, useSelector } from "react-redux";
-import { getUserDetailsAction } from "@/redux/actions/userActions";
+import { useSelector } from "react-redux";
 
 const Profile = () => {
-  const user = useSelector((state) => state.user.userInfo);
-  const dispatch = useDispatch();
-  const [userVerified, setUserVerified] = useState(false);
-
-  const fetchUserDetails = async () => {
-    const res = await dispatch(getUserDetailsAction());
-    if (res?.data) {
-      const user = res.data.user;
-      setUserVerified(user.userVerified);
-    }
-  };
-
-  console.log("User Verified Status:", userVerified);
-
-  useEffect(() => {
-    fetchUserDetails();
-  }, []);
+  const userInfo = useSelector((state) => state.user.userInfo);
+  const userVerified = userInfo?.isVerified;
 
   const getUserInitials = () => {
-    if (!user) return "U";
+    if (!userInfo) return "U";
 
     let text = "";
-    if (user.name) {
-      text = user.name.trim();
-    } else if (user.email) {
-      text = user.email.split("@")[0].trim();
+    if (userInfo.name) {
+      text = userInfo.name.trim();
+    } else if (userInfo.email) {
+      text = userInfo.email.split("@")[0].trim();
     } else {
       return "U";
     }
@@ -115,11 +99,7 @@ const Profile = () => {
       icon: "information-circle-outline",
       color: "#666",
       onPress: () => {
-        Toast.show({
-          type: "info",
-          text1: "Petmania",
-          text2: "Version 1.0.0 - Your pet adoption companion",
-        });
+        router.push("/About");
       },
     },
   ];
@@ -138,10 +118,10 @@ const Profile = () => {
               </Text>
             </View>
             <Text className="text-2xl font-bold color-textPrimary mb-1">
-              {user?.name || user?.email?.split("@")[0]?.split("+")[0]?.trim() || "User"}
+              {userInfo?.name || userInfo?.email?.split("@")[0]?.split("+")[0]?.trim() || "User"}
             </Text>
             <Text className="text-sm text-gray-500 mb-4">
-              {user?.email || "No email available"}
+              {userInfo?.email || "No email available"}
             </Text>
           </View>
 

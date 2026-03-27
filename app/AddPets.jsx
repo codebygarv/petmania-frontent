@@ -7,7 +7,8 @@ import {
     Image,
     TextInput,
     Platform,
-    ActivityIndicator
+    ActivityIndicator,
+    KeyboardAvoidingView
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
@@ -37,6 +38,7 @@ const AddPets = () => {
     const { colorScheme } = useColorScheme();
     const isDark = colorScheme === "dark";
 
+    // Pick the Profile Image
     const pickImage = async () => {
         if (images.length >= 2) {
             Toast.show({ type: "info", text1: "Limit reached", text2: "You can only add up to 2 images" });
@@ -67,6 +69,7 @@ const AddPets = () => {
         }
     };
 
+    // Get the current Location of the User to add the Pet or for the Manual location
     const getLocation = async () => {
         try {
             setLocationLoading(true);
@@ -94,6 +97,7 @@ const AddPets = () => {
         }
     };
 
+    // Submit the Pet Data to the Backend
     const onSubmit = async () => {
         if (!name || !breed || !location) {
             Toast.show({ type: "error", text1: "Validation Error", text2: "Please fill all required fields" });
@@ -106,9 +110,9 @@ const AddPets = () => {
 
         try {
             setIsSubmitting(true);
-            
+
             if (userInfo) {
-                if (!userInfo.userVerified) {
+                if (!userInfo.isVerified) {
                     Toast.show({ type: "error", text1: "Error", text2: "Please verify first" });
                     setIsSubmitting(false);
                     return;
@@ -152,137 +156,143 @@ const AddPets = () => {
     };
 
     return (
-        <View className="flex-1 bg-background px-4 pt-6">
-            <View className="flex-row items-center mb-4">
-                <Pressable className="p-2">
-                    <BackButton />
-                </Pressable>
-                <Text className="text-lg font-bold color-textPrimary ml-2">Add Pet for Adoption</Text>
-            </View>
-
-            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 40 }}>
-                <Text className="text-sm color-textPrimary mb-2">Photos</Text>
-
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-4">
-                    {images.length === 0 ? (
-                        <Pressable
-                            onPress={pickImage}
-                            className="h-40 w-40 rounded-2xl bg-loginSigcnupImageBg items-center justify-center mr-3"
-                        >
-                            <Ionicons name="image-outline" size={36} color={isDark ? "#e0e0e0ff" : "#1a1a1aff"} />
-                            <Text className="text-xs mt-2 color-textPrimary">Add Photo</Text>
-                        </Pressable>
-                    ) : (
-                        images.map((img, i) => (
-                            <View key={i} className="mr-3">
-                                <Image source={{ uri: img.uri }} className="h-40 w-40 rounded-2xl" resizeMode="cover" />
-                                <Pressable
-                                    onPress={() => setImages((prev) => prev.filter((_, idx) => idx !== i))}
-                                    className="absolute top-1 right-1 bg-white rounded-full p-1"
-                                >
-                                    <Ionicons name="close" size={16} color="#E0583D" />
-                                </Pressable>
-                            </View>
-                        ))
-                    )}
-
-                    {images.length < 2 && (
-                        <Pressable onPress={pickImage} className="h-40 w-40 rounded-2xl bg-loginSigcnupImageBg items-center justify-center border border-dashed border-gray-400">
-                            <Ionicons name="add" size={28} color={isDark ? "#e0e0e0ff" : "#1a1a1aff"} />
-                            <Text className="text-xs mt-2 color-textPrimary opacity-70">Add Photo</Text>
-                        </Pressable>
-                    )}
-                </ScrollView>
-
-                <Text className="text-sm color-textPrimary mb-2 font-semibold">Pet Name</Text>
-                <TextInput
-                    value={name}
-                    onChangeText={setName}
-                    placeholder="Enter pet name"
-                    placeholderTextColor={isDark ? "#888" : "#999"}
-                    color={isDark ? "#e0e0e0ff" : "#1a1a1aff"}
-                    className="bg-backgroundSecondary rounded-xl h-12 px-3 mb-4 border border-gray-200 dark:border-gray-800"
-                />
-
-                <Text className="text-sm color-textPrimary mb-2 font-semibold">Pet Type</Text>
-                <View className="flex-row mb-4">
-                    <Pressable
-                        onPress={() => setPetType("dog")}
-                        className={`px-4 py-2 mr-3 rounded-2xl ${petType === "dog" ? "bg-buttonPrimary" : "bg-backgroundSecondary"}`}
-                    >
-                        <Text className={"text-white"}>Dog</Text>
-                    </Pressable>
-
-                    <Pressable
-                        onPress={() => setPetType("cat")}
-                        className={`px-4 py-2 rounded-2xl ${petType === "cat" ? "bg-buttonPrimary" : "bg-backgroundSecondary"}`}
-                    >
-                        <Text className={"text-white"}>Cat</Text>
-                    </Pressable>
-                </View>
-
-                <Text className="text-sm color-textPrimary mb-2 font-semibold">Breed</Text>
-                <TextInput
-                    value={breed}
-                    onChangeText={setBreed}
-                    placeholder="Enter breed"
-                    placeholderTextColor={isDark ? "#888" : "#999"}
-                    color={isDark ? "#e0e0e0ff" : "#1a1a1aff"}
-                    className="bg-backgroundSecondary rounded-xl h-12 px-3 mb-4 border border-gray-200 dark:border-gray-800"
-                />
-
-                <Text className="text-sm color-textPrimary mb-2 font-semibold">Tags</Text>
+        <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            style={{ flex: 1 }}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 20}
+        >
+            <View className="flex-1 bg-background px-4 pt-6">
                 <View className="flex-row items-center mb-4">
-                    <View className="px-3 py-1 rounded-full bg-gray-200 mr-3 opacity-60">
-                        <Text className="text-xs">Adoption</Text>
-                    </View>
+                    <Pressable className="p-2">
+                        <BackButton />
+                    </Pressable>
+                    <Text className="text-lg font-bold color-textPrimary ml-2">Add Pet for Adoption</Text>
                 </View>
 
-                <Text className="text-sm color-textPrimary mb-2 font-semibold">Location</Text>
-                <View className="flex-row items-center bg-backgroundSecondary rounded-xl h-12 mb-4 border border-gray-200 dark:border-gray-800">
+                <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 40 }}>
+                    <Text className="text-sm color-textPrimary mb-2">Photos</Text>
+
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-4">
+                        {images.length === 0 ? (
+                            <Pressable
+                                onPress={pickImage}
+                                className="h-40 w-40 rounded-2xl bg-loginSigcnupImageBg items-center justify-center mr-3"
+                            >
+                                <Ionicons name="image-outline" size={36} color={isDark ? "#e0e0e0ff" : "#1a1a1aff"} />
+                                <Text className="text-xs mt-2 color-textPrimary">Add Photo</Text>
+                            </Pressable>
+                        ) : (
+                            images.map((img, i) => (
+                                <View key={i} className="mr-3">
+                                    <Image source={{ uri: img.uri }} className="h-40 w-40 rounded-2xl" resizeMode="cover" />
+                                    <Pressable
+                                        onPress={() => setImages((prev) => prev.filter((_, idx) => idx !== i))}
+                                        className="absolute top-1 right-1 bg-white rounded-full p-1"
+                                    >
+                                        <Ionicons name="close" size={16} color="#E0583D" />
+                                    </Pressable>
+                                </View>
+                            ))
+                        )}
+
+                        {images.length < 2 && (
+                            <Pressable onPress={pickImage} className="h-40 w-40 rounded-2xl bg-loginSigcnupImageBg items-center justify-center border border-dashed border-gray-400">
+                                <Ionicons name="add" size={28} color={isDark ? "#e0e0e0ff" : "#1a1a1aff"} />
+                                <Text className="text-xs mt-2 color-textPrimary opacity-70">Add Photo</Text>
+                            </Pressable>
+                        )}
+                    </ScrollView>
+
+                    <Text className="text-sm color-textPrimary mb-2 font-semibold">Pet Name</Text>
                     <TextInput
-                        value={location}
-                        onChangeText={setLocation}
-                        placeholder="City, State"
+                        value={name}
+                        onChangeText={setName}
+                        placeholder="Enter pet name"
                         placeholderTextColor={isDark ? "#888" : "#999"}
                         color={isDark ? "#e0e0e0ff" : "#1a1a1aff"}
-                        className="flex-1 px-3 h-12"
+                        className="bg-backgroundSecondary rounded-xl h-12 px-3 mb-4 border border-gray-200 dark:border-gray-800"
                     />
-                    <Pressable onPress={getLocation} className="px-4 justify-center items-center h-full" disabled={locationLoading}>
-                        {locationLoading ? <ActivityIndicator size="small" color="#E0583D" /> : <Ionicons name="locate" size={20} color="#E0583D" />}
+
+                    <Text className="text-sm color-textPrimary mb-2 font-semibold">Pet Type</Text>
+                    <View className="flex-row mb-4">
+                        <Pressable
+                            onPress={() => setPetType("dog")}
+                            className={`px-4 py-2 mr-3 rounded-2xl ${petType === "dog" ? "bg-buttonPrimary" : "bg-backgroundSecondary"}`}
+                        >
+                            <Text className={"text-white"}>Dog</Text>
+                        </Pressable>
+
+                        <Pressable
+                            onPress={() => setPetType("cat")}
+                            className={`px-4 py-2 rounded-2xl ${petType === "cat" ? "bg-buttonPrimary" : "bg-backgroundSecondary"}`}
+                        >
+                            <Text className={"text-white"}>Cat</Text>
+                        </Pressable>
+                    </View>
+
+                    <Text className="text-sm color-textPrimary mb-2 font-semibold">Breed</Text>
+                    <TextInput
+                        value={breed}
+                        onChangeText={setBreed}
+                        placeholder="Enter breed"
+                        placeholderTextColor={isDark ? "#888" : "#999"}
+                        color={isDark ? "#e0e0e0ff" : "#1a1a1aff"}
+                        className="bg-backgroundSecondary rounded-xl h-12 px-3 mb-4 border border-gray-200 dark:border-gray-800"
+                    />
+
+                    <Text className="text-sm color-textPrimary mb-2 font-semibold">Tags</Text>
+                    <View className="flex-row items-center mb-4">
+                        <View className="px-3 py-1 rounded-full bg-gray-200 mr-3 opacity-60">
+                            <Text className="text-xs">Adoption</Text>
+                        </View>
+                    </View>
+
+                    <Text className="text-sm color-textPrimary mb-2 font-semibold">Location</Text>
+                    <View className="flex-row items-center bg-backgroundSecondary rounded-xl h-12 mb-4 border border-gray-200 dark:border-gray-800">
+                        <TextInput
+                            value={location}
+                            onChangeText={setLocation}
+                            placeholder="City, State"
+                            placeholderTextColor={isDark ? "#888" : "#999"}
+                            color={isDark ? "#e0e0e0ff" : "#1a1a1aff"}
+                            className="flex-1 px-3 h-12"
+                        />
+                        <Pressable onPress={getLocation} className="px-4 justify-center items-center h-full" disabled={locationLoading}>
+                            {locationLoading ? <ActivityIndicator size="small" color="#E0583D" /> : <Ionicons name="locate" size={20} color="#E0583D" />}
+                        </Pressable>
+                    </View>
+
+                    <Text className="text-sm color-textPrimary mb-2 font-semibold">Owner Details</Text>
+                    <TextInput
+                        value={ownerName}
+                        onChangeText={setOwnerName}
+                        placeholder="Owner name"
+                        placeholderTextColor={isDark ? "#888" : "#999"}
+                        color={isDark ? "#e0e0e0ff" : "#1a1a1aff"}
+                        className="bg-backgroundSecondary rounded-xl h-12 px-3 mb-3 border border-gray-200 dark:border-gray-800"
+                    />
+                    <TextInput
+                        value={ownerContact}
+                        onChangeText={setOwnerContact}
+                        placeholder="Contact (phone or email)"
+                        placeholderTextColor={isDark ? "#888" : "#999"}
+                        color={isDark ? "#e0e0e0ff" : "#1a1a1aff"}
+                        className="bg-backgroundSecondary rounded-xl h-12 px-3 mb-6 border border-gray-200 dark:border-gray-800"
+                    />
+
+                    <Pressable onPress={onSubmit} disabled={isSubmitting} className={`h-12 rounded-xl py-3 ${isSubmitting ? 'bg-gray-400' : 'bg-buttonPrimary shadow-sm'} items-center justify-center mb-8 flex-row`}>
+                        {isSubmitting ? (
+                            <>
+                                <ActivityIndicator size="small" color="#ffffff" />
+                                <Text className="text-white font-bold ml-2">Saving Pet...</Text>
+                            </>
+                        ) : (
+                            <Text className="text-white font-bold">Create Listing</Text>
+                        )}
                     </Pressable>
-                </View>
-
-                <Text className="text-sm color-textPrimary mb-2 font-semibold">Owner Details</Text>
-                <TextInput
-                    value={ownerName}
-                    onChangeText={setOwnerName}
-                    placeholder="Owner name"
-                    placeholderTextColor={isDark ? "#888" : "#999"}
-                    color={isDark ? "#e0e0e0ff" : "#1a1a1aff"}
-                    className="bg-backgroundSecondary rounded-xl h-12 px-3 mb-3 border border-gray-200 dark:border-gray-800"
-                />
-                <TextInput
-                    value={ownerContact}
-                    onChangeText={setOwnerContact}
-                    placeholder="Contact (phone or email)"
-                    placeholderTextColor={isDark ? "#888" : "#999"}
-                    color={isDark ? "#e0e0e0ff" : "#1a1a1aff"}
-                    className="bg-backgroundSecondary rounded-xl h-12 px-3 mb-6 border border-gray-200 dark:border-gray-800"
-                />
-
-                <Pressable onPress={onSubmit} disabled={isSubmitting} className={`h-12 rounded-xl py-3 ${isSubmitting ? 'bg-gray-400' : 'bg-buttonPrimary shadow-sm'} items-center justify-center mb-8 flex-row`}>
-                    {isSubmitting ? (
-                        <>
-                            <ActivityIndicator size="small" color="#ffffff" />
-                            <Text className="text-white font-bold ml-2">Saving Pet...</Text>
-                        </>
-                    ) : (
-                        <Text className="text-white font-bold">Create Listing</Text>
-                    )}
-                </Pressable>
-            </ScrollView>
-        </View>
+                </ScrollView>
+            </View>
+        </KeyboardAvoidingView>
     );
 };
 
