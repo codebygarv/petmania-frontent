@@ -504,7 +504,7 @@ const EditProfile = () => {
                                     {touched.adharCardNumber && errors.adharCardNumber
                                         ? <Text style={{ color: '#E0583D', fontSize: 12, marginBottom: 8 }}>{errors.adharCardNumber}</Text>
                                         : <Text style={{ color: isDark ? '#666' : '#aaa', fontSize: 11, marginBottom: 8 }}>
-                                            Your Aadhaar number is stored securely and never shared.
+                                            Your Aadhaar number is stored securely and will never be shared. Please ensure that you provide accurate information.
                                         </Text>
                                     }
                                 </View>

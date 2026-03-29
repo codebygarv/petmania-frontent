@@ -219,14 +219,14 @@ const AddPets = () => {
                             onPress={() => setPetType("dog")}
                             className={`px-4 py-2 mr-3 rounded-2xl ${petType === "dog" ? "bg-buttonPrimary" : "bg-backgroundSecondary"}`}
                         >
-                            <Text className={"text-white"}>Dog</Text>
+                            <Text className={"text-black dark:text-white"}>Dog</Text>
                         </Pressable>
 
                         <Pressable
                             onPress={() => setPetType("cat")}
                             className={`px-4 py-2 rounded-2xl ${petType === "cat" ? "bg-buttonPrimary" : "bg-backgroundSecondary"}`}
                         >
-                            <Text className={"text-white"}>Cat</Text>
+                            <Text className={"text-black dark:text-white"}>Cat</Text>
                         </Pressable>
                     </View>
 
