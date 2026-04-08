@@ -1,6 +1,8 @@
 import { View, Text, ScrollView, TouchableOpacity } from "react-native";
 import React from "react";
 import { Ionicons } from "@expo/vector-icons";
+import { useColorScheme } from "nativewind";
+import { getColor } from "@/constants/color";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import Toast from "react-native-toast-message";
@@ -10,6 +12,13 @@ import { useSelector } from "react-redux";
 const Profile = () => {
   const userInfo = useSelector((state) => state.user.userInfo);
   const userVerified = userInfo?.isVerified;
+
+  const { colorScheme } = useColorScheme();
+  const isDark = colorScheme === "dark";
+
+  const accentColor = getColor("accent", isDark);
+  const graySoftColor = getColor("graySoft", isDark);
+  const errorColor = getColor("error", isDark);
 
   const getUserInitials = () => {
     if (!userInfo) return "U";
@@ -57,7 +66,7 @@ const Profile = () => {
       id: 1,
       title: "Edit Profile",
       icon: "person-outline",
-      color: "#E0583D",
+      color: accentColor,
       onPress: () => {
         router.push("/EditProfile");
       },
@@ -66,7 +75,7 @@ const Profile = () => {
       id: 2,
       title: "Add Pet Profile",
       icon: "paw-outline",
-      color: "#E0583D",
+      color: accentColor,
       onPress: () => {
         router.push("/AddPets");
       },
@@ -75,7 +84,7 @@ const Profile = () => {
       id: 3,
       title: "Settings",
       icon: "settings-outline",
-      color: "#666",
+      color: graySoftColor,
       onPress: () => {
         Toast.show({
           type: "info",
@@ -88,7 +97,7 @@ const Profile = () => {
       id: 4,
       title: "Help & Support",
       icon: "help-circle-outline",
-      color: "#666",
+      color: graySoftColor,
       onPress: () => {
         router.push("/HelpSupport");
       },
@@ -97,7 +106,7 @@ const Profile = () => {
       id: 5,
       title: "About",
       icon: "information-circle-outline",
-      color: "#666",
+      color: graySoftColor,
       onPress: () => {
         router.push("/About");
       },
@@ -127,7 +136,7 @@ const Profile = () => {
 
           <View className="flex-row justify-between mb-6">
             <View className="flex-1 items-center bg-backgroundSecondary rounded-2xl p-4 mx-1">
-              <Ionicons name="paw-outline" size={24} color="#E0583D" />
+              <Ionicons name="paw-outline" size={24} color={accentColor} />
               <Text className="text-2xl font-bold color-textPrimary mt-2">2</Text>
               <Text className="text-xs text-gray-500 mt-1">Adopted</Text>
             </View>
@@ -161,7 +170,7 @@ const Profile = () => {
                 <Ionicons
                   name="chevron-forward-outline"
                   size={20}
-                  color="#666"
+                  color={graySoftColor}
                 />
               </TouchableOpacity>
             ))}
@@ -173,8 +182,8 @@ const Profile = () => {
             activeOpacity={0.7}
             className="flex-row items-center justify-center bg-backgroundSecondary rounded-2xl p-4 mb-6 border border-red-200"
           >
-            <Ionicons name="log-out-outline" size={22} color="#E64545" />
-            <Text className="ml-2 text-base font-semibold color-[#E64545]">
+            <Ionicons name="log-out-outline" size={22} color={errorColor} />
+            <Text className={`ml-2 text-base font-semibold text-error`}>
               Logout
             </Text>
           </TouchableOpacity>

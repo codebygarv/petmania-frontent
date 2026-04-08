@@ -11,6 +11,7 @@ import Toast from "react-native-toast-message";
 import { useDispatch, useSelector } from "react-redux";
 import { forgotPasswordAction } from "@/redux/actions/userActions";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getColor } from "@/constants/color";
 
 const validationSchema = Yup.object().shape({
   email: Yup.string()
@@ -19,6 +20,8 @@ const validationSchema = Yup.object().shape({
 });
 
 const ForgotPassword = () => {
+  const { colorScheme } = useColorScheme();
+  const isDark = colorScheme === "dark";
   const dispatch = useDispatch<any>();
   const loading = useSelector((state: any) => state.user.loading);
 
@@ -93,7 +96,7 @@ const ForgotPassword = () => {
                 )}
 
                 <Button 
-                  text={loading ? <ActivityIndicator color={"#fff"} /> : 'Send'} 
+                  text={loading ? <ActivityIndicator color={getColor("white", isDark)} /> : 'Send'} 
                   onPress={handleSubmit}
                   disabled={!!errors.email || loading}
                 />

@@ -3,6 +3,8 @@ import React, { useEffect, useState, useCallback } from "react";
 import BackButton from "@/components/BackButton";
 import { Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useColorScheme } from "nativewind";
+import { getColor } from "@/constants/color";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Location from "expo-location";
 import { config } from "@/constants/config";
@@ -15,6 +17,8 @@ import { getUserDetailsAction } from "@/redux/actions/userActions";
 import HomeSkeleton from "@/components/HomeSkeleton/HomeSkeleton";
 
 const Index = () => {
+  const { colorScheme } = useColorScheme();
+  const isDark = colorScheme === "dark";
   const user = useSelector((state) => state.user.userInfo);
   const [activeIndex, setActiveIndex] = useState(0);
   const [activeCategory, setActiveCategory] = useState("dog");
@@ -24,6 +28,10 @@ const Index = () => {
   const [petData, setPetData] = useState({ dog: [], cat: [] });
   const [petsLoading, setPetsLoading] = useState(false);
   const dispatch = useDispatch();
+
+  const accentColor = getColor("accent", isDark);
+  const whiteColor = getColor("white", isDark);
+  const blackColor = getColor("black", isDark);
 
   const fetchUserDetails = async () => {
     await dispatch(getUserDetailsAction());
@@ -168,7 +176,7 @@ const Index = () => {
             {
               location?.city && (
                 <View className="flex-1 flex-row px-4 items-center justify-center">
-                  <Ionicons name="location-outline" size={20} color={"#E0583D"} />
+                  <Ionicons name="location-outline" size={20} color={accentColor} />
                   <Text className="font-bold text-xl color-textPrimary ml-1 text-center flex-shrink text-wrap">
                     {location?.city}
                   </Text>
@@ -179,7 +187,7 @@ const Index = () => {
               onPress={() => setShowSearch(true)}
               className="flex justify-center items-center w-10 h-10 p-1 rounded-2xl overflow-hidden bg-loginSigcnupImageBg"
             >
-              <Ionicons name="search-outline" size={20} color={"#000"} />
+              <Ionicons name="search-outline" size={20} color={whiteColor} />
             </Pressable>
           </View>
 
@@ -243,7 +251,7 @@ const Index = () => {
                   <View key={pet.id} className="w-[48%] mb-4">
                     <View className={`rounded-3xl p-2 ${pet.bg}`}>
                       <View className="absolute top-3 right-3 z-10">
-                        <Ionicons name="heart" size={18} color="#E0583D" />
+                        <Ionicons name="heart" size={18} color={accentColor} />
                       </View>
 
                       <Image
@@ -262,7 +270,7 @@ const Index = () => {
                         <Ionicons
                           name="location-outline"
                           size={14}
-                          color="#E0583D"
+                          color={accentColor}
                         />
                         <Text className="text-xs ml-1 text-gray-500 overflow-hidden line-clamp-1 w-[80%]">
                           {pet.distance}

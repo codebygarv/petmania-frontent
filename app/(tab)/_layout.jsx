@@ -3,6 +3,7 @@ import { useColorScheme } from "nativewind";
 import { TouchableOpacity } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import { getColor } from "@/constants/color";
 
 export default function TabLayout() {
   const { colorScheme } = useColorScheme();
@@ -15,7 +16,7 @@ export default function TabLayout() {
         headerShown: false,
 
         tabBarStyle: {
-          backgroundColor: isDark ? "#0B0B0B" : "#FFFFFF",
+          backgroundColor: getColor("tabBg", isDark),
           borderTopWidth: 0,
           paddingTop: 8,
           height: 55,

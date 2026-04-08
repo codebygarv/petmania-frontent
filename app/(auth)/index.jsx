@@ -14,6 +14,7 @@ import RememberMeToggle from "@/components/RememberMeToggle";
 import Button from "@/components/Button";
 import SocialLoginButtons from "@/components/SocialLoginButtons";
 import { useColorScheme } from "nativewind";
+import { getColor } from "@/constants/color";
 import { router } from "expo-router";
 import { Formik } from "formik";
 import * as Yup from "yup";
@@ -163,7 +164,7 @@ const Index = () => {
 
             <View className="flex gap-2">
               <Button
-                text={loading ? <ActivityIndicator color={"#fff"} /> : "Sign In"}
+                text={loading ? <ActivityIndicator color={getColor("white", isDark)} /> : "Sign In"}
                 onPress={handleSubmit}
                 disabled={!!(errors.email || errors.password) || loading}
               />

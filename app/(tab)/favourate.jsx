@@ -2,8 +2,15 @@ import { View, Text, ScrollView, Image } from "react-native";
 import React from "react";
 import { config } from "@/constants/config";
 import { Ionicons } from "@expo/vector-icons";
+import { useColorScheme } from "nativewind";
+import { getColor } from "@/constants/color";
 
 const favourate = () => {
+  const { colorScheme } = useColorScheme();
+  const isDark = colorScheme === "dark";
+
+  const accentColor = getColor("accent", isDark);
+  const graySoftColor = getColor("graySoft", isDark);
 
   const favouratePets = [
     {
@@ -291,10 +298,10 @@ const favourate = () => {
 
                     <View className="flex-1">
                       <View className="flex-row items-center justify-between mb-1 ">
-                        <Text className="font-bold text-lg color-[#090909]">
+                        <Text className="font-bold text-lg color-textPrimary">
                           {pet.name}
                         </Text>
-                        <Ionicons name="heart" size={20} color="#E0583D" />
+                        <Ionicons name="heart" size={20} color={accentColor} />
                       </View>
                       
                       <Text className="text-sm text-gray-600 mb-1">
@@ -302,14 +309,14 @@ const favourate = () => {
                       </Text>
                       
                       <View className="flex-row items-center mb-1">
-                        <Ionicons name="time-outline" size={14} color="#666" />
+                        <Ionicons name="time-outline" size={14} color={graySoftColor} />
                         <Text className="text-xs ml-1 text-gray-500">
                           {pet.age}
                         </Text>
                       </View>
                       
                       <View className="flex-row items-center mb-1">
-                        <Ionicons name="location-outline" size={14} color="#E0583D" />
+                        <Ionicons name="location-outline" size={14} color={accentColor} />
                         <Text className="text-xs ml-1 text-gray-500">
                           {pet.location}
                         </Text>

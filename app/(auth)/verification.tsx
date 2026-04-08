@@ -16,6 +16,8 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useLocalSearchParams } from "expo-router";
 
+import { COLORS, getColor } from "@/constants/color";
+
 const validationSchema = Yup.object().shape({
   otp: Yup.string()
     .length(4, "Code must be exactly 4 digits")
@@ -23,6 +25,8 @@ const validationSchema = Yup.object().shape({
 });
 
 const Verification = () => {
+  const { colorScheme } = useColorScheme();
+  const isDark = colorScheme === "dark";
   const dispatch = useDispatch<any>();
   const loading = useSelector((state: any) => state.user.loading);
   const { type } = useLocalSearchParams();

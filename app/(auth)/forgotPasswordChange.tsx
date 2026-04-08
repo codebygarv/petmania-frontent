@@ -1,5 +1,7 @@
 import { View, Text, ActivityIndicator } from "react-native";
 import React from "react";
+import { useColorScheme } from "nativewind";
+import { getColor } from "@/constants/color";
 import BackButton from "@/components/BackButton";
 import Input from "@/components/Input";
 import Button from "@/components/Button";
@@ -25,6 +27,8 @@ interface ChangePasswordFormValues {
 }
 
 const ForgotPasswordChange = () => {
+  const { colorScheme } = useColorScheme();
+  const isDark = colorScheme === "dark";
   const dispatch = useDispatch<any>();
   const loading = useSelector((state: any) => state.user.loading);
 
@@ -105,7 +109,7 @@ const ForgotPasswordChange = () => {
             )}
 
             <Button
-              text={loading ? <ActivityIndicator color={"#fff"} /> : "Update Password"}
+              text={loading ? <ActivityIndicator color={getColor("white", isDark)} /> : "Update Password"}
               onPress={handleSubmit}
               disabled={!!(errors.password || errors.confirmPassword) || loading}
             />

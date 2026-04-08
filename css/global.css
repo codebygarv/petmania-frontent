@@ -27,6 +27,12 @@
     --color-login-singup-image-bg: 224 88 61; /* #E0583D */
     --bg-Social-button: 240 240 240;
     --color-input-icon-dark: 237 237 237;
+    --color-white: 255 255 255;
+    --color-black: 0 0 0;
+    --color-tab-bg: 255 255 255;
+    --color-skeleton-bg: 229 229 229; /* #E5E5E5 */
+    --color-skeleton-item: 209 209 209; /* #D1D1D1 */
+    --color-gray-soft: 102 102 102; /* #666 */
   }
 
   .dark {
@@ -52,5 +58,11 @@
     --color-shadow: 0 0 0 / 0.6; /* rgba(0,0,0,0.6) */
     --color-login-singup-image-bg: 224 88 61; /* #E0583D */
     --bg-Social-button: 2 2 2;
+    --color-white: 255 255 255;
+    --color-black: 0 0 0;
+    --color-tab-bg: 11 11 11; /* #0B0B0B */
+    --color-skeleton-bg: 38 38 38; /* #262626 */
+    --color-skeleton-item: 55 55 55; /* #373737 */
+    --color-gray-soft: 154 154 154; /* #9A9A9A */
   }
 }
