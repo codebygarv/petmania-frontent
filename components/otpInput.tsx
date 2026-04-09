@@ -56,6 +56,7 @@ const OtpInputBox: React.FC<OtpInputBoxProps> = ({
           onKeyPress={(e) => handleKeyPress(e, i)}
           keyboardType={keyboardType}
           maxLength={1}
+          autoFocus={i === 0}
           textAlign="center"
           className="flex-row items-center rounded-2xl border border-buttonPrimary overflow-hidden w-full text-base font-semibold p-0 m-0 outline-none color-textPrimary text-center"
           style={{

@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, ActivityIndicator } from "react-native";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useColorScheme } from "nativewind";
 import BackButton from "@/components/BackButton";
 import OtpInputBox from "@/components/otpInput";
@@ -11,6 +11,7 @@ import { router } from "expo-router";
 import { useDispatch, useSelector } from "react-redux";
 import {
   forgotPasswordOtpAction,
+  resendOtpAction,
   verifyOtpAction,
 } from "@/redux/actions/userActions";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -31,8 +32,55 @@ const Verification = () => {
   const loading = useSelector((state: any) => state.user.loading);
   const { type } = useLocalSearchParams();
 
-  const handleVerify = async (values: { otp: string }) => {
+  const [timer, setTimer] = useState(60);
+  const [canResend, setCanResend] = useState(false);
 
+  useEffect(() => {
+    let interval: ReturnType<typeof setInterval>;
+    if (timer > 0) {
+      interval = setInterval(() => {
+        setTimer((prev) => prev - 1);
+      }, 1000);
+    } else {
+      setCanResend(true);
+    }
+    return () => clearInterval(interval);
+  }, [timer]);
+
+  const handleResendCode = async () => {
+    if (!canResend) return;
+
+    const email = await AsyncStorage.getItem(type === "forgot-password" ? "forgotPasswordemail" : "email");
+    
+    if (!email) {
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Email not found. Please restart the process.",
+      });
+      return;
+    }
+
+    const res = await dispatch(resendOtpAction({ email }));
+
+    if (res?.success) {
+      Toast.show({
+        type: "success",
+        text1: "Code Sent",
+        text2: "A new verification code has been sent to your email.",
+      });
+      setTimer(60);
+      setCanResend(false);
+    } else {
+      Toast.show({
+        type: "error",
+        text1: "Failed to send code",
+        text2: res?.error?.message || "Please try again later.",
+      });
+    }
+  };
+
+  const handleVerify = async (values: { otp: string }) => {
     if (type === "forgot-password") {
       const email = await AsyncStorage.getItem("forgotPasswordemail");
 
@@ -89,12 +137,26 @@ const Verification = () => {
           text2: res?.error?.error?.message,
         });
       } else if (res?.success === true) {
-        Toast.show({
-          type: "success",
-          text1: "Verification Successful",
-          text2: res?.message,
-        });
-        router.push("/");
+        // Auto-login: Save token and user info to AsyncStorage
+        if (res?.data?.token) {
+          await AsyncStorage.setItem("token", String(res.data.token));
+        }
+        if (res?.data?.user) {
+          await AsyncStorage.setItem("userInfo", JSON.stringify(res.data.user));
+          
+          Toast.show({
+            type: "success",
+            text1: "Verification Successful",
+            text2: "Welcome to Petmania!",
+          });
+
+          // Check if onboarding is needed
+            if (!res.data.user.name) {
+             router.replace("/Onboarding" as any);
+          } else {
+             router.replace("/(tab)");
+          }
+        }
       } else {
         Toast.show({
           type: "error",
@@ -158,9 +220,12 @@ const Verification = () => {
                 <Text className="color-textSecondary text-sm text-center">
                   Didn't receive any code?
                 </Text>
-                <TouchableOpacity>
-                  <Text className="color-buttonPrimary text-sm text-center underline">
-                    Resend Code
+                <TouchableOpacity 
+                  disabled={!canResend}
+                  onPress={handleResendCode}
+                >
+                  <Text className={`text-sm text-center underline ${canResend ? 'color-buttonPrimary' : 'color-textSecondary opacity-50'}`}>
+                    {canResend ? "Resend Code" : `Resend in ${timer}s`}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -173,3 +238,4 @@ const Verification = () => {
 };
 
 export default Verification;
+

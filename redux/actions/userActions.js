@@ -104,14 +104,16 @@ export const verifyOtpAction = (otpData) => {
         dispatch({ type: userConstants.USER_OTP_REQUEST });
         try {
             const res = await axiosInstance.post('/user/resgister/verifyOtp', otpData);
-            console.log('otp   response ', res)
-            console.log('otp   Data ', otpData)
+            
             if (res.status === 200) {
                 dispatch({
                     type: userConstants.USER_OTP_ACCEPT,
-                    payload: { message: res.data.message },
+                    payload: { 
+                        message: res.data.message,
+                        user: res.data.data.user // Capture the user info from the backend response
+                    },
                 });
-                return res.data;
+                return res.data; // Return the entire response, including the token
             }
             else {
                 dispatch({
@@ -279,3 +281,48 @@ export const updatePasswordAction = (passwordData) => {
         }
     };
 }
+
+export const resendOtpAction = (emailData) => {
+    return async (dispatch) => {
+        dispatch({ type: userConstants.USER_OTP_REQUEST }); // Reusing OTP request constant
+        try {
+            const res = await axiosInstance.post('/user/resend-otp', emailData);
+            if (res.status === 200) {
+                return res.data;
+            } else {
+                return { error: res.data };
+            }
+        } catch (error) {
+            return { error: error?.response?.data };
+        }
+    };
+};
+
+export const deleteAccountAction = () => {
+    return async (dispatch) => {
+        dispatch({ type: userConstants.USER_DELETE_ACCOUNT_REQUEST });
+        try {
+            const res = await axiosInstance.delete('/user/delete');
+            if (res.status === 200) {
+                dispatch({
+                    type: userConstants.USER_DELETE_ACCOUNT_ACCEPT,
+                    payload: { message: res.data.message },
+                });
+                return res.data;
+            } else {
+                dispatch({
+                    type: userConstants.USER_DELETE_ACCOUNT_FAILURE,
+                    payload: { error: res.data?.error || 'Deleting account failed' },
+                });
+                return { error: res.data?.errors };
+            }
+        } catch (error) {
+            dispatch({
+                type: userConstants.USER_DELETE_ACCOUNT_FAILURE,
+                payload: { error: error?.response?.data || [{ type: "general", message: "Deleting account failed" }] }
+            });
+            return { error: error?.response?.data };
+        }
+    };
+};
+

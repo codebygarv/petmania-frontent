@@ -1,11 +1,20 @@
-import { Text, TouchableOpacity } from "react-native";
+import { Text, TouchableOpacity, Platform } from "react-native";
 import React from "react";
-
+import * as Haptics from "expo-haptics";
 
 const Button = ({ text, onPress, disabled = false }) => {
+  const handlePress = () => {
+    if (!disabled) {
+      if (Platform.OS !== 'web') {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      }
+      onPress?.();
+    }
+  };
+
   return (
     <TouchableOpacity
-      onPress={onPress}
+      onPress={handlePress}
       activeOpacity={0.8}
       disabled={disabled}
       className={`rounded-xl py-4 px-8 shadow-md items-center justify-center ${

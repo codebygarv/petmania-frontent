@@ -178,8 +178,8 @@ const AddPets = () => {
                                 onPress={pickImage}
                                 className="h-40 w-40 rounded-2xl bg-loginSigcnupImageBg items-center justify-center mr-3"
                             >
-                                <Ionicons name="image-outline" size={36} color={isDark ? "#e0e0e0ff" : "#1a1a1aff"} />
-                                <Text className="text-xs mt-2 color-textPrimary">Add Photo</Text>
+                                <Ionicons name="image-outline" size={36} color={isDark ? "#e0e0e0" : "#1a1a1a"} />
+                                <Text className="text-xs mt-2 color-textSecondary">Add Photo</Text>
                             </Pressable>
                         ) : (
                             images.map((img, i) => (
@@ -197,8 +197,8 @@ const AddPets = () => {
 
                         {images.length < 2 && (
                             <Pressable onPress={pickImage} className="h-40 w-40 rounded-2xl bg-loginSigcnupImageBg items-center justify-center border border-dashed border-gray-400">
-                                <Ionicons name="add" size={28} color={isDark ? "#e0e0e0ff" : "#1a1a1aff"} />
-                                <Text className="text-xs mt-2 color-textPrimary opacity-70">Add Photo</Text>
+                                <Ionicons name="add" size={28} color={isDark ? "#e0e0e0" : "#1a1a1a"} />
+                                <Text className="text-xs mt-2 color-textSecondary opacity-70">Add Photo</Text>
                             </Pressable>
                         )}
                     </ScrollView>
@@ -208,9 +208,8 @@ const AddPets = () => {
                         value={name}
                         onChangeText={setName}
                         placeholder="Enter pet name"
-                        placeholderTextColor={isDark ? "#888" : "#999"}
-                        color={isDark ? "#e0e0e0ff" : "#1a1a1aff"}
-                        className="bg-backgroundSecondary rounded-xl h-12 px-3 mb-4 border border-gray-200 dark:border-gray-800"
+                        placeholderTextColor="#9ca3af"
+                        className="bg-backgroundSecondary text-textPrimary rounded-xl h-12 px-3 mb-4 border border-gray-200 dark:border-gray-800"
                     />
 
                     <Text className="text-sm color-textPrimary mb-2 font-semibold">Pet Type</Text>
@@ -235,9 +234,8 @@ const AddPets = () => {
                         value={breed}
                         onChangeText={setBreed}
                         placeholder="Enter breed"
-                        placeholderTextColor={isDark ? "#888" : "#999"}
-                        color={isDark ? "#e0e0e0ff" : "#1a1a1aff"}
-                        className="bg-backgroundSecondary rounded-xl h-12 px-3 mb-4 border border-gray-200 dark:border-gray-800"
+                        placeholderTextColor="#9ca3af"
+                        className="bg-backgroundSecondary text-textPrimary rounded-xl h-12 px-3 mb-4 border border-gray-200 dark:border-gray-800"
                     />
 
                     <Text className="text-sm color-textPrimary mb-2 font-semibold">Tags</Text>

@@ -51,6 +51,8 @@ const Signup = () => {
 
   const handleSubmit = async (values: SignupFormValues) => {
     const res = await dispatch(signupAction(values)); // sending the data to the backend
+    console.log("values", values);
+    console.log("res", res);
 
     if (res?.error?.success === false) {
       Toast.show({

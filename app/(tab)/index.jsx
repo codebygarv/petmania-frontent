@@ -15,6 +15,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getPetsAction } from "@/redux/actions/petActions";
 import { getUserDetailsAction } from "@/redux/actions/userActions";
 import HomeSkeleton from "@/components/HomeSkeleton/HomeSkeleton";
+import EmptyState from "@/components/EmptyState";
 
 const Index = () => {
   const { colorScheme } = useColorScheme();
@@ -243,9 +244,11 @@ const Index = () => {
               {petsLoading ? (
                 <HomeSkeleton />
               ) : petData[activeCategory]?.length === 0 ? (
-                <View className="w-full py-10 items-center">
-                  <Text className="color-textSecondary">No pets found in your area. Add some!</Text>
-                </View>
+                <EmptyState
+                  title="No Pets Found"
+                  description="There are no pets available in your area yet. Try changing your category or check back later!"
+                  icon="paw-outline"
+                />
               ) : (
                 petData[activeCategory]?.map((pet) => (
                   <View key={pet.id} className="w-[48%] mb-4">

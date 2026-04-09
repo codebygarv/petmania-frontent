@@ -86,11 +86,7 @@ const Profile = () => {
       icon: "settings-outline",
       color: graySoftColor,
       onPress: () => {
-        Toast.show({
-          type: "info",
-          text1: "Coming Soon",
-          text2: "Settings feature will be available soon",
-        });
+        router.push("/Settings");
       },
     },
     {
@@ -109,6 +105,15 @@ const Profile = () => {
       color: graySoftColor,
       onPress: () => {
         router.push("/About");
+      },
+    },
+    {
+      id: 6,
+      title: "Change Password",
+      icon: "lock-closed-outline",
+      color: graySoftColor,
+      onPress: () => {
+        router.push("/resetPassword");
       },
     },
   ];

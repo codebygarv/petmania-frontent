@@ -22,28 +22,25 @@ const SectionHeader = ({ title, isDark }) => (
         <Text style={{ fontSize: 15, fontWeight: '700', color: isDark ? '#e0e0e0' : '#1a1a1a', letterSpacing: 0.3 }}>
             {title}
         </Text>
-        <View style={{ height: 2, width: 36, backgroundColor: '#E0583D', borderRadius: 2, marginTop: 4 }} />
+        <View className="bg-buttonPrimary" style={{ height: 2, width: 36, borderRadius: 2, marginTop: 4 }} />
     </View>
 );
 
 const FieldLabel = ({ label, isDark }) => (
-    <Text style={{ fontSize: 13, color: isDark ? '#aaa' : '#555', marginBottom: 4, fontWeight: '500' }}>
+    <Text className="color-textSecondary" style={{ fontSize: 13, marginBottom: 4, fontWeight: '500' }}>
         {label}
     </Text>
 );
 
 const InputField = ({ isDark, style, ...props }) => (
     <TextInput
-        placeholderTextColor={isDark ? "#666" : "#aaa"}
+        placeholderTextColor="#9ca3af"
+        className="bg-backgroundSecondary text-textPrimary border border-gray-200 dark:border-gray-800"
         style={[{
-            backgroundColor: isDark ? '#1e1e1e' : '#f5f5f5',
             borderRadius: 12,
             paddingHorizontal: 14,
             paddingVertical: 12,
             fontSize: 14,
-            color: isDark ? '#e0e0e0' : '#1a1a1a',
-            borderWidth: 1,
-            borderColor: isDark ? '#2e2e2e' : '#e8e8e8',
             marginBottom: 4,
         }, style]}
         {...props}
