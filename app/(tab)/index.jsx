@@ -1,4 +1,4 @@
-import { View, Text, Pressable, ScrollView } from "react-native";
+import { View, Text, Pressable, ScrollView, ActivityIndicator } from "react-native";
 import React, { useEffect, useState, useCallback } from "react";
 import BackButton from "@/components/BackButton";
 import { Image } from "react-native";
@@ -13,14 +13,14 @@ import Search from "@/components/Search";
 import Toast from "react-native-toast-message";
 import { useDispatch, useSelector } from "react-redux";
 import { getPetsAction } from "@/redux/actions/petActions";
-import { getUserDetailsAction } from "@/redux/actions/userActions";
+import { getUserDetailsAction, toggleFavouriteAction, getFavouritesAction } from "@/redux/actions/userActions";
 import HomeSkeleton from "@/components/HomeSkeleton/HomeSkeleton";
 import EmptyState from "@/components/EmptyState";
 
 const Index = () => {
   const { colorScheme } = useColorScheme();
   const isDark = colorScheme === "dark";
-  const user = useSelector((state) => state.user.userInfo);
+  const { userInfo: user, favourites } = useSelector((state) => state.user);
   const [activeIndex, setActiveIndex] = useState(0);
   const [activeCategory, setActiveCategory] = useState("dog");
   const [showSearch, setShowSearch] = useState(false);
@@ -36,11 +36,16 @@ const Index = () => {
 
   const fetchUserDetails = async () => {
     await dispatch(getUserDetailsAction());
+    await dispatch(getFavouritesAction());
   };
 
   useEffect(() => {
     fetchUserDetails();
   }, []);
+
+  const handleToggleFavourite = (petId) => {
+    dispatch(toggleFavouriteAction(petId));
+  };
 
 
   const fetchPets = async (city) => {
@@ -162,6 +167,8 @@ const Index = () => {
     })();
   }, []);
 
+
+
   return (
     <View className="flex-1 bg-background overflow-hidden">
       {showSearch ? (
@@ -175,7 +182,11 @@ const Index = () => {
               </Text>
             </View>
             {
-              location?.city && (
+              locationLoading ? (
+                <View className="flex-1 flex-row px-4 items-center justify-center">
+                  <ActivityIndicator size="small" color={accentColor} />
+                </View>
+              ) : location?.city && (
                 <View className="flex-1 flex-row px-4 items-center justify-center">
                   <Ionicons name="location-outline" size={20} color={accentColor} />
                   <Text className="font-bold text-xl color-textPrimary ml-1 text-center flex-shrink text-wrap">
@@ -241,48 +252,60 @@ const Index = () => {
             </View>
 
             <View className="flex flex-row flex-wrap justify-between mt-6">
-              {petsLoading ? (
-                <HomeSkeleton />
-              ) : petData[activeCategory]?.length === 0 ? (
-                <EmptyState
-                  title="No Pets Found"
-                  description="There are no pets available in your area yet. Try changing your category or check back later!"
-                  icon="paw-outline"
-                />
-              ) : (
-                petData[activeCategory]?.map((pet) => (
-                  <View key={pet.id} className="w-[48%] mb-4">
-                    <View className={`rounded-3xl p-2 ${pet.bg}`}>
-                      <View className="absolute top-3 right-3 z-10">
-                        <Ionicons name="heart" size={18} color={accentColor} />
-                      </View>
+              {locationLoading ? (
+                <View className="flex-1 flex-row gap-3 px-4 items-center justify-center">
+                  <Text className="text-lg font-medium color-textSecondary opacity-80">Loading location...</Text>
+                </View>
+              ) :
+                (petsLoading ? (
+                  <HomeSkeleton />
+                ) : petData[activeCategory]?.length === 0 ? (
+                  <EmptyState
+                    title="No Pets Found"
+                    description="There are no pets available in your area yet. Try changing your category or check back later!"
+                    icon="paw-outline"
+                  />
+                ) : (
+                  petData[activeCategory]?.map((pet) => (
+                    <View key={pet.id} className="w-[48%] mb-4">
+                      <View className={`rounded-3xl p-2 ${pet.bg}`}>
+                        <Pressable
+                          className="absolute top-2 right-2 z-10 p-1"
+                          onPress={() => handleToggleFavourite(pet.id)}
+                        >
+                          <Ionicons
+                            name={favourites?.some(fav => fav._id === pet.id) ? "heart" : "heart-outline"}
+                            size={20}
+                            color={favourites?.some(fav => fav._id === pet.id) ? accentColor : accentColor}
+                          />
+                        </Pressable>
 
-                      <Image
-                        source={pet.image}
-                        className="w-full h-40 rounded-2xl"
-                        resizeMode="cover"
-                      />
-                    </View>
-
-                    <View className="mt-2 text-center text-wrap overflow-hidden">
-                      <Text className="font-bold text-base color-textPrimary h-6">
-                        {pet.name}
-                      </Text>
-
-                      <View className="flex flex-row items-center mt-1">
-                        <Ionicons
-                          name="location-outline"
-                          size={14}
-                          color={accentColor}
+                        <Image
+                          source={pet.image}
+                          className="w-full h-40 rounded-2xl"
+                          resizeMode="cover"
                         />
-                        <Text className="text-xs ml-1 text-gray-500 overflow-hidden line-clamp-1 w-[80%]">
-                          {pet.distance}
+                      </View>
+
+                      <View className="mt-2 text-center text-wrap overflow-hidden">
+                        <Text className="font-bold text-base color-textPrimary h-6">
+                          {pet.name}
                         </Text>
+
+                        <View className="flex flex-row items-center mt-1">
+                          <Ionicons
+                            name="location-outline"
+                            size={14}
+                            color={accentColor}
+                          />
+                          <Text className="text-xs ml-1 text-gray-500 overflow-hidden line-clamp-1 w-[80%]">
+                            {pet.distance}
+                          </Text>
+                        </View>
                       </View>
                     </View>
-                  </View>
-                ))
-              )}
+                  ))
+                ))}
             </View>
           </ScrollView>
         </View>

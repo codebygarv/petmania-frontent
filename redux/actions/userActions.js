@@ -325,4 +325,60 @@ export const deleteAccountAction = () => {
         }
     };
 };
+
+export const toggleFavouriteAction = (petId) => {
+    return async (dispatch) => {
+        dispatch({ type: userConstants.USER_TOGGLE_FAVOURITE_REQUEST });
+        try {
+            const res = await axiosInstance.post('/user/favourites/toggle', { petId });
+            if (res.status === 200) {
+                dispatch({
+                    type: userConstants.USER_TOGGLE_FAVOURITE_ACCEPT,
+                    payload: { favourites: res.data.data.favourites },
+                });
+                return res.data;
+            } else {
+                dispatch({
+                    type: userConstants.USER_TOGGLE_FAVOURITE_FAILURE,
+                    payload: { error: res.data?.error || 'Toggling favourite failed' },
+                });
+                return { error: res.data?.errors };
+            }
+        } catch (error) {
+            dispatch({
+                type: userConstants.USER_TOGGLE_FAVOURITE_FAILURE,
+                payload: { error: error?.response?.data || [{ type: "general", message: "Toggling favourite failed" }] }
+            });
+            return { error: error?.response?.data };
+        }
+    };
+};
+
+export const getFavouritesAction = () => {
+    return async (dispatch) => {
+        dispatch({ type: userConstants.USER_FAVOURITES_REQUEST });
+        try {
+            const res = await axiosInstance.get('/user/favourites');
+            if (res.status === 200) {
+                dispatch({
+                    type: userConstants.USER_FAVOURITES_ACCEPT,
+                    payload: { favourites: res.data.data.favourites },
+                });
+                return res.data;
+            } else {
+                dispatch({
+                    type: userConstants.USER_FAVOURITES_FAILURE,
+                    payload: { error: res.data?.error || 'Fetching favourites failed' },
+                });
+                return { error: res.data?.errors };
+            }
+        } catch (error) {
+            dispatch({
+                type: userConstants.USER_FAVOURITES_FAILURE,
+                payload: { error: error?.response?.data || [{ type: "general", message: "Fetching favourites failed" }] }
+            });
+            return { error: error?.response?.data };
+        }
+    };
+};
 

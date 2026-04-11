@@ -163,9 +163,7 @@ const AddPets = () => {
         >
             <View className="flex-1 bg-background px-4 pt-6">
                 <View className="flex-row items-center mb-4">
-                    <Pressable className="p-2">
-                        <BackButton />
-                    </Pressable>
+                    <BackButton />
                     <Text className="text-lg font-bold color-textPrimary ml-2">Add Pet for Adoption</Text>
                 </View>
 
@@ -176,7 +174,7 @@ const AddPets = () => {
                         {images.length === 0 ? (
                             <Pressable
                                 onPress={pickImage}
-                                className="h-40 w-40 rounded-2xl bg-loginSigcnupImageBg items-center justify-center mr-3"
+                                className="h-40 w-40 rounded-2xl bg-backgroundSecondary items-center justify-center mr-3"
                             >
                                 <Ionicons name="image-outline" size={36} color={isDark ? "#e0e0e0" : "#1a1a1a"} />
                                 <Text className="text-xs mt-2 color-textSecondary">Add Photo</Text>
@@ -196,7 +194,7 @@ const AddPets = () => {
                         )}
 
                         {images.length < 2 && (
-                            <Pressable onPress={pickImage} className="h-40 w-40 rounded-2xl bg-loginSigcnupImageBg items-center justify-center border border-dashed border-gray-400">
+                            <Pressable onPress={pickImage} className="h-40 w-40 rounded-2xl bg-backgroundSecondary items-center justify-center border border-dashed border-gray-400">
                                 <Ionicons name="add" size={28} color={isDark ? "#e0e0e0" : "#1a1a1a"} />
                                 <Text className="text-xs mt-2 color-textSecondary opacity-70">Add Photo</Text>
                             </Pressable>
