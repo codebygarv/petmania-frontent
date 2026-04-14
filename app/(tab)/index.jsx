@@ -1,181 +1,93 @@
-import { View, Text, Pressable, ScrollView } from "react-native";
-import React, { useEffect, useState } from "react";
+import { View, Text, Pressable, ScrollView, ActivityIndicator } from "react-native";
+import React, { useEffect, useState, useCallback } from "react";
 import BackButton from "@/components/BackButton";
 import { Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useColorScheme } from "nativewind";
+import { getColor } from "@/constants/color";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Location from "expo-location";
 import { config } from "@/constants/config";
-import { router } from "expo-router";
+import { useFocusEffect } from "expo-router";
 import Search from "@/components/Search";
 import Toast from "react-native-toast-message";
+import { useDispatch, useSelector } from "react-redux";
+import { getPetsAction } from "@/redux/actions/petActions";
+import { getUserDetailsAction, toggleFavouriteAction, getFavouritesAction } from "@/redux/actions/userActions";
+import HomeSkeleton from "@/components/HomeSkeleton/HomeSkeleton";
+import EmptyState from "@/components/EmptyState";
 
 const Index = () => {
-  const [user, setUser] = useState(null);
+  const { colorScheme } = useColorScheme();
+  const isDark = colorScheme === "dark";
+  const { userInfo: user, favourites } = useSelector((state) => state.user);
   const [activeIndex, setActiveIndex] = useState(0);
   const [activeCategory, setActiveCategory] = useState("dog");
   const [showSearch, setShowSearch] = useState(false);
   const [location, setLocation] = useState(null);
   const [locationLoading, setLocationLoading] = useState(false);
+  const [locationPermissionDenied, setLocationPermissionDenied] = useState(false);
+  const [petData, setPetData] = useState({ dog: [], cat: [] });
+  const [petsLoading, setPetsLoading] = useState(false);
+  const dispatch = useDispatch();
+
+  const accentColor = getColor("accent", isDark);
+  const whiteColor = getColor("white", isDark);
+  const blackColor = getColor("black", isDark);
+
+  const fetchUserDetails = async () => {
+    await dispatch(getUserDetailsAction());
+    await dispatch(getFavouritesAction());
+  };
 
   useEffect(() => {
-    const loadUser = async () => {
-      const stored = await AsyncStorage.getItem("user");
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        setUser(parsed);
-      }
-    };
-    loadUser();
+    fetchUserDetails();
   }, []);
 
-  const petData = {
-    dog: [
-      {
-        id: 1,
-        name: "Samantha",
-        distance: "2.5 km",
-        image: config.dog1,
-        bg: "bg-pink-100",
-      },
-      {
-        id: 2,
-        name: "Rocky",
-        distance: "1.2 km",
-        image: config.dog2,
-        bg: "bg-blue-100",
-      },
-      {
-        id: 3,
-        name: "Bruno",
-        distance: "3.0 km",
-        image: config.dog3,
-        bg: "bg-orange-100",
-      },
-      {
-        id: 4,
-        name: "Max",
-        distance: "0.8 km",
-        image: config.dog4,
-        bg: "bg-green-100",
-      },
-      {
-        id: 5,
-        name: "Charlie",
-        distance: "2.1 km",
-        image: config.dog5,
-        bg: "bg-purple-100",
-      },
-      {
-        id: 6,
-        name: "Buddy",
-        distance: "1.6 km",
-        image: config.dog6,
-        bg: "bg-yellow-100",
-      },
-      {
-        id: 7,
-        name: "Oscar",
-        distance: "4.2 km",
-        image: config.dog7,
-        bg: "bg-red-100",
-      },
-      {
-        id: 8,
-        name: "Leo",
-        distance: "3.5 km",
-        image: config.dog8,
-        bg: "bg-indigo-100",
-      },
-      {
-        id: 9,
-        name: "Cooper",
-        distance: "0.9 km",
-        image: config.dog9,
-        bg: "bg-teal-100",
-      },
-      {
-        id: 10,
-        name: "Bailey",
-        distance: "2.8 km",
-        image: config.dog10,
-        bg: "bg-cyan-100",
-      },
-    ],
-
-    cat: [
-      {
-        id: 11,
-        name: "Kitty",
-        distance: "3.1 km",
-        image: config.cat1,
-        bg: "bg-purple-100",
-      },
-      {
-        id: 12,
-        name: "Milo",
-        distance: "1.8 km",
-        image: config.cat2,
-        bg: "bg-yellow-100",
-      },
-      {
-        id: 13,
-        name: "Luna",
-        distance: "2.6 km",
-        image: config.cat3,
-        bg: "bg-pink-100",
-      },
-      {
-        id: 14,
-        name: "Oliver",
-        distance: "0.7 km",
-        image: config.cat4,
-        bg: "bg-blue-100",
-      },
-      {
-        id: 15,
-        name: "Bella",
-        distance: "4.0 km",
-        image: config.cat5,
-        bg: "bg-green-100",
-      },
-      {
-        id: 16,
-        name: "Simba",
-        distance: "1.4 km",
-        image: config.cat6,
-        bg: "bg-orange-100",
-      },
-      {
-        id: 17,
-        name: "Chloe",
-        distance: "2.2 km",
-        image: config.cat7,
-        bg: "bg-red-100",
-      },
-      {
-        id: 18,
-        name: "Nala",
-        distance: "3.8 km",
-        image: config.cat8,
-        bg: "bg-indigo-100",
-      },
-      {
-        id: 19,
-        name: "Coco",
-        distance: "0.5 km",
-        image: config.cat9,
-        bg: "bg-teal-100",
-      },
-      {
-        id: 20,
-        name: "Shadow",
-        distance: "2.9 km",
-        image: config.cat10,
-        bg: "bg-cyan-100",
-      },
-    ],
+  const handleToggleFavourite = (petId) => {
+    dispatch(toggleFavouriteAction(petId));
   };
+
+
+  const fetchPets = async (city) => {
+    try {
+      setPetsLoading(true);
+
+      const res = await dispatch(getPetsAction(city));
+
+      if (res && res.pets) {
+        const fetchedDogs = res.pets.filter(p => (p.type || '').toLowerCase() === 'dog');
+        const fetchedCats = res.pets.filter(p => (p.type || '').toLowerCase() === 'cat');
+
+        const mapPet = (p, idx) => ({
+          id: p._id,
+          name: p.name,
+          distance: p.city ? `${p.city}` : "Near you",
+          image: p.images && p.images.length > 0 ? { uri: p.images[0] } : config.dog1,
+          bg: ['bg-pink-100', 'bg-blue-100', 'bg-orange-100', 'bg-green-100'][idx % 4]
+        });
+
+        setPetData({
+          dog: fetchedDogs.map(mapPet),
+          cat: fetchedCats.map(mapPet)
+        });
+      }
+    } catch (err) {
+      console.error("Error fetching pets", err);
+    } finally {
+      setPetsLoading(false);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      if (location?.city) {
+        fetchPets(location.city);
+      } else if (!locationLoading && !location) {
+        fetchPets('');
+      }
+    }, [location?.city, locationLoading])
+  );
 
   const categories = [
     { name: "dog", ImageSrc: config.categoryDogImage },
@@ -185,9 +97,10 @@ const Index = () => {
   const getGreeting = () => {
     const hour = new Date().getHours();
 
-    if (hour < 12) return "Good Morning 🌅";
-    if (hour < 18) return "Good Afternoon ☀️";
-    return "Good Evening 🌙";
+    if (hour < 12) return "Good Morning 🌤️";
+    if (hour < 18) return "Good Afternoon 🌞";
+    if (hour < 22) return "Good Evening 🌇";
+    return "Good Night 🌌";
   };
 
   const getUserInitials = () => {
@@ -210,50 +123,58 @@ const Index = () => {
     return firstChar + firstChar2;
   };
 
-  useEffect(() => {
-    (async () => {
-      // Request permission
-      try {
-        setLocationLoading(true);
-        let { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== 'granted') {
+  const fetchLocation = async (isRetry = false) => {
+    try {
+      setLocationLoading(true);
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setLocationPermissionDenied(true);
+        if (isRetry) {
           Toast.show({
             type: "error",
             text1: "Permission Denied",
-            text2: "Location permission is required to access this feature.",
-          });
-          return;
-        }
-
-        let loc = await Location.getCurrentPositionAsync({
-          accuracy: Location.Accuracy.High,
-        });
-
-        setLocation({ coords: loc.coords });
-
-        if (loc && loc.coords) {
-          const address = await Location.reverseGeocodeAsync({
-            latitude: loc.coords.latitude,
-            longitude: loc.coords.longitude,
-          });
-          setLocation({
-            coords: loc.coords,
-            city: address[0]?.city || null,
-            country: address[0]?.country?.trim() || null,
+            text2: "Location is Not allowed.",
           });
         }
-      } catch (err) {
-        console.error("Location error:", err);
-        Toast.show({
-          type: "error",
-          text1: "Location Error",
-          text2: err?.message || "Unable to get location.",
-        });
-      } finally {
-        setLocationLoading(false);
+        return;
       }
-    })();
+      
+      setLocationPermissionDenied(false);
+
+      let loc = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.High,
+      });
+
+      setLocation({ coords: loc.coords });
+
+      if (loc && loc.coords) {
+        const address = await Location.reverseGeocodeAsync({
+          latitude: loc.coords.latitude,
+          longitude: loc.coords.longitude,
+        });
+        setLocation({
+          coords: loc.coords,
+          city: address[0]?.city || null,
+          country: address[0]?.country?.trim() || null,
+        });
+      }
+    } catch (err) {
+      console.error("Location error:", err);
+      Toast.show({
+        type: "error",
+        text1: "Location Error",
+        text2: err?.message || "Unable to get location.",
+      });
+    } finally {
+      setLocationLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchLocation(false);
   }, []);
+
+
 
   return (
     <View className="flex-1 bg-background overflow-hidden">
@@ -268,18 +189,33 @@ const Index = () => {
               </Text>
             </View>
             {
-              location?.city && (
-                <Text className="text-center mx-20 text-xl color-textPrimary">
-                  <Ionicons name="location-outline" size={20} color={"#E0583D"} />
-                  <Text className="font-bold">{location?.city}</Text>
-                </Text>
+              locationLoading ? (
+                <View className="flex-1 flex-row px-4 items-center justify-center">
+                  <ActivityIndicator size="small" color={accentColor} />
+                </View>
+              ) : locationPermissionDenied ? (
+                <View className="flex-1 flex-row px-4 items-center justify-center">
+                  <Pressable 
+                    onPress={() => fetchLocation(true)}
+                    className="bg-buttonPrimary px-3 py-1 rounded-full items-center justify-center"
+                  >
+                    <Text className="text-white text-xs font-bold">Allow Location</Text>
+                  </Pressable>
+                </View>
+              ) : location?.city && (
+                <View className="flex-1 flex-row px-4 items-center justify-center">
+                  <Ionicons name="location-outline" size={20} color={accentColor} />
+                  <Text className="font-bold text-xl color-textPrimary ml-1 text-center flex-shrink text-wrap">
+                    {location?.city}
+                  </Text>
+                </View>
               )
             }
             <Pressable
               onPress={() => setShowSearch(true)}
               className="flex justify-center items-center w-10 h-10 p-1 rounded-2xl overflow-hidden bg-loginSigcnupImageBg"
             >
-              <Ionicons name="search-outline" size={20} color={"#000"} />
+              <Ionicons name="search-outline" size={20} color={whiteColor} />
             </Pressable>
           </View>
 
@@ -287,11 +223,13 @@ const Index = () => {
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingBottom: 20 }}
           >
-            <View className="flex gap-4 pt-5">
-              <Text className="text-xl font-bold color-textPrimary">
-                Hi {user?.email?.split("@")[0]?.split("+")[0]?.trim()}
+            <View className="flex pt-5 gap-1">
+              <Text className="text-lg font-medium color-textSecondary opacity-80">
+                Hi, {user?.name || user?.email?.split("@")[0]?.split("+")[0]?.trim() || "Guest"}
               </Text>
-              <Text className="text-3xl color-textPrimary ">{getGreeting()}</Text>
+              <Text className="text-4xl font-extrabold color-textPrimary mb-5 tracking-tight">
+                {getGreeting()}
+              </Text>
             </View>
             <View className="flex flex-row">
               {categories.map((categ, index) => {
@@ -330,38 +268,60 @@ const Index = () => {
             </View>
 
             <View className="flex flex-row flex-wrap justify-between mt-6">
-              {petData[activeCategory]?.map((pet) => (
-                <View key={pet.id} className="w-[48%] mb-4">
-                  <View className={`rounded-3xl p-4 ${pet.bg}`}>
-                    <View className="absolute top-3 right-3">
-                      <Ionicons name="heart" size={18} color="#E0583D" />
-                    </View>
-
-                    <Image
-                      source={pet.image}
-                      className="w-full h-28"
-                      resizeMode="contain"
-                    />
-                  </View>
-
-                  <View className="mt-2">
-                    <Text className="font-bold text-base color-textPrimary">
-                      {pet.name}
-                    </Text>
-
-                    <View className="flex flex-row items-center mt-1">
-                      <Ionicons
-                        name="location-outline"
-                        size={14}
-                        color="#E0583D"
-                      />
-                      <Text className="text-xs ml-1 text-gray-500">
-                        {pet.distance} Distance
-                      </Text>
-                    </View>
-                  </View>
+              {locationLoading ? (
+                <View className="flex-1 flex-row gap-3 px-4 items-center justify-center">
+                  <Text className="text-lg font-medium color-textSecondary opacity-80">Loading location...</Text>
                 </View>
-              ))}
+              ) :
+                (petsLoading ? (
+                  <HomeSkeleton />
+                ) : petData[activeCategory]?.length === 0 ? (
+                  <EmptyState
+                    title="No Pets Found"
+                    description="There are no pets available in your area yet. Try changing your category or check back later!"
+                    icon="paw-outline"
+                  />
+                ) : (
+                  petData[activeCategory]?.map((pet) => (
+                    <View key={pet.id} className="w-[48%] mb-4">
+                      <View className={`rounded-3xl p-2 ${pet.bg}`}>
+                        <Pressable
+                          className="absolute top-2 right-2 z-10 p-1"
+                          onPress={() => handleToggleFavourite(pet.id)}
+                        >
+                          <Ionicons
+                            name={favourites?.some(fav => fav._id === pet.id) ? "heart" : "heart-outline"}
+                            size={20}
+                            color={favourites?.some(fav => fav._id === pet.id) ? accentColor : accentColor}
+                          />
+                        </Pressable>
+
+                        <Image
+                          source={pet.image}
+                          className="w-full h-40 rounded-2xl"
+                          resizeMode="cover"
+                        />
+                      </View>
+
+                      <View className="mt-2 text-center text-wrap overflow-hidden">
+                        <Text className="font-bold text-base color-textPrimary h-6">
+                          {pet.name}
+                        </Text>
+
+                        <View className="flex flex-row items-center mt-1">
+                          <Ionicons
+                            name="location-outline"
+                            size={14}
+                            color={accentColor}
+                          />
+                          <Text className="text-xs ml-1 text-gray-500 overflow-hidden line-clamp-1 w-[80%]">
+                            {pet.distance}
+                          </Text>
+                        </View>
+                      </View>
+                    </View>
+                  ))
+                ))}
             </View>
           </ScrollView>
         </View>

@@ -3,6 +3,7 @@ import { userConstants } from "../constants/usersConstants";
 const initalState = {
     loading: false,
     userInfo: null,
+    favourites: [],
     error: null,
 };
 
@@ -190,6 +191,28 @@ export const userReducer = (state = initalState, action) => {
                 error: null,
             };
         case userConstants.USER_UPDATE_PROFILE_FAILURE:
+            return {
+                ...state,
+                loading: false,
+                error: action.payload.error,
+            };
+        case userConstants.USER_FAVOURITES_REQUEST:
+        case userConstants.USER_TOGGLE_FAVOURITE_REQUEST:
+            return {
+                ...state,
+                loading: true,
+                error: null,
+            };
+        case userConstants.USER_FAVOURITES_ACCEPT:
+        case userConstants.USER_TOGGLE_FAVOURITE_ACCEPT:
+            return {
+                ...state,
+                loading: false,
+                favourites: action.payload.favourites,
+                error: null,
+            };
+        case userConstants.USER_FAVOURITES_FAILURE:
+        case userConstants.USER_TOGGLE_FAVOURITE_FAILURE:
             return {
                 ...state,
                 loading: false,

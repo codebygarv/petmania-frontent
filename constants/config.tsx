@@ -1,6 +1,8 @@
 export const config = {
+  onBoardingFirstImage: require('../assets/images/onboardingfirst.png'),
+  onBoardingSecondImage: require('../assets/images/onboardingsecond.png'),
+  onBoardingThirdImage: require('../assets/images/onboardingthreepng.png'),
   loginSignupImageBg: require('../assets/images/loginSignupBgImage.png'),
-  LoginBottomImage : require('../assets/images/LoginBottom.png'),
   SignupBottomImage : require('../assets/images/signUpBottom.png'),
   categoryCatImage : require('../assets/images/category_cat.png'),
   categoryDogImage : require('../assets/images/category_dog.png'),

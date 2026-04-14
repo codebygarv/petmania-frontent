@@ -1,6 +1,6 @@
-## Petmania
+## Adoptirx
 
-Petmania is a mobile frontend built with Expo and React Native. It provides the UI, navigation, and client-side state for a pet-focused app (authentication, profiles, chat, favorites, etc.). This repository contains the app source, UI components, API wrappers, and client-side state management.
+Adoptirx is a mobile frontend built with Expo and React Native. It provides the UI, navigation, and client-side state for a pet-focused app (authentication, profiles, chat, favorites, etc.). This repository contains the app source, UI components, API wrappers, and client-side state management.
 
 Tech stack
 - Expo + React Native

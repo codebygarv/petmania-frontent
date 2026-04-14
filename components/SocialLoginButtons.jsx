@@ -14,7 +14,7 @@ import { router } from "expo-router";
 console.log(AuthSession.makeRedirectUri());
 
 WebBrowser.maybeCompleteAuthSession();
-const webClientId = "425077338248-3c06vuh15ppqblnb3gm32aru289v89eb.apps.googleusercontent.com";
+const webClientId = "531711523042-6lbuv5loo95mgqej29slctctlk3i8h3q.apps.googleusercontent.com";
 const androidClientId = "425077338248-vr98dtse62fa9mdjlo3r7042058hf7l9.apps.googleusercontent.com";
 
 
@@ -27,6 +27,7 @@ const SocialLoginButtons = () => {
   const config = {
     webClientId,
     androidClientId,
+    expoClientId: webClientId,
   }
 
   const [request, response, promptAsync] = Google.useAuthRequest(config);
@@ -51,7 +52,7 @@ const SocialLoginButtons = () => {
         } else {
           Toast.show({
             type: "error",
-            text1: res.message,
+            text1: res?.error?.message || res.message || "Google Login Failed",
           });
         }
       }
@@ -76,7 +77,7 @@ const SocialLoginButtons = () => {
       <TouchableOpacity
         activeOpacity={0.8}
         className="bg-SocialBg dark:bg-SocialBgDark rounded-xl py-4 px-4 items-center justify-center w-[48%]"
-        onPress={() => promptAsync({ useProxy: true })}
+        onPress={() => promptAsync()}
       >
         <View className="flex flex-row items-center gap-2">
           <Ionicons name="logo-google" size={22} color={googleIconColor} />

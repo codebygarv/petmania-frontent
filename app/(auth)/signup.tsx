@@ -12,6 +12,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { signupAction } from "@/redux/actions/userActions";
 import Toast from "react-native-toast-message";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getColor } from "@/constants/color";
 
 
 const { width, height } = Dimensions.get("window");
@@ -50,6 +51,8 @@ const Signup = () => {
 
   const handleSubmit = async (values: SignupFormValues) => {
     const res = await dispatch(signupAction(values)); // sending the data to the backend
+    console.log("values", values);
+    console.log("res", res);
 
     if (res?.error?.success === false) {
       Toast.show({
@@ -157,7 +160,7 @@ const Signup = () => {
             {/* Signup Button */}
             <View className="flex gap-2">
               <Button
-                text={loading ? <ActivityIndicator color={"#fff"} /> : 'Sign Up'}
+                text={loading ? <ActivityIndicator color={getColor("white", isDark)} /> : 'Sign Up'}
                 onPress={handleSubmit}
                 disabled={!!(errors.email || errors.password || errors.confirmPassword) || loading}
               />

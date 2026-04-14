@@ -17,6 +17,7 @@ import * as ImagePicker from "expo-image-picker";
 import BackButton from "@/components/BackButton";
 import { useColorScheme } from "nativewind";
 import { router } from "expo-router";
+import EmptyState from "@/components/EmptyState";
 
 const sampleFaqs = [
     {
@@ -222,10 +223,12 @@ const HelpSupport = () => {
 
                         <SectionTitle>Your Tickets</SectionTitle>
                         {tickets.length === 0 ? (
-                            <View className="bg-backgroundSecondary rounded-xl p-4 mb-4">
-                                <Text className="color-textPrimary mb-2">No tickets yet.</Text>
-                                <Text className="text-xs color-textPrimary opacity-80">Create a ticket and we'll get back to you shortly.</Text>
-                            </View>
+                            <EmptyState
+                                title="No tickets yet"
+                                description="Create a ticket and we'll get back to you shortly."
+                                icon="chatbubble-ellipses-outline"
+                                containerStyle={{ marginBottom: 20 }}
+                            />
                         ) : (
                             tickets.map((t) => (
                                 <View key={t.id} className="bg-backgroundSecondary rounded-xl p-3 mb-3 shadow-sm">

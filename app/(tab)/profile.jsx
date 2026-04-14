@@ -1,51 +1,33 @@
 import { View, Text, ScrollView, TouchableOpacity } from "react-native";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Ionicons } from "@expo/vector-icons";
+import { useColorScheme } from "nativewind";
+import { getColor } from "@/constants/color";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import Toast from "react-native-toast-message";
 import Tags from "@/components/Tags";
-import { useDispatch } from "react-redux";
-import { getUserDetailsAction } from "@/redux/actions/userActions";
+import { useSelector } from "react-redux";
 
 const Profile = () => {
-  const [user, setUser] = useState(null);
-  const dispatch = useDispatch();
-  const [userVerified, setUserVerified] = useState(false);
+  const userInfo = useSelector((state) => state.user.userInfo);
+  const userVerified = userInfo?.isVerified;
 
-  const fetchUserDetails = async () => {
-    const res = await dispatch(getUserDetailsAction());
-    if (res?.data) {
-      const user = res.data.user;
-      setUserVerified(user.userVerified);
-    }
-  };
+  const { colorScheme } = useColorScheme();
+  const isDark = colorScheme === "dark";
 
-  console.log("User Verified Status:", userVerified);
-
-  useEffect(() => {
-    fetchUserDetails();
-  }, []);
-
-  useEffect(() => {
-    const loadUser = async () => {
-      const stored = await AsyncStorage.getItem("user");
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        setUser(parsed);
-      }
-    };
-    loadUser();
-  }, []);
+  const accentColor = getColor("accent", isDark);
+  const graySoftColor = getColor("graySoft", isDark);
+  const errorColor = getColor("error", isDark);
 
   const getUserInitials = () => {
-    if (!user) return "U";
+    if (!userInfo) return "U";
 
     let text = "";
-    if (user.name) {
-      text = user.name.trim();
-    } else if (user.email) {
-      text = user.email.split("@")[0].trim();
+    if (userInfo.name) {
+      text = userInfo.name.trim();
+    } else if (userInfo.email) {
+      text = userInfo.email.split("@")[0].trim();
     } else {
       return "U";
     }
@@ -84,7 +66,7 @@ const Profile = () => {
       id: 1,
       title: "Edit Profile",
       icon: "person-outline",
-      color: "#E0583D",
+      color: accentColor,
       onPress: () => {
         router.push("/EditProfile");
       },
@@ -93,7 +75,7 @@ const Profile = () => {
       id: 2,
       title: "Add Pet Profile",
       icon: "paw-outline",
-      color: "#E0583D",
+      color: accentColor,
       onPress: () => {
         router.push("/AddPets");
       },
@@ -102,20 +84,16 @@ const Profile = () => {
       id: 3,
       title: "Settings",
       icon: "settings-outline",
-      color: "#666",
+      color: graySoftColor,
       onPress: () => {
-        Toast.show({
-          type: "info",
-          text1: "Coming Soon",
-          text2: "Settings feature will be available soon",
-        });
+        router.push("/Settings");
       },
     },
     {
       id: 4,
       title: "Help & Support",
       icon: "help-circle-outline",
-      color: "#666",
+      color: graySoftColor,
       onPress: () => {
         router.push("/HelpSupport");
       },
@@ -124,13 +102,18 @@ const Profile = () => {
       id: 5,
       title: "About",
       icon: "information-circle-outline",
-      color: "#666",
+      color: graySoftColor,
       onPress: () => {
-        Toast.show({
-          type: "info",
-          text1: "Petmania",
-          text2: "Version 1.0.0 - Your pet adoption companion",
-        });
+        router.push("/About");
+      },
+    },
+    {
+      id: 6,
+      title: "Change Password",
+      icon: "lock-closed-outline",
+      color: graySoftColor,
+      onPress: () => {
+        router.push("/resetPassword");
       },
     },
   ];
@@ -149,16 +132,16 @@ const Profile = () => {
               </Text>
             </View>
             <Text className="text-2xl font-bold color-textPrimary mb-1">
-              {user?.name || user?.email?.split("@")[0]?.split("+")[0]?.trim() || "User"}
+              {userInfo?.name || userInfo?.email?.split("@")[0]?.split("+")[0]?.trim() || "User"}
             </Text>
             <Text className="text-sm text-gray-500 mb-4">
-              {user?.email || "No email available"}
+              {userInfo?.email || "No email available"}
             </Text>
           </View>
 
           <View className="flex-row justify-between mb-6">
             <View className="flex-1 items-center bg-backgroundSecondary rounded-2xl p-4 mx-1">
-              <Ionicons name="paw-outline" size={24} color="#E0583D" />
+              <Ionicons name="paw-outline" size={24} color={accentColor} />
               <Text className="text-2xl font-bold color-textPrimary mt-2">2</Text>
               <Text className="text-xs text-gray-500 mt-1">Adopted</Text>
             </View>
@@ -192,7 +175,7 @@ const Profile = () => {
                 <Ionicons
                   name="chevron-forward-outline"
                   size={20}
-                  color="#666"
+                  color={graySoftColor}
                 />
               </TouchableOpacity>
             ))}
@@ -204,8 +187,8 @@ const Profile = () => {
             activeOpacity={0.7}
             className="flex-row items-center justify-center bg-backgroundSecondary rounded-2xl p-4 mb-6 border border-red-200"
           >
-            <Ionicons name="log-out-outline" size={22} color="#E64545" />
-            <Text className="ml-2 text-base font-semibold color-[#E64545]">
+            <Ionicons name="log-out-outline" size={22} color={errorColor} />
+            <Text className={`ml-2 text-base font-semibold text-error`}>
               Logout
             </Text>
           </TouchableOpacity>

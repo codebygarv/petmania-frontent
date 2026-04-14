@@ -14,6 +14,7 @@ import RememberMeToggle from "@/components/RememberMeToggle";
 import Button from "@/components/Button";
 import SocialLoginButtons from "@/components/SocialLoginButtons";
 import { useColorScheme } from "nativewind";
+import { getColor } from "@/constants/color";
 import { router } from "expo-router";
 import { Formik } from "formik";
 import * as Yup from "yup";
@@ -83,9 +84,6 @@ const Index = () => {
           // AsyncStorage only accepts string values – ensure we store strings
           if (res?.data?.token != null) {
             await AsyncStorage.setItem("token", String(res.data.token));
-          }
-          if (res?.data?.user != null) {
-            await AsyncStorage.setItem("user", JSON.stringify(res.data.user));
           }
           // Navigate to the tab layout after saving the token
           router.replace("/(tab)");
@@ -166,7 +164,7 @@ const Index = () => {
 
             <View className="flex gap-2">
               <Button
-                text={loading ? <ActivityIndicator color={"#fff"} /> : "Sign In"}
+                text={loading ? <ActivityIndicator color={getColor("white", isDark)} /> : "Sign In"}
                 onPress={handleSubmit}
                 disabled={!!(errors.email || errors.password) || loading}
               />
@@ -194,20 +192,6 @@ const Index = () => {
                 </TouchableOpacity>
               </View>
             </View>
-
-            {/* <View
-              className="flex justify-center items-center p-2 mx-auto rounded-3xl overflow-hidden"
-              style={{
-                width: IMAGE_WIDTH,
-                height: IMAGE_HEIGHT,
-              }}
-            >
-              <Image
-                source={config.LoginBottomImage}
-                style={{ width: "100%", height: "100%", borderRadius: 24 }}
-                resizeMode="cover"
-              />
-            </View> */}
           </View>
         )}
       </Formik>
