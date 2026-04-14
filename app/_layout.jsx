@@ -27,15 +27,25 @@ export default function RootLayout() {
   useEffect(() => {
     if (!navigationState?.key) return;
 
-    const redirectToHome = async () => {
-      const token = await AsyncStorage.getItem("token");
+    const checkInitialRoute = async () => {
+      try {
+        const token = await AsyncStorage.getItem("token");
+        const hasOnboarded = await AsyncStorage.getItem("hasOnboarded");
 
-      if (token) {
-        router.replace("/(tab)");
+        if (token) {
+          router.replace("/(tab)");
+        } else if (!hasOnboarded) {
+          router.replace("/Onboarding");
+        } else {
+          router.replace("/(auth)");
+        }
+      } catch (error) {
+        console.error("Routing error:", error);
+        router.replace("/(auth)");
       }
     };
 
-    redirectToHome();
+    checkInitialRoute();
   }, [navigationState?.key]);
 
   return (
@@ -63,6 +73,8 @@ export default function RootLayout() {
                 >
                   <Stack.Screen name="(auth)" />
                   <Stack.Screen name="(tab)" />
+                  <Stack.Screen name="Onboarding" />
+                  <Stack.Screen name="FinishProfile" />
                   <Stack.Screen name="AddPets" />
                   <Stack.Screen name="EditProfile" />
                   <Stack.Screen name="HelpSupport" />

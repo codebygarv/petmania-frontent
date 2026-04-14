@@ -47,12 +47,12 @@
       "typedRoutes": true,
       "reactCompiler": true
     },
+    "owner": "garv_thakral",
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "b4af39f9-07ef-42a7-b18f-6d995dc69999"
+        "projectId": "61a8e382-57eb-4216-bd23-f4b9b87be815"
       }
-    },
-    "owner": "garv_thakral"
+    }
   }
 }

@@ -26,6 +26,7 @@ const Index = () => {
   const [showSearch, setShowSearch] = useState(false);
   const [location, setLocation] = useState(null);
   const [locationLoading, setLocationLoading] = useState(false);
+  const [locationPermissionDenied, setLocationPermissionDenied] = useState(false);
   const [petData, setPetData] = useState({ dog: [], cat: [] });
   const [petsLoading, setPetsLoading] = useState(false);
   const dispatch = useDispatch();
@@ -122,49 +123,55 @@ const Index = () => {
     return firstChar + firstChar2;
   };
 
-  useEffect(() => {
-    (async () => {
-      // Request permission
-      try {
-        setLocationLoading(true);
-        let { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== 'granted') {
+  const fetchLocation = async (isRetry = false) => {
+    try {
+      setLocationLoading(true);
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setLocationPermissionDenied(true);
+        if (isRetry) {
           Toast.show({
             type: "error",
             text1: "Permission Denied",
-            text2: "Location permission is required to access this feature.",
-          });
-          return;
-        }
-
-        let loc = await Location.getCurrentPositionAsync({
-          accuracy: Location.Accuracy.High,
-        });
-
-        setLocation({ coords: loc.coords });
-
-        if (loc && loc.coords) {
-          const address = await Location.reverseGeocodeAsync({
-            latitude: loc.coords.latitude,
-            longitude: loc.coords.longitude,
-          });
-          setLocation({
-            coords: loc.coords,
-            city: address[0]?.city || null,
-            country: address[0]?.country?.trim() || null,
+            text2: "Location is Not allowed.",
           });
         }
-      } catch (err) {
-        console.error("Location error:", err);
-        Toast.show({
-          type: "error",
-          text1: "Location Error",
-          text2: err?.message || "Unable to get location.",
-        });
-      } finally {
-        setLocationLoading(false);
+        return;
       }
-    })();
+      
+      setLocationPermissionDenied(false);
+
+      let loc = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.High,
+      });
+
+      setLocation({ coords: loc.coords });
+
+      if (loc && loc.coords) {
+        const address = await Location.reverseGeocodeAsync({
+          latitude: loc.coords.latitude,
+          longitude: loc.coords.longitude,
+        });
+        setLocation({
+          coords: loc.coords,
+          city: address[0]?.city || null,
+          country: address[0]?.country?.trim() || null,
+        });
+      }
+    } catch (err) {
+      console.error("Location error:", err);
+      Toast.show({
+        type: "error",
+        text1: "Location Error",
+        text2: err?.message || "Unable to get location.",
+      });
+    } finally {
+      setLocationLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchLocation(false);
   }, []);
 
 
@@ -185,6 +192,15 @@ const Index = () => {
               locationLoading ? (
                 <View className="flex-1 flex-row px-4 items-center justify-center">
                   <ActivityIndicator size="small" color={accentColor} />
+                </View>
+              ) : locationPermissionDenied ? (
+                <View className="flex-1 flex-row px-4 items-center justify-center">
+                  <Pressable 
+                    onPress={() => fetchLocation(true)}
+                    className="bg-buttonPrimary px-3 py-1 rounded-full items-center justify-center"
+                  >
+                    <Text className="text-white text-xs font-bold">Allow Location</Text>
+                  </Pressable>
                 </View>
               ) : location?.city && (
                 <View className="flex-1 flex-row px-4 items-center justify-center">

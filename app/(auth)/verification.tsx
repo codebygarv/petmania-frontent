@@ -51,7 +51,7 @@ const Verification = () => {
     if (!canResend) return;
 
     const email = await AsyncStorage.getItem(type === "forgot-password" ? "forgotPasswordemail" : "email");
-    
+
     if (!email) {
       Toast.show({
         type: "error",
@@ -143,18 +143,18 @@ const Verification = () => {
         }
         if (res?.data?.user) {
           await AsyncStorage.setItem("userInfo", JSON.stringify(res.data.user));
-          
+
           Toast.show({
             type: "success",
             text1: "Verification Successful",
-            text2: "Welcome to Petmania!",
+            text2: "Welcome to Adoptirx!",
           });
 
           // Check if onboarding is needed
-            if (!res.data.user.name) {
-             router.replace("/Onboarding" as any);
+          if (!res.data.user.name) {
+            router.replace("/FinishProfile" as any);
           } else {
-             router.replace("/(tab)");
+            router.replace("/(tab)");
           }
         }
       } else {
@@ -220,7 +220,7 @@ const Verification = () => {
                 <Text className="color-textSecondary text-sm text-center">
                   Didn't receive any code?
                 </Text>
-                <TouchableOpacity 
+                <TouchableOpacity
                   disabled={!canResend}
                   onPress={handleResendCode}
                 >

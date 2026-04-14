@@ -1,6 +1,6 @@
-# Pending Tasks & Improvements - Petmania Frontend
+# Pending Tasks & Improvements - Adoptirx Frontend
 
-This document tracks the missing features, UX improvements, and technical gaps identified in the Petmania Frontend application.
+This document tracks the missing features, UX improvements, and technical gaps identified in the Adoptirx Frontend application.
 
 ## 🔐 Authentication & Security
 

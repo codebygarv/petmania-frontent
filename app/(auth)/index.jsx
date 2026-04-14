@@ -192,20 +192,6 @@ const Index = () => {
                 </TouchableOpacity>
               </View>
             </View>
-
-            {/* <View
-              className="flex justify-center items-center p-2 mx-auto rounded-3xl overflow-hidden"
-              style={{
-                width: IMAGE_WIDTH,
-                height: IMAGE_HEIGHT,
-              }}
-            >
-              <Image
-                source={config.LoginBottomImage}
-                style={{ width: "100%", height: "100%", borderRadius: 24 }}
-                resizeMode="cover"
-              />
-            </View> */}
           </View>
         )}
       </Formik>

@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, Text } from 'react-native';
-import Animated, { FadeInDown } from 'react-native-reanimated';
+import { FadeInDown } from 'react-native-reanimated';
 
 const InfoCard = ({ icon: Icon, title, description, index = 0 }) => {
     return (
-        <Animated.View 
+        <View
             entering={FadeInDown.delay(index * 100).duration(500)}
             className="bg-backgroundSecondary border border-border rounded-3xl p-5 mb-4 shadow-sm"
         >
@@ -17,7 +17,7 @@ const InfoCard = ({ icon: Icon, title, description, index = 0 }) => {
             <Text className="text-sm text-textSecondary leading-5">
                 {description}
             </Text>
-        </Animated.View>
+        </View>
     );
 };
 
