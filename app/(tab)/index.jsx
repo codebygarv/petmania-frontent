@@ -8,7 +8,7 @@ import { getColor } from "@/constants/color";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Location from "expo-location";
 import { config } from "@/constants/config";
-import { useFocusEffect } from "expo-router";
+import { useFocusEffect, router } from "expo-router";
 import Search from "@/components/Search";
 import Toast from "react-native-toast-message";
 import { useDispatch, useSelector } from "react-redux";
@@ -296,11 +296,13 @@ const Index = () => {
                           />
                         </Pressable>
 
-                        <Image
-                          source={pet.image}
-                          className="w-full h-40 rounded-2xl"
-                          resizeMode="cover"
-                        />
+                        <Pressable onPress={() => router.push(`/PetDetails?id=${pet.id}`)}>
+                          <Image
+                            source={pet.image}
+                            className="w-full h-40 rounded-2xl"
+                            resizeMode="cover"
+                          />
+                        </Pressable>
                       </View>
 
                       <View className="mt-2 text-center text-wrap overflow-hidden">

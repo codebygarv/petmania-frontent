@@ -19,7 +19,7 @@ export default function TabLayout() {
           backgroundColor: getColor("tabBg", isDark),
           borderTopWidth: 0,
           paddingTop: 8,
-          height: 55,
+          height: 60,
         },
 
         tabBarButton: ({ children, onPress, accessibilityState, accessibilityLabel, testID, style }) => (
@@ -50,6 +50,8 @@ export default function TabLayout() {
             iconName = "person";
           } else if (route.name === "favourate") {
             iconName = "heart";
+          } else if (route.name === "myPets") {
+            iconName = "paw";
           }
 
           return <Ionicons name={iconName} size={size} color={color} />;
@@ -72,6 +74,12 @@ export default function TabLayout() {
         name="profile"
         options={{
           title: "profile",
+        }}
+      />
+      <Tabs.Screen
+        name="myPets"
+        options={{
+          title: "my pets",
         }}
       />
     </Tabs>

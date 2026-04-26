@@ -81,6 +81,15 @@ const Profile = () => {
       },
     },
     {
+      id: 2.5,
+      title: "My Pets",
+      icon: "paw",
+      color: accentColor,
+      onPress: () => {
+        router.push("/myPets");
+      },
+    },
+    {
       id: 3,
       title: "Settings",
       icon: "settings-outline",

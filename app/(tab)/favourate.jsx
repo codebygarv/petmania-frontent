@@ -69,7 +69,7 @@ const favourate = () => {
 
           {loading && !refreshing ? (
             <ActivityIndicator size="large" color={accentColor} className="mt-10" />
-          ) : !favourites || favourites.length === 0 ? (
+          ) : !favourites || favourites.filter(p => !p.isAdopted).length === 0 ? (
             <View className="items-center justify-center mt-10">
               <Ionicons name="heart-dislike-outline" size={60} color={graySoftColor} />
               <Text className="text-gray-500 mt-4 text-center">
@@ -77,7 +77,7 @@ const favourate = () => {
               </Text>
             </View>
           ) : (
-            favourites.map((pet, index) => {
+            favourites.filter(p => !p.isAdopted).map((pet, index) => {
               const petImage = pet.images && pet.images.length > 0 ? { uri: pet.images[0] } : config.dog1;
               const location = `${pet.city || ''}, ${pet.country || ''}`;
 
