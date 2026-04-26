@@ -3,22 +3,22 @@ import { View, Text, Pressable } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 
 const VARIANT_CLASSES = {
-  default: 'px-2 py-1 border rounded-full ml-2 bg-red-200 border-red-500',
-  outline: 'px-2 py-1 border rounded-full ml-2 bg-transparent border-gray-300',
-  success: 'px-2 py-1 border rounded-full ml-2 bg-green-200 border-green-500',
-  warning: 'px-2 py-1 border rounded-full ml-2 bg-yellow-200 border-yellow-500',
+  default: 'px-2 py-1 border rounded-full ml-2 dark:bg-red-900/30 dark:border-red-500 bg-red-200 border-red-500',
+  outline: 'px-2 py-1 border rounded-full ml-2 dark:bg-transparent dark:border-gray-600 bg-transparent border-gray-300',
+  success: 'px-2 py-1 border rounded-full ml-2 dark:bg-green-900/30 dark:border-green-500 bg-green-200 border-green-500',
+  warning: 'px-2 py-1 border rounded-full ml-2 dark:bg-yellow-900/30 dark:border-yellow-500 bg-yellow-200 border-yellow-500',
 }
 
 const TEXT_CLASSES = {
-  default: 'text-red-700',
-  outline: 'text-gray-700',
-  success: 'text-green-700',
-  warning: 'text-yellow-800',
+  default: 'dark:text-red-400 text-red-700',
+  outline: 'dark:text-gray-400 text-gray-700',
+  success: 'dark:text-green-400 text-green-700',
+  warning: 'dark:text-yellow-400 text-yellow-800',
 }
 
 const ICON_COLORS = {
   default: '#E0583D',
-  outline: '#666666',
+  outline: '#9ca3af',
   success: '#2F855A',
   warning: '#D97706',
 }

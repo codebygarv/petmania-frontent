@@ -222,32 +222,32 @@ const EditProfile = () => {
                     {/* Verification Status Banner */}
                     {!userInfo?.isVerified ? (
                         <View style={{
-                            backgroundColor: '#FFFBEB', borderRadius: 12, padding: 12, marginBottom: 20,
-                            flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#FEF3C7'
+                            backgroundColor: isDark ? '#3D2E00' : '#FFFBEB', borderRadius: 12, padding: 12, marginBottom: 20,
+                            flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: isDark ? '#5C4403' : '#FEF3C7'
                         }}>
-                            <Ionicons name="alert-circle" size={20} color="#D97706" />
-                            <Text style={{ marginLeft: 8, fontSize: 13, color: '#92400E', flex: 1 }}>
+                            <Ionicons name="alert-circle" size={20} color={isDark ? '#FCD34D' : '#D97706'} />
+                            <Text style={{ marginLeft: 8, fontSize: 13, color: isDark ? '#FCD34D' : '#92400E', flex: 1 }}>
                                 Your profile is not verified. Please provide your Aadhaar details to enable all features.
                             </Text>
                         </View>
                     ) : (
                         !userInfo?.isAadhaarVerified ? (
                             <View style={{
-                                backgroundColor: '#ECFDF5', borderRadius: 12, padding: 12, marginBottom: 20,
-                                flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#D1FAE5'
+                                backgroundColor: isDark ? '#1B3A2F' : '#ECFDF5', borderRadius: 12, padding: 12, marginBottom: 20,
+                                flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: isDark ? '#2F5F42' : '#D1FAE5'
                             }}>
-                                <Ionicons name="checkmark-circle" size={20} color="#059669" />
-                                <Text style={{ marginLeft: 8, fontSize: 13, color: '#065F46', flex: 1 }}>
+                                <Ionicons name="checkmark-circle" size={20} color={isDark ? '#6EE7B7' : '#059669'} />
+                                <Text style={{ marginLeft: 8, fontSize: 13, color: isDark ? '#6EE7B7' : '#065F46', flex: 1 }}>
                                     Your Identity details are submitted for verification.
                                 </Text>
                             </View>
                         ) : (
                             <View style={{
-                                backgroundColor: '#ECFDF5', borderRadius: 12, padding: 12, marginBottom: 20,
-                                flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#D1FAE5'
+                                backgroundColor: isDark ? '#1B3A2F' : '#ECFDF5', borderRadius: 12, padding: 12, marginBottom: 20,
+                                flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: isDark ? '#2F5F42' : '#D1FAE5'
                             }}>
-                                <Ionicons name="checkmark-circle" size={20} color="#059669" />
-                                <Text style={{ marginLeft: 8, fontSize: 13, color: '#065F46', flex: 1 }}>
+                                <Ionicons name="checkmark-circle" size={20} color={isDark ? '#6EE7B7' : '#059669'} />
+                                <Text style={{ marginLeft: 8, fontSize: 13, color: isDark ? '#6EE7B7' : '#065F46', flex: 1 }}>
                                     Your Identity details are verified.
                                 </Text>
                             </View>

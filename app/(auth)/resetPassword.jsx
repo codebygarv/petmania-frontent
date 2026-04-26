@@ -1,10 +1,14 @@
-import { View, Text } from "react-native";
+import { View, Text, useColorScheme } from "react-native";
 import React from "react";
 import BackButton from "@/components/BackButton";
 import Input from "@/components/Input";
 import Button from "@/components/Button";
 import { Formik } from "formik";
 import * as Yup from "yup";
+import { useDispatch } from "react-redux";
+import { resetPasswordAction } from "@/redux/actions/userActions";
+import Toast from "react-native-toast-message";
+import { router } from "expo-router";
 
 const validationSchema = Yup.object().shape({
   oldPassword: Yup.string()
@@ -19,12 +23,37 @@ const validationSchema = Yup.object().shape({
 });
 
 const resetPassword = () => {
+  const { colorScheme } = useColorScheme();
+  const isDark = colorScheme === "dark";
+  const dispatch = useDispatch<any>();
+
   const handleSubmit = async (values: {
     oldPassword: string;
     newPassword: string;
     confirmNewPassword: string;
   }) => {
+    const res = await dispatch(resetPasswordAction({
+      oldPassword: values.oldPassword,
+      password: values.newPassword,
+      confirmPassword: values.confirmNewPassword,
+    }));
     console.log("Reset Password Data:", values);
+    console.log("res", res);
+
+    if (res?.success === true) {
+      Toast.show({
+        type: 'success',
+        text1: 'Password Updated',
+        text2: res?.message || 'Your password has been changed successfully.',
+      });
+      router.back();
+    } else {
+      Toast.show({
+        type: 'error',
+        text1: 'Failed',
+        text2: res?.error?.message || 'Something went wrong',
+      });
+    }
   };
 
   return (

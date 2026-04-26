@@ -7,13 +7,18 @@ import { getColor } from "@/constants/color";
 import { useDispatch, useSelector } from "react-redux";
 import { getFavouritesAction, toggleFavouriteAction } from "../../redux/actions/userActions";
 
-const getBackgroundColor = (index) => {
-  const colors = [
+const getBackgroundColor = (index, isDark) => {
+  const lightColors = [
     "bg-cyan-100", "bg-indigo-100", "bg-purple-100", "bg-green-100",
     "bg-pink-100", "bg-orange-100", "bg-yellow-100", "bg-blue-100",
     "bg-teal-100", "bg-sky-100", "bg-rose-100", "bg-gray-100", "bg-lime-100"
   ];
-  return colors[index % colors.length];
+  const darkColors = [
+    "dark:bg-cyan-900/30", "dark:bg-indigo-900/30", "dark:bg-purple-900/30", "dark:bg-green-900/30",
+    "dark:bg-pink-900/30", "dark:bg-orange-900/30", "dark:bg-yellow-900/30", "dark:bg-blue-900/30",
+    "dark:bg-teal-900/30", "dark:bg-sky-900/30", "dark:bg-rose-900/30", "dark:bg-gray-900/30", "dark:bg-lime-900/30"
+  ];
+  return `${lightColors[index % lightColors.length]} ${darkColors[index % darkColors.length]}`;
 };
 
 const formatDate = (dateString) => {
@@ -78,7 +83,7 @@ const favourate = () => {
 
               return (
                 <View key={pet._id} className="mb-4">
-                  <View className={`rounded-3xl p-4 ${getBackgroundColor(index)} flex-row items-center`}>
+                  <View className={`rounded-3xl p-4 ${getBackgroundColor(index, isDark)} flex-row items-center`}>
                     <View className="w-24 h-24 rounded-2xl overflow-hidden mr-4">
                       <Image
                         source={petImage}

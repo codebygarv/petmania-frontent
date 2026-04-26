@@ -54,25 +54,19 @@ const Signup = () => {
     console.log("values", values);
     console.log("res", res);
 
-    if (res?.error?.success === false) {
-      Toast.show({
-        type: 'error',
-        text1: 'Signup Failed',
-        text2: res?.error?.error?.message,
-      });
-    } else if (res?.success === true || res?.data?.success === true) {
+    if (res?.success === true || res?.data?.success === true) {
       Toast.show({
         type: 'success',
         text1: 'Signup Successful',
         text2: 'We have sent a verification code to your email.'
       });
-      await AsyncStorage.setItem('email', values.email); // for next verification step
+      await AsyncStorage.setItem('email', values.email);
       router.push("/verification?type=register");
     } else {
       Toast.show({
         type: 'error',
         text1: 'Signup Failed',
-        text2: res?.error?.error?.message
+        text2: res?.error?.message || 'Something went wrong'
       });
     }
 
@@ -175,7 +169,7 @@ const Signup = () => {
               </View>
 
               {/* Social Buttons */}
-              <SocialLoginButtons />
+              {/* <SocialLoginButtons />  */}
 
               {/* Navigate to Login */}
               <View className="flex-row justify-center items-center">
