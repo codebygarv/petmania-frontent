@@ -2,12 +2,9 @@ import { Link, router } from "expo-router";
 import React, { useState } from "react";
 import { View, Text, Switch, TouchableOpacity } from "react-native";
 
-interface RememberMeToggleProps {
-  onToggle?: (remember: boolean) => void;
-  onForgotPassword?: () => void;
-}
 
-const RememberMeToggle: React.FC<RememberMeToggleProps> = ({
+
+const RememberMeToggle = ({
   onToggle,
   onForgotPassword,
 }) => {

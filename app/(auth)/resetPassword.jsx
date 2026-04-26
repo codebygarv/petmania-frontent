@@ -25,13 +25,9 @@ const validationSchema = Yup.object().shape({
 const resetPassword = () => {
   const { colorScheme } = useColorScheme();
   const isDark = colorScheme === "dark";
-  const dispatch = useDispatch<any>();
+  const dispatch = useDispatch();
 
-  const handleSubmit = async (values: {
-    oldPassword: string;
-    newPassword: string;
-    confirmNewPassword: string;
-  }) => {
+  const handleSubmit = async (values) => {
     const res = await dispatch(resetPasswordAction({
       oldPassword: values.oldPassword,
       password: values.newPassword,

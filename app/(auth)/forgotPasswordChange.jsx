@@ -21,18 +21,14 @@ const validationSchema = Yup.object().shape({
     .required("Confirm password is required"),
 });
 
-interface ChangePasswordFormValues {
-  password: string;
-  confirmPassword: string;
-}
 
 const ForgotPasswordChange = () => {
   const { colorScheme } = useColorScheme();
   const isDark = colorScheme === "dark";
-  const dispatch = useDispatch<any>();
-  const loading = useSelector((state: any) => state.user.loading);
+  const dispatch = useDispatch();
+  const loading = useSelector((state) => state.user.loading);
 
-  const handlePasswordChange = async (values: ChangePasswordFormValues) => {
+  const handlePasswordChange = async (values) => {
     console.log("Password Change Data:", values);  // remove in production
 
     const res = await dispatch(updatePasswordAction(values));

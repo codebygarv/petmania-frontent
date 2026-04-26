@@ -6,24 +6,18 @@ import {
   TextInputKeyPressEventData,
 } from "react-native";
 
-interface OtpInputBoxProps {
-  length?: number;
-  value: string;
-  onChange: (otp: string) => void;
-  boxSize?: number;
-  keyboardType?: "numeric" | "default";
-}
 
-const OtpInputBox: React.FC<OtpInputBoxProps> = ({
+
+const OtpInputBox = ({
   length = 4,
   value,
   onChange,
   boxSize = 55,
   keyboardType = "numeric",
 }) => {
-  const inputs = useRef<TextInput[]>([]);
+  const inputs = useRef([]);
 
-  const handleChange = (text: string, index: number) => {
+  const handleChange = (text, index) => {
     const otpArray = value.split("");
     otpArray[index] = text;
     const otpValue = otpArray.join("");
@@ -35,8 +29,7 @@ const OtpInputBox: React.FC<OtpInputBoxProps> = ({
   };
 
   const handleKeyPress = (
-    e: NativeSyntheticEvent<TextInputKeyPressEventData>,
-    index: number
+     e, index
   ) => {
     if (e.nativeEvent.key === "Backspace" && !value[index] && index > 0) {
       inputs.current[index - 1]?.focus();

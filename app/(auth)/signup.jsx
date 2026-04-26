@@ -35,21 +35,16 @@ const validationSchema = Yup.object().shape({
     .required("Confirm Password is required"),
 });
 
-interface SignupFormValues {
-  email: string;
-  password: string;
-  confirmPassword: string;
-}
 
 const Signup = () => {
   const { colorScheme } = useColorScheme();
   const { IMAGE_WIDTH, IMAGE_HEIGHT } = getImageDimensions();
-  const dispatch = useDispatch<any>();
-  const loading = useSelector((state: any) => state.user.loading);
+  const dispatch = useDispatch();
+  const loading = useSelector((state) => state.user.loading);
 
   const isDark = colorScheme === "dark";
 
-  const handleSubmit = async (values: SignupFormValues) => {
+  const handleSubmit = async (values) => {
     const res = await dispatch(signupAction(values)); // sending the data to the backend
     console.log("values", values);
     console.log("res", res);
