@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="brand" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF8A00" />
+      <stop offset="100%" stop-color="#E52D27" />
+    </linearGradient>
+  </defs>
+  
+  <g fill="url(#brand)" transform="translate(0, -60)">
+    <!-- Heart Pad -->
+    <path d="M 512 480 C 420 380 300 420 320 540 C 340 680 512 800 512 800 C 512 800 684 680 704 540 C 724 420 604 380 512 480 Z" />
+    <!-- Toes -->
+    <ellipse cx="320" cy="360" rx="60" ry="85" transform="rotate(-30 320 360)" />
+    <ellipse cx="440" cy="270" rx="65" ry="95" transform="rotate(-10 440 270)" />
+    <ellipse cx="584" cy="270" rx="65" ry="95" transform="rotate(10 584 270)" />
+    <ellipse cx="704" cy="360" rx="60" ry="85" transform="rotate(30 704 360)" />
+  </g>
+
+  <!-- App Name -->
+  <text x="512" y="860" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="90" font-weight="800" fill="#1C1C1E" text-anchor="middle" letter-spacing="-2">PetMania</text>
+  
+  <!-- Subtitle -->
+  <text x="512" y="920" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="28" font-weight="600" fill="#8E8E93" text-anchor="middle" letter-spacing="4">FIND YOUR COMPANION</text>
+</svg>
