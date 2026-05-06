@@ -71,17 +71,18 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="profile"
-        options={{
-          title: "profile",
-        }}
-      />
-      <Tabs.Screen
         name="myPets"
         options={{
           title: "my pets",
         }}
       />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: "profile",
+        }}
+      />
+      
     </Tabs>
   );
 }

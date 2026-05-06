@@ -183,11 +183,19 @@ const Index = () => {
       ) : (
         <View className="flex gap-4 pt-7 pl-6 pr-6">
           <View className="flex flex-row items-center justify-between">
-            <View className="flex justify-center items-center w-10 h-10 rounded-2xl overflow-hidden bg-buttonPrimary">
-              <Text className="text-white font-bold text-sm">
-                {getUserInitials()}
-              </Text>
-            </View>
+            {user?.profileImage ? (
+              <Image
+                source={{ uri: user.profileImage }}
+                className="w-10 h-10 rounded-2xl"
+                resizeMode="cover"
+              />
+            ) : (
+              <View className="flex justify-center items-center w-10 h-10 rounded-2xl overflow-hidden bg-buttonPrimary">
+                <Text className="text-white font-bold text-sm">
+                  {getUserInitials()}
+                </Text>
+              </View>
+            )}
             {
               locationLoading ? (
                 <View className="flex-1 flex-row px-4 items-center justify-center">

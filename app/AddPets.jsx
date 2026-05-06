@@ -11,6 +11,7 @@ import {
     KeyboardAvoidingView
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import DateTimePicker from '@react-native-community/datetimepicker';
 import * as ImagePicker from "expo-image-picker";
 import * as Location from "expo-location";
 import { router } from "expo-router";
@@ -35,6 +36,7 @@ const AddPets = () => {
     const [location, setLocation] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [locationLoading, setLocationLoading] = useState(false);
+    const [showDatePicker, setShowDatePicker] = useState(false);
     const dispatch = useDispatch();
     const userInfo = useSelector((state) => state.user.userInfo);
 
@@ -299,13 +301,49 @@ const AddPets = () => {
                     />
 
                     <Text className="text-sm color-textPrimary mb-2 font-semibold">Last Vaccination Date</Text>
-                    <TextInput
-                        value={lastVaccinationDate}
-                        onChangeText={setLastVaccinationDate}
-                        placeholder="YYYY-MM-DD"
-                        placeholderTextColor="#9ca3af"
-                        className="bg-backgroundSecondary text-textPrimary rounded-xl h-12 px-3 mb-4 border border-gray-200 dark:border-gray-800"
-                    />
+                    <Pressable
+                        onPress={() => setShowDatePicker(true)}
+                        className="bg-backgroundSecondary border border-gray-200 dark:border-gray-800"
+                        style={{
+                            borderRadius: 12,
+                            paddingHorizontal: 14,
+                            paddingVertical: 12,
+                            marginBottom: 4,
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            height: 48
+                        }}
+                    >
+                        <Text style={{
+                            fontSize: 14,
+                            color: lastVaccinationDate ? (isDark ? '#e0e0e0' : '#1a1a1a') : '#9ca3af',
+                            flex: 1
+                        }}>
+                            {lastVaccinationDate || "Select date"}
+                        </Text>
+                        <Ionicons name="calendar-outline" size={20} color={isDark ? '#888' : '#999'} />
+                    </Pressable>
+
+                    {showDatePicker && (
+                        <DateTimePicker
+                            value={lastVaccinationDate ? new Date(lastVaccinationDate) : new Date()}
+                            mode="date"
+                            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                            onChange={(event, selectedDate) => {
+                                if (event.type === 'dismissed') {
+                                    setShowDatePicker(false);
+                                    return;
+                                }
+                                const currentDate = selectedDate || new Date();
+                                setShowDatePicker(Platform.OS === 'ios');
+                                const year = currentDate.getFullYear();
+                                const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+                                const day = String(currentDate.getDate()).padStart(2, '0');
+                                setLastVaccinationDate(`${year}-${month}-${day}`);
+                            }}
+                            maximumDate={new Date()}
+                        />
+                    )}
 
                     <Text className="text-sm color-textPrimary mb-2 font-semibold">Tags</Text>
                     <View className="flex-row items-center mb-4">

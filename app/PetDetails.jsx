@@ -194,11 +194,19 @@ const PetDetails = () => {
             <Text className="text-base font-semibold color-textPrimary mb-3">Owner Information</Text>
             <View className="bg-backgroundSecondary rounded-xl p-4">
               <View className="flex flex-row items-center gap-3">
-                <View className="w-12 h-12 rounded-full bg-buttonPrimary items-center justify-center">
-                  <Text className="text-white font-bold text-lg">
-                    {pet.userId?.name?.[0]?.toUpperCase() || "U"}
-                  </Text>
-                </View>
+                {pet.userId?.profileImage ? (
+                  <Image
+                    source={{ uri: pet.userId.profileImage }}
+                    className="w-12 h-12 rounded-full"
+                    resizeMode="cover"
+                  />
+                ) : (
+                  <View className="w-12 h-12 rounded-full bg-buttonPrimary items-center justify-center">
+                    <Text className="text-white font-bold text-lg">
+                      {pet.userId?.name?.[0]?.toUpperCase() || "U"}
+                    </Text>
+                  </View>
+                )}
                 <View className="flex-1">
                   <Text className="text-base font-medium color-textPrimary">
                     {pet.userId?.name || "Unknown"}

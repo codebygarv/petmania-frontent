@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, TouchableOpacity } from "react-native";
+import { View, Text, ScrollView, TouchableOpacity, Image } from "react-native";
 import React from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useColorScheme } from "nativewind";
@@ -135,11 +135,19 @@ const Profile = () => {
       >
         <View className="flex gap-4 pt-7 pl-6 pr-6">
           <View className="items-center mb-6">
-            <View className="flex justify-center items-center w-24 h-24 rounded-full overflow-hidden bg-buttonPrimary mb-4">
-              <Text className="text-white font-bold text-3xl">
-                {getUserInitials()}
-              </Text>
-            </View>
+            {userInfo?.profileImage ? (
+              <Image
+                source={{ uri: userInfo.profileImage }}
+                className="w-24 h-24 rounded-full mb-4 border-2 border-buttonPrimary"
+                resizeMode="cover"
+              />
+            ) : (
+              <View className="flex justify-center items-center w-24 h-24 rounded-full overflow-hidden bg-buttonPrimary mb-4">
+                <Text className="text-white font-bold text-3xl">
+                  {getUserInitials()}
+                </Text>
+              </View>
+            )}
             <Text className="text-2xl font-bold color-textPrimary mb-1">
               {userInfo?.name || userInfo?.email?.split("@")[0]?.split("+")[0]?.trim() || "User"}
             </Text>
@@ -148,13 +156,13 @@ const Profile = () => {
             </Text>
           </View>
 
-          <View className="flex-row justify-between mb-6">
+          {/* <View className="flex-row justify-between mb-6">
             <View className="flex-1 items-center bg-backgroundSecondary rounded-2xl p-4 mx-1">
               <Ionicons name="paw-outline" size={24} color={accentColor} />
               <Text className="text-2xl font-bold color-textPrimary mt-2">2</Text>
               <Text className="text-xs text-gray-500 mt-1">Adopted</Text>
             </View>
-          </View>
+          </View> */}
 
           <View className="mb-6">
             <Text className="text-lg font-semibold color-textPrimary mb-4">
