@@ -8,6 +8,7 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import * as Location from "expo-location";
 import { Ionicons } from "@expo/vector-icons";
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { useDispatch, useSelector } from "react-redux";
 import { getUserDetailsAction, updateUserProfileAction } from "@/redux/actions/userActions";
 import BackButton from "@/components/BackButton";
@@ -58,6 +59,7 @@ const EditProfile = () => {
 
     const [loading, setLoading] = useState(true);
     const [locationLoading, setLocationLoading] = useState(false);
+    const [showDatePicker, setShowDatePicker] = useState(false);
 
     const [initialValues, setInitialValues] = useState({
         name: '',
@@ -222,32 +224,32 @@ const EditProfile = () => {
                     {/* Verification Status Banner */}
                     {!userInfo?.isVerified ? (
                         <View style={{
-                            backgroundColor: '#FFFBEB', borderRadius: 12, padding: 12, marginBottom: 20,
-                            flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#FEF3C7'
+                            backgroundColor: isDark ? '#3D2E00' : '#FFFBEB', borderRadius: 12, padding: 12, marginBottom: 20,
+                            flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: isDark ? '#5C4403' : '#FEF3C7'
                         }}>
-                            <Ionicons name="alert-circle" size={20} color="#D97706" />
-                            <Text style={{ marginLeft: 8, fontSize: 13, color: '#92400E', flex: 1 }}>
+                            <Ionicons name="alert-circle" size={20} color={isDark ? '#FCD34D' : '#D97706'} />
+                            <Text style={{ marginLeft: 8, fontSize: 13, color: isDark ? '#FCD34D' : '#92400E', flex: 1 }}>
                                 Your profile is not verified. Please provide your Aadhaar details to enable all features.
                             </Text>
                         </View>
                     ) : (
                         !userInfo?.isAadhaarVerified ? (
                             <View style={{
-                                backgroundColor: '#ECFDF5', borderRadius: 12, padding: 12, marginBottom: 20,
-                                flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#D1FAE5'
+                                backgroundColor: isDark ? '#1B3A2F' : '#ECFDF5', borderRadius: 12, padding: 12, marginBottom: 20,
+                                flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: isDark ? '#2F5F42' : '#D1FAE5'
                             }}>
-                                <Ionicons name="checkmark-circle" size={20} color="#059669" />
-                                <Text style={{ marginLeft: 8, fontSize: 13, color: '#065F46', flex: 1 }}>
+                                <Ionicons name="checkmark-circle" size={20} color={isDark ? '#6EE7B7' : '#059669'} />
+                                <Text style={{ marginLeft: 8, fontSize: 13, color: isDark ? '#6EE7B7' : '#065F46', flex: 1 }}>
                                     Your Identity details are submitted for verification.
                                 </Text>
                             </View>
                         ) : (
                             <View style={{
-                                backgroundColor: '#ECFDF5', borderRadius: 12, padding: 12, marginBottom: 20,
-                                flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#D1FAE5'
+                                backgroundColor: isDark ? '#1B3A2F' : '#ECFDF5', borderRadius: 12, padding: 12, marginBottom: 20,
+                                flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: isDark ? '#2F5F42' : '#D1FAE5'
                             }}>
-                                <Ionicons name="checkmark-circle" size={20} color="#059669" />
-                                <Text style={{ marginLeft: 8, fontSize: 13, color: '#065F46', flex: 1 }}>
+                                <Ionicons name="checkmark-circle" size={20} color={isDark ? '#6EE7B7' : '#059669'} />
+                                <Text style={{ marginLeft: 8, fontSize: 13, color: isDark ? '#6EE7B7' : '#065F46', flex: 1 }}>
                                     Your Identity details are verified.
                                 </Text>
                             </View>
@@ -385,14 +387,49 @@ const EditProfile = () => {
                                         ))}
                                     </View>
 
-                                    <FieldLabel label="Date of Birth (YYYY-MM-DD)" isDark={isDark} />
-                                    <InputField
-                                        isDark={isDark}
-                                        placeholder="YYYY-MM-DD"
-                                        value={values.dateOfBirth}
-                                        onChangeText={handleChange('dateOfBirth')}
-                                        onBlur={handleBlur('dateOfBirth')}
-                                    />
+                                    <FieldLabel label="Date of Birth" isDark={isDark} />
+                                    <Pressable
+                                        onPress={() => setShowDatePicker(true)}
+                                        className="bg-backgroundSecondary border border-gray-200 dark:border-gray-800"
+                                        style={{
+                                            borderRadius: 12,
+                                            paddingHorizontal: 14,
+                                            paddingVertical: 12,
+                                            marginBottom: 4,
+                                            flexDirection: 'row',
+                                            alignItems: 'center'
+                                        }}
+                                    >
+                                        <Text style={{
+                                            fontSize: 14,
+                                            color: values.dateOfBirth ? (isDark ? '#e0e0e0' : '#1a1a1a') : '#9ca3af',
+                                            flex: 1
+                                        }}>
+                                            {values.dateOfBirth || "Select your birthday"}
+                                        </Text>
+                                        <Ionicons name="calendar-outline" size={20} color={isDark ? '#888' : '#999'} />
+                                    </Pressable>
+
+                                    {showDatePicker && (
+                                        <DateTimePicker
+                                            value={values.dateOfBirth ? new Date(values.dateOfBirth) : new Date()}
+                                            mode="date"
+                                            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                                            onChange={(event, selectedDate) => {
+                                                if (event.type === 'dismissed') {
+                                                    setShowDatePicker(false);
+                                                    return;
+                                                }
+                                                const currentDate = selectedDate || new Date();
+                                                setShowDatePicker(Platform.OS === 'ios');
+                                                const year = currentDate.getFullYear();
+                                                const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+                                                const day = String(currentDate.getDate()).padStart(2, '0');
+                                                setFieldValue('dateOfBirth', `${year}-${month}-${day}`);
+                                            }}
+                                            maximumDate={new Date()}
+                                        />
+                                    )}
                                     {touched.dateOfBirth && errors.dateOfBirth && <Text style={{ color: '#E0583D', fontSize: 12, marginBottom: 8 }}>{errors.dateOfBirth}</Text>}
                                 </View>
 

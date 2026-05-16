@@ -8,7 +8,7 @@ import { getColor } from "@/constants/color";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Location from "expo-location";
 import { config } from "@/constants/config";
-import { useFocusEffect } from "expo-router";
+import { useFocusEffect, router } from "expo-router";
 import Search from "@/components/Search";
 import Toast from "react-native-toast-message";
 import { useDispatch, useSelector } from "react-redux";
@@ -183,11 +183,19 @@ const Index = () => {
       ) : (
         <View className="flex gap-4 pt-7 pl-6 pr-6">
           <View className="flex flex-row items-center justify-between">
-            <View className="flex justify-center items-center w-10 h-10 rounded-2xl overflow-hidden bg-buttonPrimary">
-              <Text className="text-white font-bold text-sm">
-                {getUserInitials()}
-              </Text>
-            </View>
+            {user?.profileImage ? (
+              <Image
+                source={{ uri: user.profileImage }}
+                className="w-10 h-10 rounded-2xl"
+                resizeMode="cover"
+              />
+            ) : (
+              <View className="flex justify-center items-center w-10 h-10 rounded-2xl overflow-hidden bg-buttonPrimary">
+                <Text className="text-white font-bold text-sm">
+                  {getUserInitials()}
+                </Text>
+              </View>
+            )}
             {
               locationLoading ? (
                 <View className="flex-1 flex-row px-4 items-center justify-center">
@@ -296,11 +304,13 @@ const Index = () => {
                           />
                         </Pressable>
 
-                        <Image
-                          source={pet.image}
-                          className="w-full h-40 rounded-2xl"
-                          resizeMode="cover"
-                        />
+                        <Pressable onPress={() => router.push(`/PetDetails?id=${pet.id}`)}>
+                          <Image
+                            source={pet.image}
+                            className="w-full h-40 rounded-2xl"
+                            resizeMode="cover"
+                          />
+                        </Pressable>
                       </View>
 
                       <View className="mt-2 text-center text-wrap overflow-hidden">

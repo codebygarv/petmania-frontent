@@ -4,11 +4,9 @@ import { Ionicons } from "@expo/vector-icons";
 import { useColorScheme } from "nativewind";
 import { router } from "expo-router";
 
-interface BackButtonProps {
-  onPress?: () => void;
-}
 
-const BackButton = ({ onPress }: BackButtonProps) => {
+
+const BackButton = ({ onPress }) => {
   const { colorScheme } = useColorScheme();
   const isDark = colorScheme === "dark";
   const BackButtonColor = isDark ? "#EDEDED" : "#1C1C1C";

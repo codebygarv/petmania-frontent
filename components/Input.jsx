@@ -3,16 +3,8 @@ import { View, Text, TextInput, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useColorScheme } from "nativewind";
 
-interface InputProps {
-  label?: string;
-  type?: "text" | "password";
-  textValue?: string;
-  icon?: keyof typeof Ionicons.glyphMap;
-  placeholder?: string;
-  onChangeText?: (value: string) => void;
-}
 
-const Input: React.FC<InputProps> = ({
+const Input = ({
   label = "Email or username",
   type = "text",
   textValue = "",

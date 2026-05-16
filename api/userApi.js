@@ -1,5 +1,5 @@
 import axiosInstance from './axiosInstance';
 
 export const SignIn = async (data) => {
- return await axiosInstance.post('/users',data);
+ return await axiosInstance.post('/user/login',data);
 };

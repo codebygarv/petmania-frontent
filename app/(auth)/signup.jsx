@@ -35,44 +35,39 @@ const validationSchema = Yup.object().shape({
     .required("Confirm Password is required"),
 });
 
-interface SignupFormValues {
-  email: string;
-  password: string;
-  confirmPassword: string;
-}
 
 const Signup = () => {
   const { colorScheme } = useColorScheme();
   const { IMAGE_WIDTH, IMAGE_HEIGHT } = getImageDimensions();
-  const dispatch = useDispatch<any>();
-  const loading = useSelector((state: any) => state.user.loading);
+  const dispatch = useDispatch();
+  const loading = useSelector((state) => state.user.loading);
 
   const isDark = colorScheme === "dark";
 
-  const handleSubmit = async (values: SignupFormValues) => {
+  const handleSubmit = async (values) => {
     const res = await dispatch(signupAction(values)); // sending the data to the backend
     console.log("values", values);
-    console.log("res", res);
+    console.log("res", JSON.stringify(res));
 
-    if (res?.error?.success === false) {
-      Toast.show({
-        type: 'error',
-        text1: 'Signup Failed',
-        text2: res?.error?.error?.message,
-      });
-    } else if (res?.success === true || res?.data?.success === true) {
+    if (res?.success === true || res?.data?.success === true) {
       Toast.show({
         type: 'success',
         text1: 'Signup Successful',
         text2: 'We have sent a verification code to your email.'
       });
-      await AsyncStorage.setItem('email', values.email); // for next verification step
+      await AsyncStorage.setItem('email', values.email);
       router.push("/verification?type=register");
+    } else if (res?.error?.message.success === false) {
+      Toast.show({
+        type: 'error',
+        text1: 'Signup Failed',
+        text2: res?.error?.message?.error?.message
+      });
     } else {
       Toast.show({
         type: 'error',
         text1: 'Signup Failed',
-        text2: res?.error?.error?.message
+        text2: res?.error?.message || 'Something went wrong'
       });
     }
 
@@ -175,7 +170,7 @@ const Signup = () => {
               </View>
 
               {/* Social Buttons */}
-              <SocialLoginButtons />
+              {/* <SocialLoginButtons />  */}
 
               {/* Navigate to Login */}
               <View className="flex-row justify-center items-center">

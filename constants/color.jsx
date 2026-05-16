@@ -47,6 +47,6 @@ export const COLORS = {
   },
 };
 
-export const getColor = (colorName: keyof typeof COLORS.light, isDark: boolean) => {
+export const getColor = (colorName, isDark) => {
   return isDark ? COLORS.dark[colorName] : COLORS.light[colorName];
 };

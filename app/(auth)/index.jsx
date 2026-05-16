@@ -88,13 +88,13 @@ const Index = () => {
           // Navigate to the tab layout after saving the token
           router.replace("/(tab)");
         }
-      } else {
-        Toast.show({
-          type: "error",
-          text1: "Login Failed",
-          text2: "An unexpected error occurred. Please try again.",
-        });
-      }
+      } else if (res?.error?.message?.success === false) {
+            Toast.show({
+              type: 'error',
+              text1: 'Login Failed',
+              text2: res?.error?.message?.error?.message
+            });
+          }
 
     } catch (error) {
       console.error("Error fetching location:", error);
@@ -177,7 +177,7 @@ const Index = () => {
                 <View className="flex-1 h-[1px] bg-textPrimary" />
               </View>
 
-              <SocialLoginButtons />
+              {/* <SocialLoginButtons /> */}
 
               <View className="flex-row justify-center items-center">
                 <Text className="text-sm font-semibold color-textPrimary">

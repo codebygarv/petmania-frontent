@@ -11,6 +11,7 @@ import {
     KeyboardAvoidingView
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import DateTimePicker from '@react-native-community/datetimepicker';
 import * as ImagePicker from "expo-image-picker";
 import * as Location from "expo-location";
 import { router } from "expo-router";
@@ -27,11 +28,15 @@ const AddPets = () => {
     const [name, setName] = useState("");
     const [petType, setPetType] = useState("dog");
     const [breed, setBreed] = useState("");
+    const [gender, setGender] = useState("unknown");
+    const [color, setColor] = useState("");
+    const [age, setAge] = useState("");
+    const [description, setDescription] = useState("");
+    const [lastVaccinationDate, setLastVaccinationDate] = useState("");
     const [location, setLocation] = useState("");
-    const [ownerName, setOwnerName] = useState("");
-    const [ownerContact, setOwnerContact] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [locationLoading, setLocationLoading] = useState(false);
+    const [showDatePicker, setShowDatePicker] = useState(false);
     const dispatch = useDispatch();
     const userInfo = useSelector((state) => state.user.userInfo);
 
@@ -107,6 +112,10 @@ const AddPets = () => {
             Toast.show({ type: "error", text1: "Validation Error", text2: "Please add at least one photo" });
             return;
         }
+        if (age && (isNaN(Number(age)) || Number(age) < 0 || Number(age) > 30)) {
+            Toast.show({ type: "error", text1: "Validation Error", text2: "Age must be between 0 and 30 years" });
+            return;
+        }
 
         try {
             setIsSubmitting(true);
@@ -130,12 +139,15 @@ const AddPets = () => {
                 name,
                 type: petType,
                 breed,
+                gender: gender,
+                color: color || "Unknown",
+                age: age ? Number(age) : 0,
+                description: description,
+                lastVaccinationDate: lastVaccinationDate || null,
                 city: city,
                 state: state,
                 country: locationParts[2] || "Unknown",
                 pincode: "000000",
-                age: 1,
-                color: "Unknown",
             };
 
             const res = await dispatch(createPetAction(payload));
@@ -236,6 +248,103 @@ const AddPets = () => {
                         className="bg-backgroundSecondary text-textPrimary rounded-xl h-12 px-3 mb-4 border border-gray-200 dark:border-gray-800"
                     />
 
+                    <Text className="text-sm color-textPrimary mb-2 font-semibold">Age (years)</Text>
+                    <TextInput
+                        value={age}
+                        onChangeText={setAge}
+                        placeholder="Enter age in years"
+                        placeholderTextColor="#9ca3af"
+                        keyboardType="numeric"
+                        className="bg-backgroundSecondary text-textPrimary rounded-xl h-12 px-3 mb-4 border border-gray-200 dark:border-gray-800"
+                    />
+
+                    <Text className="text-sm color-textPrimary mb-2 font-semibold">Gender</Text>
+                    <View className="flex-row mb-4">
+                        <Pressable
+                            onPress={() => setGender("male")}
+                            className={`px-4 py-2 mr-3 rounded-2xl ${gender === "male" ? "bg-buttonPrimary" : "bg-backgroundSecondary"}`}
+                        >
+                            <Text className={"text-black dark:text-white"}>Male</Text>
+                        </Pressable>
+                        <Pressable
+                            onPress={() => setGender("female")}
+                            className={`px-4 py-2 mr-3 rounded-2xl ${gender === "female" ? "bg-buttonPrimary" : "bg-backgroundSecondary"}`}
+                        >
+                            <Text className={"text-black dark:text-white"}>Female</Text>
+                        </Pressable>
+                        <Pressable
+                            onPress={() => setGender("unknown")}
+                            className={`px-4 py-2 rounded-2xl ${gender === "unknown" ? "bg-buttonPrimary" : "bg-backgroundSecondary"}`}
+                        >
+                            <Text className={"text-black dark:text-white"}>Unknown</Text>
+                        </Pressable>
+                    </View>
+
+                    <Text className="text-sm color-textPrimary mb-2 font-semibold">Color</Text>
+                    <TextInput
+                        value={color}
+                        onChangeText={setColor}
+                        placeholder="Enter color"
+                        placeholderTextColor="#9ca3af"
+                        className="bg-backgroundSecondary text-textPrimary rounded-xl h-12 px-3 mb-4 border border-gray-200 dark:border-gray-800"
+                    />
+
+                    <Text className="text-sm color-textPrimary mb-2 font-semibold">Description</Text>
+                    <TextInput
+                        value={description}
+                        onChangeText={setDescription}
+                        placeholder="Enter description"
+                        placeholderTextColor="#9ca3af"
+                        multiline
+                        numberOfLines={3}
+                        className="bg-backgroundSecondary text-textPrimary rounded-xl h-20 px-3 mb-4 border border-gray-200 dark:border-gray-800"
+                    />
+
+                    <Text className="text-sm color-textPrimary mb-2 font-semibold">Last Vaccination Date</Text>
+                    <Pressable
+                        onPress={() => setShowDatePicker(true)}
+                        className="bg-backgroundSecondary border border-gray-200 dark:border-gray-800"
+                        style={{
+                            borderRadius: 12,
+                            paddingHorizontal: 14,
+                            paddingVertical: 12,
+                            marginBottom: 4,
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            height: 48
+                        }}
+                    >
+                        <Text style={{
+                            fontSize: 14,
+                            color: lastVaccinationDate ? (isDark ? '#e0e0e0' : '#1a1a1a') : '#9ca3af',
+                            flex: 1
+                        }}>
+                            {lastVaccinationDate || "Select date"}
+                        </Text>
+                        <Ionicons name="calendar-outline" size={20} color={isDark ? '#888' : '#999'} />
+                    </Pressable>
+
+                    {showDatePicker && (
+                        <DateTimePicker
+                            value={lastVaccinationDate ? new Date(lastVaccinationDate) : new Date()}
+                            mode="date"
+                            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                            onChange={(event, selectedDate) => {
+                                if (event.type === 'dismissed') {
+                                    setShowDatePicker(false);
+                                    return;
+                                }
+                                const currentDate = selectedDate || new Date();
+                                setShowDatePicker(Platform.OS === 'ios');
+                                const year = currentDate.getFullYear();
+                                const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+                                const day = String(currentDate.getDate()).padStart(2, '0');
+                                setLastVaccinationDate(`${year}-${month}-${day}`);
+                            }}
+                            maximumDate={new Date()}
+                        />
+                    )}
+
                     <Text className="text-sm color-textPrimary mb-2 font-semibold">Tags</Text>
                     <View className="flex-row items-center mb-4">
                         <View className="px-3 py-1 rounded-full bg-gray-200 mr-3 opacity-60">
@@ -257,24 +366,6 @@ const AddPets = () => {
                             {locationLoading ? <ActivityIndicator size="small" color="#E0583D" /> : <Ionicons name="locate" size={20} color="#E0583D" />}
                         </Pressable>
                     </View>
-
-                    <Text className="text-sm color-textPrimary mb-2 font-semibold">Owner Details</Text>
-                    <TextInput
-                        value={ownerName}
-                        onChangeText={setOwnerName}
-                        placeholder="Owner name"
-                        placeholderTextColor={isDark ? "#888" : "#999"}
-                        color={isDark ? "#e0e0e0ff" : "#1a1a1aff"}
-                        className="bg-backgroundSecondary rounded-xl h-12 px-3 mb-3 border border-gray-200 dark:border-gray-800"
-                    />
-                    <TextInput
-                        value={ownerContact}
-                        onChangeText={setOwnerContact}
-                        placeholder="Contact (phone or email)"
-                        placeholderTextColor={isDark ? "#888" : "#999"}
-                        color={isDark ? "#e0e0e0ff" : "#1a1a1aff"}
-                        className="bg-backgroundSecondary rounded-xl h-12 px-3 mb-6 border border-gray-200 dark:border-gray-800"
-                    />
 
                     <Pressable onPress={onSubmit} disabled={isSubmitting} className={`h-12 rounded-xl py-3 ${isSubmitting ? 'bg-gray-400' : 'bg-buttonPrimary shadow-sm'} items-center justify-center mb-8 flex-row`}>
                         {isSubmitting ? (

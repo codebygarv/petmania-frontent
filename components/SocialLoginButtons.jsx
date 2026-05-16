@@ -76,7 +76,7 @@ const SocialLoginButtons = () => {
     <View className="flex w-full flex-wrap gap-3 flex-row justify-between">
       <TouchableOpacity
         activeOpacity={0.8}
-        className="bg-SocialBg dark:bg-SocialBgDark rounded-xl py-4 px-4 items-center justify-center w-[48%]"
+        className="bg-SocialBg rounded-xl py-4 px-4 items-center justify-center w-[48%]"
         onPress={() => promptAsync()}
       >
         <View className="flex flex-row items-center gap-2">
@@ -89,7 +89,7 @@ const SocialLoginButtons = () => {
 
       <TouchableOpacity
         activeOpacity={0.8}
-        className="bg-SocialBg dark:bg-SocialBgDark rounded-xl py-4 px-4 items-center justify-center w-[48%]"
+        className="bg-SocialBg rounded-xl py-4 px-4 items-center justify-center w-[48%]"
       >
         <View className="flex flex-row items-center gap-2">
           <Ionicons name="logo-apple" size={22} color={appleIconColor} />

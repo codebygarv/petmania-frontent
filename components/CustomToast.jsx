@@ -7,14 +7,14 @@ const CustomToast = ({ text1, type }) => {
 
     const background =
         type === "success"
-            ? isDark ? "#53144f" : "#BBF7D0"
+            ? isDark ? "#1B3A2F" : "#BBF7D0"
             : type === "error"
-                ? isDark ? "#7F1D1D" : "#FCA5A5"
+                ? isDark ? "#3B1C1C" : "#FCA5A5"
                 : isDark
                     ? "#1E293B"
                     : "#ffffff";
 
-    const color = isDark ? "#ffffff" : "#1C1C1C";
+    const color = isDark ? "#EDEDED" : "#1C1C1C";
 
     return (
         <View

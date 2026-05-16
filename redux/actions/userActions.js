@@ -35,7 +35,7 @@ export const loginAction = (userData) => {
                 payload: { error: error?.response?.data }
             });
 
-            return { error: error?.response?.data };
+            return { error: { message: error?.response?.data?.message || error?.response?.data } };
         }
     };
 };
@@ -64,7 +64,7 @@ export const googleLoginAction = (accessToken) => {
                 payload: { error: error?.response?.data }
             });
 
-            return { error: error?.response?.data };
+            return { error: { message: error?.response?.data?.message || error?.response?.data } };
         }
     };
 }
@@ -94,7 +94,7 @@ export const signupAction = (userData) => {
                 type: userConstants.USER_REGISTER_FAILURE,
                 payload: { error: error?.response?.data }
             });
-            return { error: error?.response?.data };
+            return { error: { message: error?.response?.data?.message || error?.response?.data } };
         }
     };
 };
@@ -127,7 +127,7 @@ export const verifyOtpAction = (otpData) => {
                 type: userConstants.USER_OTP_FAILURE,
                 payload: { error: error?.response?.data }
             });
-            return { error: error?.response?.data };
+            return { error: { message: error?.response?.data?.message || error?.response?.data } };
         }
     };
 };
@@ -156,7 +156,7 @@ export const forgotPasswordAction = (emailData) => {
                 type: userConstants.USER_FORGOT_PASSWORD_FAILURE,
                 payload: { error: error?.response?.data || [{ type: "general", message: "Forgot password request failed" }] }
             });
-            return { error: error?.response?.data };
+            return { error: { message: error?.response?.data?.message || error?.response?.data } };
         }
     };
 };
@@ -186,7 +186,7 @@ export const getUserDetailsAction = () => {
                 type: userConstants.USER_DETAILS_FAILURE,
                 payload: { error: error?.response?.data }
             });
-            return { error: error?.response?.data };
+            return { error: { message: error?.response?.data?.message || error?.response?.data } };
         }
     };
 }
@@ -216,7 +216,7 @@ export const updateUserProfileAction = (profileData) => {
                 type: userConstants.USER_UPDATE_PROFILE_FAILURE,
                 payload: { error: error?.response?.data || [{ type: "general", message: "Updating profile failed" }] }
             });
-            return { error: error?.response?.data };
+            return { error: { message: error?.response?.data?.message || error?.response?.data } };
         }
     };
 }
@@ -245,7 +245,7 @@ export const forgotPasswordOtpAction = (otpData) => {
                 type: userConstants.USER_FORGOT_PASSWORD_OTP_FAILURE,
                 payload: { error: error?.response?.data }
             });
-            return { error: error?.response?.data };
+            return { error: { message: error?.response?.data?.message || error?.response?.data } };
         }
 
     };
@@ -277,10 +277,39 @@ export const updatePasswordAction = (passwordData) => {
                 type: userConstants.USER_UPDATE_PASSWORD_FAILURE,
                 payload: { error: error?.response?.data }
             });
-            return { error: error?.response?.data };
+            return { error: { message: error?.response?.data?.message || error?.response?.data } };
         }
     };
 }
+
+export const resetPasswordAction = (passwordData) => {
+    return async (dispatch) => {
+        dispatch({ type: userConstants.USER_UPDATE_PASSWORD_REQUEST });
+        try {
+            const res = await axiosInstance.post('/user/resetPassword', passwordData);
+            if (res.status === 200) {
+                dispatch({
+                    type: userConstants.USER_UPDATE_PASSWORD_ACCEPT,
+                    payload: { message: res.data.message },
+                });
+                return res.data;
+            }
+            else {
+                dispatch({
+                    type: userConstants.USER_UPDATE_PASSWORD_FAILURE,
+                    payload: { error: res.data?.error },
+                });
+                return { error: res.data?.errors };
+            }
+        } catch (error) {
+            dispatch({
+                type: userConstants.USER_UPDATE_PASSWORD_FAILURE,
+                payload: { error: error?.response?.data }
+            });
+            return { error: { message: error?.response?.data?.message || error?.response?.data } };
+        }
+    };
+};
 
 export const resendOtpAction = (emailData) => {
     return async (dispatch) => {
@@ -293,7 +322,7 @@ export const resendOtpAction = (emailData) => {
                 return { error: res.data };
             }
         } catch (error) {
-            return { error: error?.response?.data };
+            return { error: { message: error?.response?.data?.message || error?.response?.data } };
         }
     };
 };
@@ -321,7 +350,7 @@ export const deleteAccountAction = () => {
                 type: userConstants.USER_DELETE_ACCOUNT_FAILURE,
                 payload: { error: error?.response?.data || [{ type: "general", message: "Deleting account failed" }] }
             });
-            return { error: error?.response?.data };
+            return { error: { message: error?.response?.data?.message || error?.response?.data } };
         }
     };
 };
@@ -349,7 +378,7 @@ export const toggleFavouriteAction = (petId) => {
                 type: userConstants.USER_TOGGLE_FAVOURITE_FAILURE,
                 payload: { error: error?.response?.data || [{ type: "general", message: "Toggling favourite failed" }] }
             });
-            return { error: error?.response?.data };
+            return { error: { message: error?.response?.data?.message || error?.response?.data } };
         }
     };
 };
@@ -377,7 +406,7 @@ export const getFavouritesAction = () => {
                 type: userConstants.USER_FAVOURITES_FAILURE,
                 payload: { error: error?.response?.data || [{ type: "general", message: "Fetching favourites failed" }] }
             });
-            return { error: error?.response?.data };
+            return { error: { message: error?.response?.data?.message || error?.response?.data } };
         }
     };
 };

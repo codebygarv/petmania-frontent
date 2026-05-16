@@ -28,15 +28,15 @@ const validationSchema = Yup.object().shape({
 const Verification = () => {
   const { colorScheme } = useColorScheme();
   const isDark = colorScheme === "dark";
-  const dispatch = useDispatch<any>();
-  const loading = useSelector((state: any) => state.user.loading);
+  const dispatch = useDispatch();
+  const loading = useSelector((state) => state.user.loading);
   const { type } = useLocalSearchParams();
 
   const [timer, setTimer] = useState(60);
   const [canResend, setCanResend] = useState(false);
 
   useEffect(() => {
-    let interval: ReturnType<typeof setInterval>;
+    let interval;
     if (timer > 0) {
       interval = setInterval(() => {
         setTimer((prev) => prev - 1);
@@ -80,7 +80,7 @@ const Verification = () => {
     }
   };
 
-  const handleVerify = async (values: { otp: string }) => {
+  const handleVerify = async (values) => {
     if (type === "forgot-password") {
       const email = await AsyncStorage.getItem("forgotPasswordemail");
 
@@ -152,7 +152,7 @@ const Verification = () => {
 
           // Check if onboarding is needed
           if (!res.data.user.name) {
-            router.replace("/FinishProfile" as any);
+            router.replace("/FinishProfile");
           } else {
             router.replace("/(tab)");
           }

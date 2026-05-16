@@ -22,10 +22,10 @@ const validationSchema = Yup.object().shape({
 const ForgotPassword = () => {
   const { colorScheme } = useColorScheme();
   const isDark = colorScheme === "dark";
-  const dispatch = useDispatch<any>();
-  const loading = useSelector((state: any) => state.user.loading);
+  const dispatch = useDispatch();
+  const loading = useSelector((state) => state.user.loading);
 
-  const handleForgotPassword = async (values: { email: string }) => {
+  const handleForgotPassword = async (values) => {
     console.log("Email Submitted:", values.email);
 
     // Save email to storage for later verification
