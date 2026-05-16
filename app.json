@@ -32,9 +32,13 @@
     },
     "splash": {
       "image": "./assets/images/splash-icon.png",
-      "imageWidth": 250,
+      "imageWidth": "full",
       "resizeMode": "contain",
-      "backgroundColor": "#FFFFFF"
+      "backgroundColor": "#FFFFFF",
+      "dark": {
+        "image": "./assets/images/splash-icon.png",
+        "backgroundColor": "#121212"
+      }
     },
     "plugins": [
       "expo-router",
@@ -42,9 +46,13 @@
         "expo-splash-screen",
         {
           "image": "./assets/images/splash-icon.png",
-          "imageWidth": 250,
+          "imageWidth": "full",
           "resizeMode": "contain",
-          "backgroundColor": "#FFFFFF"
+          "backgroundColor": "#FFFFFF",
+          "dark": {
+            "image": "./assets/images/splash-icon.png",
+            "backgroundColor": "#121212"
+          }
         }
       ],
       "expo-web-browser",

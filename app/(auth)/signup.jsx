@@ -47,7 +47,7 @@ const Signup = () => {
   const handleSubmit = async (values) => {
     const res = await dispatch(signupAction(values)); // sending the data to the backend
     console.log("values", values);
-    console.log("res", res);
+    console.log("res", JSON.stringify(res));
 
     if (res?.success === true || res?.data?.success === true) {
       Toast.show({
@@ -57,6 +57,12 @@ const Signup = () => {
       });
       await AsyncStorage.setItem('email', values.email);
       router.push("/verification?type=register");
+    } else if (res?.error?.message.success === false) {
+      Toast.show({
+        type: 'error',
+        text1: 'Signup Failed',
+        text2: res?.error?.message?.error?.message
+      });
     } else {
       Toast.show({
         type: 'error',

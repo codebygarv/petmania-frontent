@@ -4,8 +4,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 // Shared Axios client; token is injected in the request interceptor to avoid
 // creating the client asynchronously.
 const axiosInstance = axios.create({
-  baseURL: "https://petmania-backend-gamma.vercel.app/api",
-  // baseURL: "http://10.179.85.133:5050/api",
+  baseURL: "https://petmania-backend-delta.vercel.app/api",
+  // baseURL: "http://192.168.1.74:5050/api",
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",
