@@ -23,7 +23,7 @@ const SocialLoginButtons = () => {
   const dispatch = useDispatch();
 
   // Google Auth Request
-  const googleRedirectUri = AuthSession.makeRedirectUri({ useProxy: true });
+  const googleRedirectUri = "https://auth.expo.io/@garv_thakral/petmania";
   console.log("Google Redirect URI:", googleRedirectUri);
 
   const [googleRequest, googleResponse, promptGoogleAsync] = Google.useAuthRequest({
@@ -33,7 +33,7 @@ const SocialLoginButtons = () => {
   });
 
   // Facebook Auth Request via AuthSession
-  const facebookRedirectUri = AuthSession.makeRedirectUri({ useProxy: true });
+  const facebookRedirectUri = "https://auth.expo.io/@garv_thakral/petmania";
   const [fbRequest, fbResponse, promptFacebookAsync] = AuthSession.useAuthRequest(
     {
       clientId: facebookAppId,
