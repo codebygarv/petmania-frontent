@@ -65,9 +65,37 @@ export const googleLoginAction = (accessToken) => {
             });
 
             return { error: { message: error?.response?.data?.message || error?.response?.data } };
-        }
     };
 }
+
+export const facebookLoginAction = (accessToken) => {
+    return async (dispatch) => {
+        dispatch({ type: userConstants.USER_FACEBOOK_LOGIN_REQUEST });
+        try {
+            const res = await axiosInstance.post('/user/facebook', { accessToken });
+            if (res.status === 200) {
+                dispatch({
+                    type: userConstants.USER_FACEBOOK_LOGIN_ACCEPT,
+                    payload: { user: res.data.data.user },
+                });
+                return res.data;
+            } else {
+                dispatch({
+                    type: userConstants.USER_FACEBOOK_LOGIN_FAILURE,
+                    payload: { error: res.data },
+                });
+                return { error: res.data };
+            }
+        } catch (error) {
+            dispatch({
+                type: userConstants.USER_FACEBOOK_LOGIN_FAILURE,
+                payload: { error: error?.response?.data }
+            });
+
+            return { error: { message: error?.response?.data?.message || error?.response?.data } };
+        }
+    };
+};
 
 export const signupAction = (userData) => {
     return async (dispatch) => {
