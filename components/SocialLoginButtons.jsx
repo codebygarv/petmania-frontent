@@ -23,10 +23,12 @@ const SocialLoginButtons = () => {
   const dispatch = useDispatch();
 
   // Google Auth Request
+  const googleRedirectUri = AuthSession.makeRedirectUri();
   const [googleRequest, googleResponse, promptGoogleAsync] = Google.useAuthRequest({
     webClientId,
     androidClientId,
     expoClientId: webClientId,
+    redirectUri: googleRedirectUri,
   });
 
   // Facebook Auth Request via AuthSession
