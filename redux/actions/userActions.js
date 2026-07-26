@@ -103,7 +103,7 @@ export const verifyOtpAction = (otpData) => {
     return async (dispatch) => {
         dispatch({ type: userConstants.USER_OTP_REQUEST });
         try {
-            const res = await axiosInstance.post('/user/resgister/verifyOtp', otpData);
+            const res = await axiosInstance.post('/user/register/verifyOtp', otpData);
             
             if (res.status === 200) {
                 dispatch({
