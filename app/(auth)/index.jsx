@@ -177,7 +177,7 @@ const Index = () => {
                 <View className="flex-1 h-[1px] bg-textPrimary" />
               </View>
 
-              {/* <SocialLoginButtons /> */}
+              <SocialLoginButtons />
 
               <View className="flex-row justify-center items-center">
                 <Text className="text-sm font-semibold color-textPrimary">

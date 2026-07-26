@@ -170,7 +170,7 @@ const Signup = () => {
               </View>
 
               {/* Social Buttons */}
-              {/* <SocialLoginButtons />  */}
+              <SocialLoginButtons />
 
               {/* Navigate to Login */}
               <View className="flex-row justify-center items-center">
