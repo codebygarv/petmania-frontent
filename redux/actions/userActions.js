@@ -65,8 +65,9 @@ export const googleLoginAction = (accessToken) => {
             });
 
             return { error: { message: error?.response?.data?.message || error?.response?.data } };
+        }
     };
-}
+};
 
 export const facebookLoginAction = (accessToken) => {
     return async (dispatch) => {
