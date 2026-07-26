@@ -1,10 +1,9 @@
 import { View, Text, TouchableOpacity } from "react-native";
-import React, { useEffect } from "react";
+import React from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useColorScheme } from "nativewind";
 import { useDispatch } from "react-redux";
 import * as WebBrowser from "expo-web-browser";
-import * as Google from "expo-auth-session/providers/google";
 import * as AuthSession from "expo-auth-session";
 import { googleLoginAction, facebookLoginAction } from "@/redux/actions/userActions";
 import Toast from "react-native-toast-message";
@@ -14,7 +13,6 @@ import { router } from "expo-router";
 WebBrowser.maybeCompleteAuthSession();
 
 const webClientId = process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID || "531711523042-6lbuv5loo95mgqej29slctctlk3i8h3q.apps.googleusercontent.com";
-const androidClientId = process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID || "425077338248-vr98dtse62fa9mdjlo3r7042058hf7l9.apps.googleusercontent.com";
 const facebookAppId = process.env.EXPO_PUBLIC_FACEBOOK_APP_ID || "123456789012345";
 
 const SocialLoginButtons = () => {
@@ -22,36 +20,30 @@ const SocialLoginButtons = () => {
   const isDark = colorScheme === "dark";
   const dispatch = useDispatch();
 
-  // Google Auth Request
-  const googleRedirectUri = "https://auth.expo.io/@garv_thakral/petmania";
-  console.log("Google Redirect URI:", googleRedirectUri);
+  const handleGoogleLogin = async () => {
+    try {
+      const redirectUri = AuthSession.makeRedirectUri({
+        scheme: "petmania",
+        preferLocalhost: true,
+      });
 
-  const [googleRequest, googleResponse, promptGoogleAsync] = Google.useAuthRequest({
-    clientId: webClientId,
-    webClientId: webClientId,
-    redirectUri: googleRedirectUri,
-  });
+      const authUrl =
+        `https://accounts.google.com/o/oauth2/v2/auth?` +
+        `client_id=${webClientId}` +
+        `&redirect_uri=${encodeURIComponent(redirectUri)}` +
+        `&response_type=token` +
+        `&scope=${encodeURIComponent("openid profile email")}`;
 
-  // Facebook Auth Request via AuthSession
-  const facebookRedirectUri = "https://auth.expo.io/@garv_thakral/petmania";
-  const [fbRequest, fbResponse, promptFacebookAsync] = AuthSession.useAuthRequest(
-    {
-      clientId: facebookAppId,
-      responseType: AuthSession.ResponseType.Token,
-      scopes: ["public_profile", "email"],
-      redirectUri: facebookRedirectUri,
-    },
-    {
-      authorizationEndpoint: "https://www.facebook.com/v18.0/dialog/oauth",
-    }
-  );
+      console.log("[Google Auth] Redirect URI:", redirectUri);
+      const result = await WebBrowser.openAuthSessionAsync(authUrl, redirectUri);
 
-  // Handle Google OAuth Response
-  useEffect(() => {
-    if (googleResponse?.type === "success") {
-      const accessToken = googleResponse.authentication?.accessToken;
-      if (accessToken) {
-        dispatch(googleLoginAction(accessToken)).then(async (res) => {
+      if (result.type === "success" && result.url) {
+        const hash = result.url.includes("#") ? result.url.split("#")[1] : result.url.split("?")[1];
+        const urlParams = new URLSearchParams(hash || "");
+        const accessToken = urlParams.get("access_token");
+
+        if (accessToken) {
+          const res = await dispatch(googleLoginAction(accessToken));
           if (res?.success) {
             await AsyncStorage.setItem("userInfo", JSON.stringify(res.data.user));
             await AsyncStorage.setItem("token", res.data.token);
@@ -66,17 +58,38 @@ const SocialLoginButtons = () => {
               text1: res?.error?.message || "Google Login Failed",
             });
           }
-        });
+        }
       }
+    } catch (err) {
+      console.error("Google auth error:", err);
+      Toast.show({ type: "error", text1: "Google Login Error" });
     }
-  }, [googleResponse]);
+  };
 
-  // Handle Facebook OAuth Response
-  useEffect(() => {
-    if (fbResponse?.type === "success") {
-      const accessToken = fbResponse.params?.access_token;
-      if (accessToken) {
-        dispatch(facebookLoginAction(accessToken)).then(async (res) => {
+  const handleFacebookLogin = async () => {
+    try {
+      const redirectUri = AuthSession.makeRedirectUri({
+        scheme: "petmania",
+        preferLocalhost: true,
+      });
+
+      const authUrl =
+        `https://www.facebook.com/v18.0/dialog/oauth?` +
+        `client_id=${facebookAppId}` +
+        `&redirect_uri=${encodeURIComponent(redirectUri)}` +
+        `&response_type=token` +
+        `&scope=${encodeURIComponent("public_profile,email")}`;
+
+      console.log("[Facebook Auth] Redirect URI:", redirectUri);
+      const result = await WebBrowser.openAuthSessionAsync(authUrl, redirectUri);
+
+      if (result.type === "success" && result.url) {
+        const hash = result.url.includes("#") ? result.url.split("#")[1] : result.url.split("?")[1];
+        const urlParams = new URLSearchParams(hash || "");
+        const accessToken = urlParams.get("access_token");
+
+        if (accessToken) {
+          const res = await dispatch(facebookLoginAction(accessToken));
           if (res?.success) {
             await AsyncStorage.setItem("userInfo", JSON.stringify(res.data.user));
             await AsyncStorage.setItem("token", res.data.token);
@@ -91,10 +104,13 @@ const SocialLoginButtons = () => {
               text1: res?.error?.message || "Facebook Login Failed",
             });
           }
-        });
+        }
       }
+    } catch (err) {
+      console.error("Facebook auth error:", err);
+      Toast.show({ type: "error", text1: "Facebook Login Error" });
     }
-  }, [fbResponse]);
+  };
 
   const googleIconColor = isDark ? "#EDEDED" : "#1C1C1C";
   const facebookIconColor = "#1877F2";
@@ -105,7 +121,7 @@ const SocialLoginButtons = () => {
       <TouchableOpacity
         activeOpacity={0.8}
         className="bg-SocialBg rounded-xl py-4 px-4 items-center justify-center w-[48%]"
-        onPress={() => promptGoogleAsync()}
+        onPress={handleGoogleLogin}
       >
         <View className="flex flex-row items-center gap-2">
           <Ionicons name="logo-google" size={22} color={googleIconColor} />
@@ -119,7 +135,7 @@ const SocialLoginButtons = () => {
       <TouchableOpacity
         activeOpacity={0.8}
         className="bg-SocialBg rounded-xl py-4 px-4 items-center justify-center w-[48%]"
-        onPress={() => promptFacebookAsync()}
+        onPress={handleFacebookLogin}
       >
         <View className="flex flex-row items-center gap-2">
           <Ionicons name="logo-facebook" size={22} color={facebookIconColor} />
