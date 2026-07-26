@@ -25,9 +25,8 @@ const SocialLoginButtons = () => {
   // Google Auth Request
   const googleRedirectUri = AuthSession.makeRedirectUri({ useProxy: true });
   const [googleRequest, googleResponse, promptGoogleAsync] = Google.useAuthRequest({
-    webClientId,
-    androidClientId,
-    expoClientId: webClientId,
+    clientId: webClientId,
+    webClientId: webClientId,
     redirectUri: googleRedirectUri,
   });
 
