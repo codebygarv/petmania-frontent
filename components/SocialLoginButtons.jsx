@@ -78,15 +78,20 @@ const SocialLoginButtons = () => {
 
   const handleGoogleLogin = async () => {
     try {
+      // Dynamic return URL: exp://192.168.1.5:8081/--/google-auth in Expo Go, or petmania://google-auth in standalone
+      const returnUrl = Linking.createURL("google-auth");
+      console.log("[Google Auth] Dynamic Return URL:", returnUrl);
+
       const authUrl =
         `https://accounts.google.com/o/oauth2/v2/auth?` +
         `client_id=${webClientId}` +
         `&redirect_uri=${encodeURIComponent(GOOGLE_REDIRECT_URI)}` +
         `&response_type=token` +
-        `&scope=${encodeURIComponent("openid profile email")}`;
+        `&scope=${encodeURIComponent("openid profile email")}` +
+        `&state=${encodeURIComponent(returnUrl)}`;
 
       console.log("[Google Auth] Opening auth session:", authUrl);
-      const result = await WebBrowser.openAuthSessionAsync(authUrl, GOOGLE_REDIRECT_URI);
+      const result = await WebBrowser.openAuthSessionAsync(authUrl, returnUrl);
       console.log("[Google Auth] Auth session result:", result);
 
       if (result.type === "success" && result.url) {
