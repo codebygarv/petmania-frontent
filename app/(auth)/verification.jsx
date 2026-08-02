@@ -59,7 +59,7 @@ const Verification = () => {
       return;
     }
 
-    const res = await dispatch(resendOtpAction({ email }));
+    const res = await dispatch(resendOtpAction({ email, type }));
 
     if (res?.success) {
       Toast.show({
@@ -70,10 +70,11 @@ const Verification = () => {
       setTimer(60);
       setCanResend(false);
     } else {
+      const errorMsg = typeof res?.error === "string" ? res.error : res?.error?.message || res?.message || "Please try again later.";
       Toast.show({
         type: "error",
         text1: "Failed to send code",
-        text2: res?.error?.message || "Please try again later.",
+        text2: errorMsg,
       });
     }
   };
@@ -95,25 +96,26 @@ const Verification = () => {
         forgotPasswordOtpAction({ email, otp: values.otp })
       );
 
-      if (res?.error?.success === false) {
-        Toast.show({
-          type: "error",
-          text1: "Verification Failed",
-          text2: res?.error?.error?.message,
-        });
-      } else if (res?.success === true) {
+      if (res?.success === true) {
         Toast.show({
           type: "success",
           text1: "Verification Successful",
-          text2: res?.message,
+          text2: res?.message || "OTP verified successfully.",
         });
-        await AsyncStorage.setItem("verifyChangePassword", res?.data?.token);
+        if (res?.data?.token) {
+          await AsyncStorage.setItem("verifyChangePassword", res?.data?.token);
+        }
         router.push("/forgotPasswordChange");
       } else {
+        const errorMsg =
+          res?.error?.message ||
+          res?.error?.error?.message ||
+          res?.message ||
+          "Invalid or expired OTP. Please try again.";
         Toast.show({
           type: "error",
           text1: "Verification Failed",
-          text2: "An unexpected error occurred. Please try again.",
+          text2: errorMsg,
         });
       }
     } else {
@@ -128,13 +130,7 @@ const Verification = () => {
         return;
       }
       const res = await dispatch(verifyOtpAction({ email, otp: values.otp }));
-      if (res?.error?.success === false) {
-        Toast.show({
-          type: "error",
-          text1: "Verification Failed",
-          text2: res?.error?.error?.message,
-        });
-      } else if (res?.success === true) {
+      if (res?.success === true) {
         // Auto-login: Save token and user info to AsyncStorage
         if (res?.data?.token) {
           await AsyncStorage.setItem("token", String(res.data.token));
@@ -145,7 +141,7 @@ const Verification = () => {
           Toast.show({
             type: "success",
             text1: "Verification Successful",
-            text2: "Welcome to Adoptirx!",
+            text2: "Welcome to Adoptrix!",
           });
 
           // Check if onboarding is needed
@@ -156,10 +152,15 @@ const Verification = () => {
           }
         }
       } else {
+        const errorMsg =
+          res?.error?.message ||
+          res?.error?.error?.message ||
+          res?.message ||
+          "Invalid or expired OTP. Please try again.";
         Toast.show({
           type: "error",
           text1: "Verification Failed",
-          text2: "An unexpected error occurred. Please try again.",
+          text2: errorMsg,
         });
       }
     }

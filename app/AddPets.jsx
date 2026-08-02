@@ -22,6 +22,20 @@ import { useDispatch, useSelector } from "react-redux";
 import { createPetAction } from "@/redux/actions/petActions";
 import { getColor } from "@/constants/color";
 
+const DOG_BREEDS = [
+    "Labrador Retriever", "German Shepherd", "Golden Retriever", "Beagle",
+    "Bulldog", "Poodle", "Rottweiler", "Shih Tzu", "Pug", "Doberman",
+    "Siberian Husky", "Cocker Spaniel", "Pomeranian", "Great Dane",
+    "Indian Pariah", "Rajapalayam", "Mudhol Hound", "Chihuahua", "Boxer",
+    "Mixed Breed", "Other"
+];
+
+const CAT_BREEDS = [
+    "Persian", "Siamese", "Maine Coon", "British Shorthair", "Ragdoll",
+    "Bengal", "Sphynx", "Abyssinian", "Scottish Fold", "Russian Blue",
+    "Himalayan", "Burmese", "Indian Domestic", "Mixed Breed", "Other"
+];
+
 const AddPets = () => {
     const { colorScheme } = useColorScheme();
     const isDark = colorScheme === "dark";
@@ -34,6 +48,7 @@ const AddPets = () => {
     const [name, setName] = useState("");
     const [petType, setPetType] = useState("dog");
     const [breed, setBreed] = useState("");
+    const [customBreed, setCustomBreed] = useState("");
     const [gender, setGender] = useState("unknown");
     const [color, setColor] = useState("");
     const [age, setAge] = useState("");
@@ -45,6 +60,10 @@ const AddPets = () => {
     const [showDatePicker, setShowDatePicker] = useState(false);
     const dispatch = useDispatch();
     const userInfo = useSelector((state) => state.user.userInfo);
+
+    const isIdentityVerified = Boolean(
+        userInfo?.isAdharVerified || userInfo?.isAadhaarVerified || userInfo?.userVerified
+    );
 
     // Pick the Profile Image
     const pickImage = async () => {
@@ -107,8 +126,27 @@ const AddPets = () => {
 
     // Submit the Pet Data to the Backend
     const onSubmit = async () => {
-        if (!name || !breed || !location) {
-            Toast.show({ type: "error", text1: "Validation Error", text2: "Please fill all required fields" });
+        if (!userInfo?.isVerified) {
+            Toast.show({
+                type: "error",
+                text1: "Email Not Verified",
+                text2: "Please verify your email address first"
+            });
+            return;
+        }
+
+        if (!isIdentityVerified) {
+            Toast.show({
+                type: "error",
+                text1: "Identity Verification Required",
+                text2: "Please complete Aadhaar/identity verification in your profile before adding a pet"
+            });
+            return;
+        }
+
+        const selectedBreed = breed === "Other" ? customBreed.trim() : breed;
+        if (!name.trim() || !selectedBreed || !location.trim()) {
+            Toast.show({ type: "error", text1: "Validation Error", text2: "Please fill all required fields (Name, Breed, Location)" });
             return;
         }
         if (images.length === 0) {
@@ -123,14 +161,6 @@ const AddPets = () => {
         try {
             setIsSubmitting(true);
 
-            if (userInfo) {
-                if (!userInfo.isVerified) {
-                    Toast.show({ type: "error", text1: "Error", text2: "Please verify first" });
-                    setIsSubmitting(false);
-                    return;
-                }
-            }
-
             const base64Images = images.map(img => `data:image/jpeg;base64,${img.base64}`);
 
             const locationParts = location.split(',').map(p => p.trim());
@@ -139,9 +169,9 @@ const AddPets = () => {
 
             const payload = {
                 images: base64Images,
-                name,
+                name: name.trim(),
                 type: petType,
-                breed,
+                breed: selectedBreed,
                 gender: gender,
                 color: color || "Unknown",
                 age: age ? Number(age) : 0,
@@ -154,7 +184,6 @@ const AddPets = () => {
             };
 
             const res = await dispatch(createPetAction(payload));
-            console.log(res)
 
             if (res && res.pet) {
                 Toast.show({ type: "success", text1: "Success", text2: "Pet added successfully!" });
@@ -170,6 +199,8 @@ const AddPets = () => {
         }
     };
 
+    const currentBreeds = petType === "dog" ? DOG_BREEDS : CAT_BREEDS;
+
     return (
         <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -183,6 +214,35 @@ const AddPets = () => {
                 </View>
 
                 <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 40 }}>
+                    {/* Verification Warning Banner if identity is not verified */}
+                    {!isIdentityVerified && (
+                        <Pressable
+                            onPress={() => router.push("/EditProfile")}
+                            className="rounded-2xl p-4 mb-4 flex-row items-center border"
+                            style={{
+                                backgroundColor: `${getColor("warning", isDark)}15`,
+                                borderColor: `${getColor("warning", isDark)}40`,
+                            }}
+                        >
+                            <Ionicons
+                                name={userInfo?.adharCardFrontImage ? "time-outline" : "shield-outline"}
+                                size={24}
+                                color={getColor("warning", isDark)}
+                            />
+                            <View className="ml-3 flex-1">
+                                <Text className="text-sm font-bold" style={{ color: getColor("warning", isDark) }}>
+                                    {userInfo?.adharCardFrontImage ? "Verification Pending by Admin" : "Identity Verification Required"}
+                                </Text>
+                                <Text className="text-xs mt-0.5" style={{ color: secondaryTextColor }}>
+                                    {userInfo?.adharCardFrontImage
+                                        ? "Your Aadhaar is submitted and pending admin approval. You can create listings once verified."
+                                        : "Your Aadhaar / Identity must be verified by admin before listing pets. Tap here to complete verification."}
+                                </Text>
+                            </View>
+                            <Ionicons name="chevron-forward" size={18} color={getColor("warning", isDark)} />
+                        </Pressable>
+                    )}
+
                     <Text className="text-sm color-textPrimary mb-2">Photos</Text>
 
                     <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-4">
@@ -228,14 +288,22 @@ const AddPets = () => {
                     <Text className="text-sm color-textPrimary mb-2 font-semibold">Pet Type</Text>
                     <View className="flex-row mb-4">
                         <Pressable
-                            onPress={() => setPetType("dog")}
+                            onPress={() => {
+                                setPetType("dog");
+                                setBreed("");
+                                setCustomBreed("");
+                            }}
                             className={`px-4 py-2 mr-3 rounded-2xl ${petType === "dog" ? "bg-buttonPrimary" : "bg-backgroundSecondary border border-border"}`}
                         >
                             <Text className={petType === "dog" ? "text-white font-semibold" : "color-textPrimary"}>Dog</Text>
                         </Pressable>
 
                         <Pressable
-                            onPress={() => setPetType("cat")}
+                            onPress={() => {
+                                setPetType("cat");
+                                setBreed("");
+                                setCustomBreed("");
+                            }}
                             className={`px-4 py-2 rounded-2xl ${petType === "cat" ? "bg-buttonPrimary" : "bg-backgroundSecondary border border-border"}`}
                         >
                             <Text className={petType === "cat" ? "text-white font-semibold" : "color-textPrimary"}>Cat</Text>
@@ -243,13 +311,48 @@ const AddPets = () => {
                     </View>
 
                     <Text className="text-sm color-textPrimary mb-2 font-semibold">Breed</Text>
-                    <TextInput
-                        value={breed}
-                        onChangeText={setBreed}
-                        placeholder="Enter breed"
-                        placeholderTextColor={placeholderColor}
-                        className="bg-backgroundSecondary color-textPrimary rounded-xl h-12 px-3 mb-4 border border-border"
-                    />
+                    <ScrollView
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        className="mb-3"
+                        contentContainerStyle={{ gap: 8, paddingRight: 8 }}
+                    >
+                        {currentBreeds.map((b) => {
+                            const isSelected = breed === b;
+                            return (
+                                <Pressable
+                                    key={b}
+                                    onPress={() => {
+                                        setBreed(b);
+                                        if (b !== "Other") {
+                                            setCustomBreed("");
+                                        }
+                                    }}
+                                    className={`px-3.5 py-2 rounded-full border ${isSelected ? "bg-buttonPrimary border-buttonPrimary" : "bg-backgroundSecondary border-border"}`}
+                                >
+                                    <Text className={`text-xs font-semibold ${isSelected ? "text-white" : "color-textPrimary"}`}>
+                                        {b}
+                                    </Text>
+                                </Pressable>
+                            );
+                        })}
+                    </ScrollView>
+
+                    {breed === "Other" && (
+                        <TextInput
+                            value={customBreed}
+                            onChangeText={setCustomBreed}
+                            placeholder="Type custom breed name"
+                            placeholderTextColor={placeholderColor}
+                            className="bg-backgroundSecondary color-textPrimary rounded-xl h-12 px-3 mb-4 border border-border"
+                        />
+                    )}
+
+                    {breed !== "" && breed !== "Other" && (
+                        <Text className="text-xs mb-3 font-medium" style={{ color: accentColor }}>
+                            Selected Breed: {breed}
+                        </Text>
+                    )}
 
                     <Text className="text-sm color-textPrimary mb-2 font-semibold">Age (years)</Text>
                     <TextInput
@@ -370,7 +473,11 @@ const AddPets = () => {
                         </Pressable>
                     </View>
 
-                    <Pressable onPress={onSubmit} disabled={isSubmitting} className={`h-12 rounded-xl py-3 ${isSubmitting ? 'bg-buttonDisabled' : 'bg-buttonPrimary shadow-sm'} items-center justify-center mb-8 flex-row`}>
+                    <Pressable
+                        onPress={onSubmit}
+                        disabled={isSubmitting}
+                        className={`h-12 rounded-xl py-3 ${isSubmitting ? 'bg-buttonDisabled' : 'bg-buttonPrimary shadow-sm'} items-center justify-center mb-8 flex-row`}
+                    >
                         {isSubmitting ? (
                             <>
                                 <ActivityIndicator size="small" color={getColor("white", isDark)} />

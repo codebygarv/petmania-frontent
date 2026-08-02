@@ -47,17 +47,18 @@ const Signup = () => {
       });
       await AsyncStorage.setItem('email', values.email);
       router.push("/verification?type=register");
-    } else if (res?.error?.message.success === false) {
-      Toast.show({
-        type: 'error',
-        text1: 'Signup Failed',
-        text2: res?.error?.message?.error?.message
-      });
     } else {
+      const errorMsg =
+        (typeof res?.error?.message === 'string' && res.error.message) ||
+        res?.error?.message?.error?.message ||
+        res?.error?.error?.message ||
+        res?.error?.message?.message ||
+        (typeof res?.error === 'string' && res.error) ||
+        'Registration failed. Please try again.';
       Toast.show({
         type: 'error',
         text1: 'Signup Failed',
-        text2: res?.error?.message || 'Something went wrong'
+        text2: errorMsg
       });
     }
 
