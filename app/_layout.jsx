@@ -13,6 +13,9 @@ import queryClient from "../query/queryClient";
 import Toast from "react-native-toast-message";
 import { toastConfig } from "../config/toastConfig";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as WebBrowser from "expo-web-browser";
+
+WebBrowser.maybeCompleteAuthSession();
 
 export default function RootLayout() {
   const { colorScheme } = useColorScheme();
@@ -73,6 +76,7 @@ export default function RootLayout() {
                 >
                   <Stack.Screen name="(auth)" />
                   <Stack.Screen name="(tab)" />
+                  <Stack.Screen name="google-auth" />
                   <Stack.Screen name="Onboarding" />
                   <Stack.Screen name="FinishProfile" />
                   <Stack.Screen name="AddPets" />

@@ -15,16 +15,14 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
   async (config) => {
     const token = await AsyncStorage.getItem("token");
-    const verifyChangePassword = await AsyncStorage.getItem("verifyChangePassword");
-    // console.log("verifyChangePassword from axiosInstance", verifyChangePassword); 
-    if (verifyChangePassword) {
-      config.headers.Authorization = `Bearer ${verifyChangePassword}`;
-    } else if (token) {
+    if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     console.log(`[Request] ${config.method?.toUpperCase()} ${config.url}`);
     return config;
-  }, (error) => Promise.reject(error));
+  },
+  (error) => Promise.reject(error)
+);
 
 axiosInstance.interceptors.response.use(
   (response) => response,
