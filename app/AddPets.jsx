@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
     View,
     Text,
@@ -8,7 +8,10 @@ import {
     TextInput,
     Platform,
     ActivityIndicator,
-    KeyboardAvoidingView
+    KeyboardAvoidingView,
+    Modal,
+    TouchableOpacity,
+    FlatList,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -22,6 +25,152 @@ import { useDispatch, useSelector } from "react-redux";
 import { createPetAction } from "@/redux/actions/petActions";
 import { getColor } from "@/constants/color";
 
+// ──────────────────────────────────────────────
+// Breed definitions per pet type
+// ──────────────────────────────────────────────
+const DOG_BREEDS = [
+    "Labrador Retriever",
+    "German Shepherd",
+    "Golden Retriever",
+    "Poodle",
+    "Bulldog",
+    "Beagle",
+    "Siberian Husky",
+    "Pomeranian",
+    "Rottweiler",
+    "Doberman",
+    "Shih Tzu",
+    "Pug",
+    "Dachshund",
+    "Border Collie",
+    "Australian Shepherd",
+    "Maltese",
+    "Chihuahua",
+    "Great Dane",
+    "Boxer",
+    "Saint Bernard",
+    "Indian Pariah",
+    "Mixed / Other",
+];
+
+const CAT_BREEDS = [
+    "Persian",
+    "Maine Coon",
+    "Siamese",
+    "Ragdoll",
+    "Bengal",
+    "British Shorthair",
+    "Abyssinian",
+    "Scottish Fold",
+    "Sphynx",
+    "Russian Blue",
+    "Birman",
+    "Himalayan",
+    "Burmese",
+    "American Shorthair",
+    "Indian Street Cat (Desi)",
+    "Mixed / Other",
+];
+
+// ──────────────────────────────────────────────
+// BreedPicker component — modal bottom-sheet style
+// ──────────────────────────────────────────────
+const BreedPicker = ({ value, breeds, isDark, onSelect }) => {
+    const [open, setOpen] = useState(false);
+    const primaryTextColor = getColor("textPrimary", isDark);
+    const placeholderColor = getColor("inputPlaceholder", isDark);
+    const accentColor = getColor("accent", isDark);
+    const bgColor = getColor("background", isDark);
+    const bgSecondary = getColor("backgroundSecondary", isDark);
+    const borderColor = getColor("border", isDark);
+
+    return (
+        <>
+            <Pressable
+                onPress={() => setOpen(true)}
+                style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    backgroundColor: bgSecondary,
+                    borderRadius: 12,
+                    borderWidth: 1,
+                    borderColor,
+                    height: 48,
+                    paddingHorizontal: 12,
+                    marginBottom: 16,
+                }}
+            >
+                <Text
+                    style={{
+                        flex: 1,
+                        color: value ? primaryTextColor : placeholderColor,
+                        fontSize: 14,
+                    }}
+                    numberOfLines={1}
+                >
+                    {value || "Select breed"}
+                </Text>
+                <Ionicons name="chevron-down" size={18} color={placeholderColor} />
+            </Pressable>
+
+            <Modal visible={open} animationType="slide" transparent>
+                <View style={{ flex: 1, justifyContent: "flex-end", backgroundColor: "rgba(0,0,0,0.5)" }}>
+                    <View
+                        style={{
+                            backgroundColor: bgColor,
+                            borderTopLeftRadius: 20,
+                            borderTopRightRadius: 20,
+                            maxHeight: "65%",
+                            paddingTop: 16,
+                        }}
+                    >
+                        <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 20, marginBottom: 12 }}>
+                            <Text style={{ fontSize: 16, fontWeight: "700", color: primaryTextColor }}>
+                                Select Breed
+                            </Text>
+                            <TouchableOpacity onPress={() => setOpen(false)}>
+                                <Ionicons name="close" size={22} color={primaryTextColor} />
+                            </TouchableOpacity>
+                        </View>
+
+                        <FlatList
+                            data={breeds}
+                            keyExtractor={(item) => item}
+                            renderItem={({ item }) => {
+                                const selected = item === value;
+                                return (
+                                    <TouchableOpacity
+                                        onPress={() => { onSelect(item); setOpen(false); }}
+                                        style={{
+                                            flexDirection: "row",
+                                            alignItems: "center",
+                                            paddingHorizontal: 20,
+                                            paddingVertical: 14,
+                                            borderBottomWidth: 1,
+                                            borderBottomColor: borderColor,
+                                            backgroundColor: selected ? `${accentColor}15` : "transparent",
+                                        }}
+                                    >
+                                        <Text style={{ flex: 1, color: selected ? accentColor : primaryTextColor, fontWeight: selected ? "600" : "400", fontSize: 14 }}>
+                                            {item}
+                                        </Text>
+                                        {selected && <Ionicons name="checkmark" size={18} color={accentColor} />}
+                                    </TouchableOpacity>
+                                );
+                            }}
+                            contentContainerStyle={{ paddingBottom: 32 }}
+                            showsVerticalScrollIndicator={false}
+                        />
+                    </View>
+                </View>
+            </Modal>
+        </>
+    );
+};
+
+// ──────────────────────────────────────────────
+// Main AddPets screen
+// ──────────────────────────────────────────────
 const AddPets = () => {
     const { colorScheme } = useColorScheme();
     const isDark = colorScheme === "dark";
@@ -45,6 +194,22 @@ const AddPets = () => {
     const [showDatePicker, setShowDatePicker] = useState(false);
     const dispatch = useDispatch();
     const userInfo = useSelector((state) => state.user.userInfo);
+
+    // Reset breed when pet type changes
+    const handlePetTypeChange = (type) => {
+        setPetType(type);
+        setBreed("");
+    };
+
+    const breedList = useMemo(
+        () => (petType === "dog" ? DOG_BREEDS : CAT_BREEDS),
+        [petType]
+    );
+
+    // ─── Verification Check ───────────────────────
+    const isEmailVerified = userInfo?.isVerified === true;
+    const isAdharVerified = userInfo?.isAdharVerified === true;
+    const canAddPet = isEmailVerified && isAdharVerified;
 
     // Pick the Profile Image
     const pickImage = async () => {
@@ -77,7 +242,7 @@ const AddPets = () => {
         }
     };
 
-    // Get the current Location of the User to add the Pet or for the Manual location
+    // Get the current Location
     const getLocation = async () => {
         try {
             setLocationLoading(true);
@@ -105,8 +270,13 @@ const AddPets = () => {
         }
     };
 
-    // Submit the Pet Data to the Backend
+    // Submit the Pet Data
     const onSubmit = async () => {
+        if (!canAddPet) {
+            Toast.show({ type: "error", text1: "Verification Required", text2: "Please verify your email and Aadhaar to add a pet" });
+            return;
+        }
+
         if (!name || !breed || !location) {
             Toast.show({ type: "error", text1: "Validation Error", text2: "Please fill all required fields" });
             return;
@@ -122,14 +292,6 @@ const AddPets = () => {
 
         try {
             setIsSubmitting(true);
-
-            if (userInfo) {
-                if (!userInfo.isVerified) {
-                    Toast.show({ type: "error", text1: "Error", text2: "Please verify first" });
-                    setIsSubmitting(false);
-                    return;
-                }
-            }
 
             const base64Images = images.map(img => `data:image/jpeg;base64,${img.base64}`);
 
@@ -154,7 +316,7 @@ const AddPets = () => {
             };
 
             const res = await dispatch(createPetAction(payload));
-            console.log(res)
+            console.log(res);
 
             if (res && res.pet) {
                 Toast.show({ type: "success", text1: "Success", text2: "Pet added successfully!" });
@@ -182,7 +344,46 @@ const AddPets = () => {
                     <Text className="text-lg font-bold color-textPrimary ml-2">Add Pet for Adoption</Text>
                 </View>
 
-                <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 40 }}>
+                {/* ── Verification Required Banner ─────────────── */}
+                {!canAddPet && (
+                    <View
+                        className="rounded-xl p-3 mb-4 border"
+                        style={{
+                            backgroundColor: `${getColor("warning", isDark)}15`,
+                            borderColor: `${getColor("warning", isDark)}40`,
+                        }}
+                    >
+                        <View className="flex-row items-start">
+                            <Ionicons name="shield-checkmark-outline" size={20} color={getColor("warning", isDark)} />
+                            <View className="ml-2 flex-1">
+                                <Text className="font-semibold text-sm mb-0.5" style={{ color: getColor("warning", isDark) }}>
+                                    Verification Required
+                                </Text>
+                                <Text className="text-xs" style={{ color: getColor("warning", isDark) }}>
+                                    {!isEmailVerified
+                                        ? "Your email is not verified. Please verify your email first."
+                                        : "Your Aadhaar is not verified. Please submit your Aadhaar details to list a pet."}
+                                </Text>
+                                <Pressable
+                                    onPress={() => router.push("/EditProfile")}
+                                    className="mt-2 self-start px-3 py-1 rounded-full"
+                                    style={{ backgroundColor: `${getColor("warning", isDark)}30` }}
+                                >
+                                    <Text className="text-xs font-semibold" style={{ color: getColor("warning", isDark) }}>
+                                        Go to Edit Profile →
+                                    </Text>
+                                </Pressable>
+                            </View>
+                        </View>
+                    </View>
+                )}
+
+                <ScrollView
+                    showsVerticalScrollIndicator={false}
+                    contentContainerStyle={{ paddingBottom: 40 }}
+                    style={!canAddPet ? { opacity: 0.5 } : undefined}
+                    pointerEvents={!canAddPet ? "none" : "auto"}
+                >
                     <Text className="text-sm color-textPrimary mb-2">Photos</Text>
 
                     <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-4">
@@ -228,14 +429,14 @@ const AddPets = () => {
                     <Text className="text-sm color-textPrimary mb-2 font-semibold">Pet Type</Text>
                     <View className="flex-row mb-4">
                         <Pressable
-                            onPress={() => setPetType("dog")}
+                            onPress={() => handlePetTypeChange("dog")}
                             className={`px-4 py-2 mr-3 rounded-2xl ${petType === "dog" ? "bg-buttonPrimary" : "bg-backgroundSecondary border border-border"}`}
                         >
                             <Text className={petType === "dog" ? "text-white font-semibold" : "color-textPrimary"}>Dog</Text>
                         </Pressable>
 
                         <Pressable
-                            onPress={() => setPetType("cat")}
+                            onPress={() => handlePetTypeChange("cat")}
                             className={`px-4 py-2 rounded-2xl ${petType === "cat" ? "bg-buttonPrimary" : "bg-backgroundSecondary border border-border"}`}
                         >
                             <Text className={petType === "cat" ? "text-white font-semibold" : "color-textPrimary"}>Cat</Text>
@@ -243,12 +444,11 @@ const AddPets = () => {
                     </View>
 
                     <Text className="text-sm color-textPrimary mb-2 font-semibold">Breed</Text>
-                    <TextInput
+                    <BreedPicker
                         value={breed}
-                        onChangeText={setBreed}
-                        placeholder="Enter breed"
-                        placeholderTextColor={placeholderColor}
-                        className="bg-backgroundSecondary color-textPrimary rounded-xl h-12 px-3 mb-4 border border-border"
+                        breeds={breedList}
+                        isDark={isDark}
+                        onSelect={setBreed}
                     />
 
                     <Text className="text-sm color-textPrimary mb-2 font-semibold">Age (years)</Text>
@@ -370,14 +570,20 @@ const AddPets = () => {
                         </Pressable>
                     </View>
 
-                    <Pressable onPress={onSubmit} disabled={isSubmitting} className={`h-12 rounded-xl py-3 ${isSubmitting ? 'bg-buttonDisabled' : 'bg-buttonPrimary shadow-sm'} items-center justify-center mb-8 flex-row`}>
+                    <Pressable
+                        onPress={onSubmit}
+                        disabled={isSubmitting || !canAddPet}
+                        className={`h-12 rounded-xl py-3 ${isSubmitting || !canAddPet ? 'bg-buttonDisabled' : 'bg-buttonPrimary shadow-sm'} items-center justify-center mb-8 flex-row`}
+                    >
                         {isSubmitting ? (
                             <>
                                 <ActivityIndicator size="small" color={getColor("white", isDark)} />
                                 <Text className="text-white font-bold ml-2">Saving Pet...</Text>
                             </>
                         ) : (
-                            <Text className="text-white font-bold">Create Listing</Text>
+                            <Text className="text-white font-bold">
+                                {canAddPet ? "Create Listing" : "Verification Required"}
+                            </Text>
                         )}
                     </Pressable>
                 </ScrollView>
