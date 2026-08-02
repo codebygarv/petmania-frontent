@@ -18,9 +18,12 @@ export const COLORS = {
     warning: "#FF9800",
     border: "#E5E5E5",
     tabBg: "#FFFFFF",
+    tabActive: "#E0583D",
+    tabInactive: "#6E6E6E",
     graySoft: "#666666",
     white: "#FFFFFF",
     black: "#000000",
+    shadow: "#000000",
   },
   dark: {
     background: "#121212",
@@ -41,9 +44,12 @@ export const COLORS = {
     warning: "#FF9800",
     border: "#2C2C2C",
     tabBg: "#0B0B0B",
+    tabActive: "#E0583D",
+    tabInactive: "#9A9A9A",
     graySoft: "#9A9A9A",
     white: "#FFFFFF",
     black: "#000000",
+    shadow: "#000000",
   },
 };
 

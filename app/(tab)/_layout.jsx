@@ -33,9 +33,9 @@ export default function TabLayout() {
           </TouchableOpacity>
         ),
 
-        tabBarActiveTintColor: getColor("tabActive", isDark),
+        tabBarActiveTintColor: getColor("buttonPrimary", isDark),
 
-        tabBarInactiveTintColor: getColor("tabInactive", isDark),
+        tabBarInactiveTintColor: getColor("textSecondary", isDark),
 
         tabBarIcon: ({ color, size }) => {
           let iconName;
