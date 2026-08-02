@@ -15,26 +15,79 @@ export default function GoogleAuthCallback() {
   const dispatch = useDispatch();
   const isProcessing = useRef(false);
 
-  const processToken = async (accessToken) => {
-    if (!accessToken || isProcessing.current) return;
-    isProcessing.current = true;
+  const handleUrl = async (url) => {
+    if (!url || isProcessing.current) return;
 
     try {
-      const res = await dispatch(googleLoginAction(accessToken));
-      if (res?.success) {
-        await AsyncStorage.setItem("userInfo", JSON.stringify(res.data.user));
-        await AsyncStorage.setItem("token", res.data.token);
+      const fragment = url.includes("#")
+        ? url.split("#")[1]
+        : url.includes("?")
+        ? url.split("?")[1]
+        : "";
+      const urlParams = new URLSearchParams(fragment);
+
+      const token = urlParams.get("token");
+      const userParam = urlParams.get("user");
+      const accessToken = urlParams.get("access_token");
+      const error = urlParams.get("error");
+
+      if (error) {
+        Toast.show({ type: "error", text1: "Google login failed: " + error });
+        router.replace("/(auth)");
+        return;
+      }
+
+      if (token) {
+        isProcessing.current = true;
+        let userData = null;
+        if (userParam) {
+          try {
+            userData = JSON.parse(decodeURIComponent(userParam));
+          } catch (e) {
+            console.error("User parse error:", e);
+          }
+        }
+
+        await AsyncStorage.setItem("token", token);
+        if (userData) {
+          await AsyncStorage.setItem("userInfo", JSON.stringify(userData));
+        }
+
         Toast.show({
           type: "success",
-          text1: res.message || "Google Login Successful",
+          text1: "Google Login Successful",
         });
         router.replace("/(tab)");
+        return;
+      }
+
+      if (accessToken) {
+        isProcessing.current = true;
+        const res = await dispatch(googleLoginAction(accessToken));
+        if (res?.success) {
+          await AsyncStorage.setItem("userInfo", JSON.stringify(res.data.user));
+          await AsyncStorage.setItem("token", res.data.token);
+          Toast.show({
+            type: "success",
+            text1: res.message || "Google Login Successful",
+          });
+          router.replace("/(tab)");
+        } else {
+          Toast.show({
+            type: "error",
+            text1: res?.error?.message || "Google Login Failed",
+          });
+          router.replace("/(auth)");
+        }
+        return;
+      }
+
+      // Check if already authenticated in storage
+      const savedToken = await AsyncStorage.getItem("token");
+      if (savedToken) {
+        router.replace("/(tab)");
       } else {
-        Toast.show({
-          type: "error",
-          text1: res?.error?.message || "Google Login Failed",
-        });
-        router.replace("/(auth)");
+        setTimeout(() => router.replace("/(auth)"), 1500);
       }
     } catch (err) {
       console.error("[Google Auth Callback] Error:", err);
@@ -46,27 +99,6 @@ export default function GoogleAuthCallback() {
   };
 
   useEffect(() => {
-    const handleUrl = async (url) => {
-      if (!url) return;
-      if (url.includes("access_token")) {
-        const hash = url.includes("#") ? url.split("#")[1] : url.split("?")[1];
-        const urlParams = new URLSearchParams(hash || "");
-        const accessToken = urlParams.get("access_token");
-        if (accessToken) {
-          await processToken(accessToken);
-          return;
-        }
-      }
-
-      // If token already saved, go to tab; otherwise auth
-      const savedToken = await AsyncStorage.getItem("token");
-      if (savedToken) {
-        router.replace("/(tab)");
-      } else {
-        setTimeout(() => router.replace("/(auth)"), 1500);
-      }
-    };
-
     Linking.getInitialURL().then(handleUrl);
 
     const subscription = Linking.addEventListener("url", (event) => {
