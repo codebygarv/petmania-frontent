@@ -11,7 +11,6 @@ import { useSelector } from "react-redux";
 
 const Profile = () => {
   const userInfo = useSelector((state) => state.user.userInfo);
-  const userVerified = userInfo?.isVerified;
 
   const { colorScheme } = useColorScheme();
   const isDark = colorScheme === "dark";
@@ -151,9 +150,18 @@ const Profile = () => {
             <Text className="text-2xl font-bold color-textPrimary mb-1">
               {userInfo?.name || userInfo?.email?.split("@")[0]?.split("+")[0]?.trim() || "User"}
             </Text>
-            <Text className="text-sm color-textSecondary mb-4">
-              {userInfo?.email || "No email available"}
-            </Text>
+            <View className="flex-row items-center justify-center gap-1.5 mb-4">
+              <Text className="text-sm color-textSecondary">
+                {userInfo?.email || "No email available"}
+              </Text>
+              {userInfo?.isVerified && (
+                <Ionicons
+                  name="checkmark-circle"
+                  size={16}
+                  color={getColor("success", isDark)}
+                />
+              )}
+            </View>
           </View>
 
           {/* <View className="flex-row justify-between mb-6">
@@ -186,7 +194,29 @@ const Profile = () => {
                 </Text>
                 {
                   item.id === 1 && (
-                    <Tags text={userVerified === true ? "Verified" : "Not Verified"} variant={userVerified === true ? "success" : "warning"} icon={userVerified === true ? "" : "alert-circle-outline"} />
+                    <Tags
+                      text={
+                        userInfo?.userVerified || userInfo?.isAdharVerified
+                          ? "Verified"
+                          : userInfo?.isVerified
+                          ? "Email Verified"
+                          : "Not Verified"
+                      }
+                      variant={
+                        userInfo?.userVerified || userInfo?.isAdharVerified
+                          ? "success"
+                          : userInfo?.isVerified
+                          ? "default"
+                          : "warning"
+                      }
+                      icon={
+                        userInfo?.userVerified || userInfo?.isAdharVerified
+                          ? "checkmark-circle"
+                          : userInfo?.isVerified
+                          ? "mail-outline"
+                          : "alert-circle-outline"
+                      }
+                    />
                   )
                 }
                 <Ionicons

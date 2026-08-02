@@ -242,43 +242,59 @@ const EditProfile = () => {
                                 className="ml-2 text-xs flex-1"
                                 style={{ color: getColor("warning", isDark) }}
                             >
-                                Your profile is not verified. Please provide your Aadhaar details to enable all features.
+                                Your email is not verified. Please verify your email to secure your account.
                             </Text>
                         </View>
-                    ) : (
-                        !userInfo?.isAadhaarVerified ? (
+                    ) : !(userInfo?.isAdharVerified || userInfo?.isAadhaarVerified) ? (
+                        userInfo?.adharCardFrontImage ? (
                             <View
                                 className="rounded-xl p-3 mb-5 flex-row items-center border"
                                 style={{
-                                    backgroundColor: `${getColor("success", isDark)}15`,
-                                    borderColor: `${getColor("success", isDark)}40`,
+                                    backgroundColor: `${getColor("warning", isDark)}15`,
+                                    borderColor: `${getColor("warning", isDark)}40`,
                                 }}
                             >
-                                <Ionicons name="checkmark-circle" size={20} color={getColor("success", isDark)} />
+                                <Ionicons name="time-outline" size={20} color={getColor("warning", isDark)} />
                                 <Text
                                     className="ml-2 text-xs flex-1"
-                                    style={{ color: getColor("success", isDark) }}
+                                    style={{ color: getColor("warning", isDark) }}
                                 >
-                                    Your Identity details are submitted for verification.
+                                    Your Identity details are submitted and pending admin verification.
                                 </Text>
                             </View>
                         ) : (
                             <View
                                 className="rounded-xl p-3 mb-5 flex-row items-center border"
                                 style={{
-                                    backgroundColor: `${getColor("success", isDark)}15`,
-                                    borderColor: `${getColor("success", isDark)}40`,
+                                    backgroundColor: `${getColor("warning", isDark)}15`,
+                                    borderColor: `${getColor("warning", isDark)}40`,
                                 }}
                             >
-                                <Ionicons name="checkmark-circle" size={20} color={getColor("success", isDark)} />
+                                <Ionicons name="alert-circle" size={20} color={getColor("warning", isDark)} />
                                 <Text
                                     className="ml-2 text-xs flex-1"
-                                    style={{ color: getColor("success", isDark) }}
+                                    style={{ color: getColor("warning", isDark) }}
                                 >
-                                    Your Identity details are verified.
+                                    Email verified. Please submit your Aadhaar details below to verify your identity.
                                 </Text>
                             </View>
                         )
+                    ) : (
+                        <View
+                            className="rounded-xl p-3 mb-5 flex-row items-center border"
+                            style={{
+                                backgroundColor: `${getColor("success", isDark)}15`,
+                                borderColor: `${getColor("success", isDark)}40`,
+                            }}
+                        >
+                            <Ionicons name="checkmark-circle" size={20} color={getColor("success", isDark)} />
+                            <Text
+                                className="ml-2 text-xs flex-1"
+                                style={{ color: getColor("success", isDark) }}
+                            >
+                                {userInfo?.userVerified ? "Your profile is fully verified." : "Your Identity details are verified."}
+                            </Text>
+                        </View>
                     )}
 
                     {/* Profile Photo */}
@@ -379,14 +395,34 @@ const EditProfile = () => {
                                     {touched.phoneNumber && errors.phoneNumber && <Text style={{ color: errorColor, fontSize: 12, marginBottom: 8 }}>{errors.phoneNumber}</Text>}
 
                                     <FieldLabel label="Email" isDark={isDark} />
-                                    <InputField
-                                        isDark={isDark}
-                                        placeholder="Email address"
-                                        keyboardType="email-address"
-                                        value={values.email}
-                                        editable={false}
-                                        style={{ opacity: 0.5 }}
-                                    />
+                                    <View className="relative justify-center">
+                                        <InputField
+                                            isDark={isDark}
+                                            placeholder="Email address"
+                                            keyboardType="email-address"
+                                            value={values.email}
+                                            editable={false}
+                                            style={{ opacity: 0.85, paddingRight: userInfo?.isVerified ? 95 : 14 }}
+                                        />
+                                        {userInfo?.isVerified && (
+                                            <View
+                                                className="absolute right-3 flex-row items-center px-2 py-1 rounded-full border"
+                                                style={{
+                                                    backgroundColor: `${getColor("success", isDark)}15`,
+                                                    borderColor: `${getColor("success", isDark)}40`,
+                                                    top: 9,
+                                                }}
+                                            >
+                                                <Ionicons name="checkmark-circle" size={14} color={getColor("success", isDark)} />
+                                                <Text
+                                                    className="ml-1 text-xs font-semibold"
+                                                    style={{ color: getColor("success", isDark) }}
+                                                >
+                                                    Verified
+                                                </Text>
+                                            </View>
+                                        )}
+                                    </View>
 
                                     <FieldLabel label="Gender" isDark={isDark} />
                                     <View style={{ flexDirection: 'row', gap: 10, marginBottom: 4 }}>
