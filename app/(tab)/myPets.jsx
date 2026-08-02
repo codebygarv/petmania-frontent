@@ -38,7 +38,12 @@ const MyPets = () => {
 
   const dispatch = useDispatch();
   const { myPets, myPetsLoading } = useSelector((state) => state.pet);
+  const userInfo = useSelector((state) => state.user.userInfo);
   const [refreshing, setRefreshing] = useState(false);
+
+  const isIdentityVerified = Boolean(
+    userInfo?.userVerified || userInfo?.isAdharVerified || userInfo?.isAadhaarVerified
+  );
 
   useEffect(() => {
     dispatch(getMyPetsAction());
@@ -98,6 +103,17 @@ const MyPets = () => {
   };
 
   const handleAddPet = () => {
+    if (!isIdentityVerified) {
+      Toast.show({
+        type: "error",
+        text1: "Identity Verification Required",
+        text2: userInfo?.adharCardFrontImage
+          ? "Your Aadhaar is pending admin verification before you can add pets."
+          : "Please verify your Aadhaar in Edit Profile before adding pets for adoption.",
+      });
+      router.push("/EditProfile");
+      return;
+    }
     router.push("/AddPets");
   };
 
@@ -117,10 +133,16 @@ const MyPets = () => {
             </Text>
             <TouchableOpacity
               onPress={handleAddPet}
-              className="px-4 py-2 bg-buttonPrimary rounded-xl flex-row items-center"
+              className={`px-4 py-2 rounded-xl flex-row items-center ${isIdentityVerified ? 'bg-buttonPrimary' : 'bg-backgroundSecondary border border-border'}`}
             >
-              <Ionicons name="add" size={18} color="white" />
-              <Text className="text-white font-semibold ml-1">Add Pet</Text>
+              <Ionicons
+                name={isIdentityVerified ? "add" : "lock-closed-outline"}
+                size={18}
+                color={isIdentityVerified ? "white" : graySoftColor}
+              />
+              <Text className={`font-semibold ml-1 ${isIdentityVerified ? 'text-white' : 'color-textSecondary'}`}>
+                Add Pet
+              </Text>
             </TouchableOpacity>
           </View>
 
@@ -137,8 +159,11 @@ const MyPets = () => {
               </Text>
               <TouchableOpacity
                 onPress={handleAddPet}
-                className="mt-6 px-6 py-3 bg-buttonPrimary rounded-xl"
+                className="mt-6 px-6 py-3 bg-buttonPrimary rounded-xl flex-row items-center justify-center"
               >
+                {!isIdentityVerified && (
+                  <Ionicons name="lock-closed-outline" size={18} color="white" style={{ marginRight: 6 }} />
+                )}
                 <Text className="text-white font-semibold">Add Your First Pet</Text>
               </TouchableOpacity>
             </View>

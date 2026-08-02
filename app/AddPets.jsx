@@ -224,13 +224,19 @@ const AddPets = () => {
                                 borderColor: `${getColor("warning", isDark)}40`,
                             }}
                         >
-                            <Ionicons name="shield-outline" size={24} color={getColor("warning", isDark)} />
+                            <Ionicons
+                                name={userInfo?.adharCardFrontImage ? "time-outline" : "shield-outline"}
+                                size={24}
+                                color={getColor("warning", isDark)}
+                            />
                             <View className="ml-3 flex-1">
                                 <Text className="text-sm font-bold" style={{ color: getColor("warning", isDark) }}>
-                                    Identity Verification Required
+                                    {userInfo?.adharCardFrontImage ? "Verification Pending by Admin" : "Identity Verification Required"}
                                 </Text>
                                 <Text className="text-xs mt-0.5" style={{ color: secondaryTextColor }}>
-                                    Your Aadhaar / Identity must be verified before listing pets. Tap here to complete verification in Edit Profile.
+                                    {userInfo?.adharCardFrontImage
+                                        ? "Your Aadhaar is submitted and pending admin approval. You can create listings once verified."
+                                        : "Your Aadhaar / Identity must be verified by admin before listing pets. Tap here to complete verification."}
                                 </Text>
                             </View>
                             <Ionicons name="chevron-forward" size={18} color={getColor("warning", isDark)} />

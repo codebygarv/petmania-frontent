@@ -39,6 +39,23 @@ const Profile = () => {
     return firstChar + firstChar2;
   };
 
+  const isIdentityVerified = Boolean(
+    userInfo?.userVerified || userInfo?.isAdharVerified || userInfo?.isAadhaarVerified
+  );
+
+  const getVerificationTag = () => {
+    if (isIdentityVerified) {
+      return { text: "Verified", variant: "success", icon: "checkmark-circle" };
+    }
+    if (userInfo?.adharCardFrontImage) {
+      return { text: "Pending Review", variant: "warning", icon: "time-outline" };
+    }
+    if (userInfo?.isVerified) {
+      return { text: "Email Verified", variant: "default", icon: "mail-outline" };
+    }
+    return { text: "Not Verified", variant: "warning", icon: "alert-circle-outline" };
+  };
+
   const handleLogout = async () => {
     try {
       await AsyncStorage.removeItem("token");
@@ -73,9 +90,20 @@ const Profile = () => {
     {
       id: 2,
       title: "Add Pet Profile",
-      icon: "paw-outline",
-      color: accentColor,
+      icon: isIdentityVerified ? "paw-outline" : "lock-closed-outline",
+      color: isIdentityVerified ? accentColor : graySoftColor,
       onPress: () => {
+        if (!isIdentityVerified) {
+          Toast.show({
+            type: "error",
+            text1: "Identity Verification Required",
+            text2: userInfo?.adharCardFrontImage
+              ? "Your Aadhaar is pending admin verification before you can add pets."
+              : "Please verify your Aadhaar in Edit Profile to add pets for adoption.",
+          });
+          router.push("/EditProfile");
+          return;
+        }
         router.push("/AddPets");
       },
     },
@@ -126,6 +154,8 @@ const Profile = () => {
     },
   ];
 
+  const verificationTag = getVerificationTag();
+
   return (
     <View className="flex-1 bg-background">
       <ScrollView
@@ -147,20 +177,22 @@ const Profile = () => {
                 </Text>
               </View>
             )}
-            <Text className="text-2xl font-bold color-textPrimary mb-1">
-              {userInfo?.name || userInfo?.email?.split("@")[0]?.split("+")[0]?.trim() || "User"}
-            </Text>
+            <View className="flex-row items-center justify-center gap-1.5 mb-1">
+              <Text className="text-2xl font-bold color-textPrimary">
+                {userInfo?.name || userInfo?.email?.split("@")[0]?.split("+")[0]?.trim() || "User"}
+              </Text>
+              {isIdentityVerified && (
+                <Ionicons
+                  name="checkmark-circle"
+                  size={20}
+                  color={getColor("success", isDark)}
+                />
+              )}
+            </View>
             <View className="flex-row items-center justify-center gap-1.5 mb-4">
               <Text className="text-sm color-textSecondary">
                 {userInfo?.email || "No email available"}
               </Text>
-              {userInfo?.isVerified && (
-                <Ionicons
-                  name="checkmark-circle"
-                  size={16}
-                  color={getColor("success", isDark)}
-                />
-              )}
             </View>
           </View>
 
@@ -195,27 +227,18 @@ const Profile = () => {
                 {
                   item.id === 1 && (
                     <Tags
-                      text={
-                        userInfo?.userVerified || userInfo?.isAdharVerified
-                          ? "Verified"
-                          : userInfo?.isVerified
-                          ? "Email Verified"
-                          : "Not Verified"
-                      }
-                      variant={
-                        userInfo?.userVerified || userInfo?.isAdharVerified
-                          ? "success"
-                          : userInfo?.isVerified
-                          ? "default"
-                          : "warning"
-                      }
-                      icon={
-                        userInfo?.userVerified || userInfo?.isAdharVerified
-                          ? "checkmark-circle"
-                          : userInfo?.isVerified
-                          ? "mail-outline"
-                          : "alert-circle-outline"
-                      }
+                      text={verificationTag.text}
+                      variant={verificationTag.variant}
+                      icon={verificationTag.icon}
+                    />
+                  )
+                }
+                {
+                  item.id === 2 && !isIdentityVerified && (
+                    <Tags
+                      text="Locked"
+                      variant="warning"
+                      icon="lock-closed-outline"
                     />
                   )
                 }
