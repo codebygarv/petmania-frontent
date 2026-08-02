@@ -1,26 +1,25 @@
-import { View, Text, ScrollView, Image, TouchableOpacity, SafeAreaView, Dimensions } from 'react-native';
+import { View, Text, ScrollView, Image, Dimensions, SafeAreaView } from 'react-native';
 import React from 'react';
-import { LinearGradient } from 'expo-linear-gradient';
-import { router } from 'expo-router';
 import {
     Heart,
     ShieldCheck,
     Users,
     Smartphone,
-    ArrowLeft
 } from 'lucide-react-native';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { config } from '@/constants/config';
 import SectionHeader from '@/components/SectionHeader';
 import InfoCard from '@/components/InfoCard';
 import BackButton from '@/components/BackButton';
+import { useColorScheme } from 'nativewind';
+import { getColor } from '@/constants/color';
 
 const { width } = Dimensions.get('window');
 
 const About = () => {
-    const handleBack = () => {
-        router.back();
-    };
+    const { colorScheme } = useColorScheme();
+    const isDark = colorScheme === 'dark';
+    const accentColor = getColor('accent', isDark);
 
     const features = [
         {
@@ -73,13 +72,13 @@ const About = () => {
                         </View>
                         <Text
                             entering={FadeInDown.delay(200).duration(600)}
-                            className="text-white text-4xl font-bold tracking-tight"
+                            className="color-textPrimary text-4xl font-bold tracking-tight"
                         >
                             Adoptrix
                         </Text>
                         <Text
                             entering={FadeInDown.delay(300).duration(600)}
-                            className="text-white/80 text-lg font-medium text-center mt-2 px-6"
+                            className="color-textSecondary text-lg font-medium text-center mt-2 px-6"
                         >
                             Connecting Hearts, Saving Lives.
                         </Text>
@@ -95,8 +94,8 @@ const About = () => {
                             subtitle="Making pet adoption joyful and accessible for everyone."
                         />
                         <View className="bg-backgroundSecondary border border-border p-5 rounded-3xl mb-8">
-                            <Text className="text-textPrimary text-base leading-7">
-                                Adoptirx is a complete pet adoption and community platform designed to bridge the gap between pet seekers and animals in need. We believe every animal deserves a loving home, and every home is better with a pet.
+                            <Text className="color-textPrimary text-base leading-7">
+                                Adoptrix is a complete pet adoption and community platform designed to bridge the gap between pet seekers and animals in need. We believe every animal deserves a loving home, and every home is better with a pet.
                             </Text>
                         </View>
                     </View>
@@ -117,25 +116,25 @@ const About = () => {
                     </View>
 
                     {/* Mission Statement Callout */}
-                    <View
+                    <Animated.View
                         entering={FadeInDown.delay(1200).duration(600)}
                         className="bg-accent/5 p-8 rounded-3xl border border-accent/20 mt-8 items-center"
                     >
-                        <Heart size={40} color="rgb(224, 88, 61)" fill="rgba(224, 88, 61, 0.2)" />
-                        <Text className="text-textPrimary text-xl font-bold text-center mt-4">
+                        <Heart size={40} color={accentColor} fill={`${accentColor}33`} />
+                        <Text className="color-textPrimary text-xl font-bold text-center mt-4">
                             Together, we can make a difference.
                         </Text>
-                        <Text className="text-textSecondary text-center mt-2 leading-6">
-                            Helping one animal won't change the world, but it will certainly change the world for that one animal.
+                        <Text className="color-textSecondary text-center mt-2 leading-6">
+                            Helping one animal won&apos;t change the world, but it will certainly change the world for that one animal.
                         </Text>
-                    </View>
+                    </Animated.View>
 
                     {/* Developer Info */}
                     <View className="mt-12 py-8 border-t border-border items-center">
-                        <Text className="text-textSecondary text-sm">Created with passion by</Text>
-                        <Text className="text-textPrimary text-lg font-bold mt-1">codebygarv (Garv)</Text>
-                        <Text className="text-textSecondary text-xs mt-4">
-                            © {new Date().getFullYear()} Adoptirx. v1.0.0
+                        <Text className="color-textSecondary text-sm">Created with passion by</Text>
+                        <Text className="color-textPrimary text-lg font-bold mt-1">codebygarv (Garv)</Text>
+                        <Text className="color-textSecondary text-xs mt-4">
+                            © {new Date().getFullYear()} Adoptrix. v1.0.0
                         </Text>
                     </View>
                 </View>

@@ -6,16 +6,16 @@ import {
   TouchableOpacity,
   Pressable,
   ActivityIndicator,
+  Image,
 } from "react-native";
 import React, { useState, useEffect, useCallback } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { Image } from "react-native";
 import { config } from "@/constants/config";
 import BackButton from "./BackButton";
 import EmptyState from "./EmptyState";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { searchPetsAction } from "@/redux/actions/petActions";
 import { getColor } from "@/constants/color";
 import { useColorScheme } from "nativewind";
@@ -49,6 +49,15 @@ const Search = ({ onClose }) => {
     loadRecentSearches();
   }, []);
 
+  const handleSearch = useCallback(async (query) => {
+    setLoading(true);
+    const res = await dispatch(searchPetsAction(query));
+    if (res?.pets) {
+        setSearchResults(res.pets);
+    }
+    setLoading(false);
+  }, [dispatch]);
+
   // Debounced search
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
@@ -60,16 +69,7 @@ const Search = ({ onClose }) => {
     }, 500);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [searchQuery]);
-
-  const handleSearch = async (query) => {
-    setLoading(true);
-    const res = await dispatch(searchPetsAction(query));
-    if (res?.pets) {
-        setSearchResults(res.pets);
-    }
-    setLoading(false);
-  };
+  }, [searchQuery, handleSearch]);
 
   const saveToRecent = async (pet) => {
     const updated = [pet, ...recentSearches.filter(p => p._id !== pet._id)].slice(0, 5);
@@ -79,7 +79,7 @@ const Search = ({ onClose }) => {
 
   return (
     <View className="flex-1 bg-background">
-      <View className="flex gap-4 pt-7 pl-6 pr-6 border-b border-gray-100 dark:border-gray-800 pb-4">
+      <View className="flex gap-4 pt-7 pl-6 pr-6 border-b border-border pb-4">
         <View className="flex-row items-center">
           <BackButton onPress={onClose} />
           <Text className="text-2xl text-center font-bold color-textPrimary flex-1">
@@ -87,11 +87,11 @@ const Search = ({ onClose }) => {
           </Text>
         </View>
 
-        <View className="flex-row items-center bg-backgroundSecondary rounded-2xl px-4 py-3 shadow-sm border border-backgroundSecondary">
-          <Ionicons name="search-outline" size={20} color={isDark ? "#aaa" : "#666"} />
+        <View className="flex-row items-center bg-backgroundSecondary rounded-2xl px-4 py-3 shadow-sm border border-border">
+          <Ionicons name="search-outline" size={20} color={getColor("inputPlaceholder", isDark)} />
           <TextInput
             placeholder="Search for pets..."
-            placeholderTextColor="#999"
+            placeholderTextColor={getColor("inputPlaceholder", isDark)}
             value={searchQuery}
             onChangeText={setSearchQuery}
             className="flex-1 ml-3 text-base color-textPrimary"
@@ -101,7 +101,7 @@ const Search = ({ onClose }) => {
             <ActivityIndicator size="small" color={accentColor} />
           ) : searchQuery.length > 0 ? (
             <TouchableOpacity onPress={() => setSearchQuery("")}>
-               <Ionicons name="close-circle" size={20} color="#999" />
+               <Ionicons name="close-circle" size={20} color={getColor("inputPlaceholder", isDark)} />
             </TouchableOpacity>
           ) : null}
         </View>
@@ -142,7 +142,7 @@ const Search = ({ onClose }) => {
                     }}
                     className="mr-4"
                   >
-                    <View className="w-24 h-32 rounded-2xl bg-backgroundSecondary items-center justify-center p-3 border border-gray-100 dark:border-gray-800">
+                    <View className="w-24 h-32 rounded-2xl bg-backgroundSecondary items-center justify-center p-3 border border-border">
                       <Image
                         source={item.images?.[0] ? { uri: item.images[0] } : config.dog1}
                         className="w-full h-20 rounded-xl"
@@ -162,7 +162,7 @@ const Search = ({ onClose }) => {
           {searchQuery.length > 0 && (
             <View>
               <Text className="text-lg font-bold color-textPrimary mb-4">
-                {searchResults.length} Results for "{searchQuery}"
+                {searchResults.length} Results for &quot;{searchQuery}&quot;
               </Text>
               
               {searchResults.length === 0 && !loading ? (
@@ -184,7 +184,7 @@ const Search = ({ onClose }) => {
                       }}
                       className="w-[48%] mb-4"
                     >
-                      <View className="bg-backgroundSecondary rounded-3xl p-2 border border-gray-100 dark:border-gray-800">
+                      <View className="bg-backgroundSecondary rounded-3xl p-2 border border-border">
                         <Image
                           source={pet.images?.[0] ? { uri: pet.images[0] } : config.dog1}
                           className="w-full h-40 rounded-2xl"
@@ -196,7 +196,7 @@ const Search = ({ onClose }) => {
                           </Text>
                           <View className="flex-row items-center mt-1">
                             <Ionicons name="location-outline" size={14} color={accentColor} />
-                            <Text className="text-xs ml-1 text-gray-500" numberOfLines={1}>
+                            <Text className="text-xs ml-1 color-textSecondary" numberOfLines={1}>
                               {pet.city || "Nearby"}
                             </Text>
                           </View>

@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   Dimensions,
   FlatList,
-  Platform,
 } from "react-native";
 import { router } from "expo-router";
 import { useColorScheme } from "nativewind";
@@ -84,8 +83,8 @@ const Onboarding = () => {
           />
         </Animated.View>
         <Animated.View entering={FadeInDown.delay(300)} className="items-center w-full px-2">
-          <View className="bg-orange-100 dark:bg-orange-900 absolute -top-12 p-4 rounded-full shadow-sm z-10" style={{ elevation: 5 }}>
-            <Icon size={28} color="#FF8A00" strokeWidth={2.5} />
+          <View className="bg-backgroundSecondary border border-border absolute -top-12 p-4 rounded-full shadow-sm z-10" style={{ elevation: 5 }}>
+            <Icon size={28} color={getColor("accent", isDark)} strokeWidth={2.5} />
           </View>
           <Text className="text-3xl font-extrabold color-textPrimary text-center mb-4 mt-8" style={{ letterSpacing: -0.5 }}>
             {item.title}
@@ -129,7 +128,7 @@ const Onboarding = () => {
               style={{
                 height: 8,
                 width: currentIndex === index ? 32 : 8,
-                backgroundColor: currentIndex === index ? "#FF8A00" : (isDark ? "#333333" : "#E5E5E5"),
+                backgroundColor: currentIndex === index ? getColor("accent", isDark) : getColor("border", isDark),
                 borderRadius: 4,
               }}
             />
@@ -148,7 +147,7 @@ const Onboarding = () => {
           <Text className="text-white text-lg font-black mr-2">
             {currentIndex === ONBOARDING_DATA.length - 1 ? "Get Started" : "Continue"}
           </Text>
-          <ArrowRight size={20} color="white" strokeWidth={3} />
+          <ArrowRight size={20} color={getColor("white", isDark)} strokeWidth={3} />
         </TouchableOpacity>
       </View>
     </View>

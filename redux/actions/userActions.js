@@ -1,13 +1,5 @@
-import axiosInstance from '../../api/axiosInstance'
+import axiosInstance from '../../api/axiosInstance';
 import { userConstants } from '../constants/usersConstants';
-import * as WebBrowser from "expo-web-browser";
-import * as Google from "expo-auth-session/providers/google";
-
-WebBrowser.maybeCompleteAuthSession();
-
-const discovery = {
-    authorizationEndpoint: "https://accounts.google.com/o/oauth2/v2/auth",
-};
 
 export const loginAction = (userData) => {
     return async (dispatch) => {

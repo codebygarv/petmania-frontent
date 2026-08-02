@@ -1,10 +1,7 @@
 import React from 'react';
-import { View, Text } from 'react-native';
-import { useColorScheme } from 'nativewind';
+import { View } from 'react-native';
 
 const HomeSkeleton = ({ count = 8 }) => {
-  const { colorScheme } = useColorScheme();
-  const isDark = colorScheme === 'dark';
 
   return (
     <View className="flex flex-row flex-wrap justify-between gap-1 mb-10">

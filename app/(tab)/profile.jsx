@@ -52,7 +52,7 @@ const Profile = () => {
         text2: "You have been successfully logged out",
       });
       router.replace("/(auth)");
-    } catch (error) {
+    } catch (_error) {
       Toast.show({
         type: "error",
         text1: "Logout Failed",
@@ -151,7 +151,7 @@ const Profile = () => {
             <Text className="text-2xl font-bold color-textPrimary mb-1">
               {userInfo?.name || userInfo?.email?.split("@")[0]?.split("+")[0]?.trim() || "User"}
             </Text>
-            <Text className="text-sm text-gray-500 mb-4">
+            <Text className="text-sm color-textSecondary mb-4">
               {userInfo?.email || "No email available"}
             </Text>
           </View>
@@ -160,7 +160,7 @@ const Profile = () => {
             <View className="flex-1 items-center bg-backgroundSecondary rounded-2xl p-4 mx-1">
               <Ionicons name="paw-outline" size={24} color={accentColor} />
               <Text className="text-2xl font-bold color-textPrimary mt-2">2</Text>
-              <Text className="text-xs text-gray-500 mt-1">Adopted</Text>
+              <Text className="text-xs color-textSecondary mt-1">Adopted</Text>
             </View>
           </View> */}
 
@@ -173,7 +173,7 @@ const Profile = () => {
                 key={item.id}
                 onPress={item.onPress}
                 activeOpacity={0.7}
-                className="flex-row items-center bg-backgroundSecondary rounded-2xl p-4 mb-3"
+                className="flex-row items-center bg-backgroundSecondary border border-border rounded-2xl p-4 mb-3"
               >
                 <View
                   className="w-10 h-10 rounded-xl items-center justify-center mr-4"
@@ -202,7 +202,7 @@ const Profile = () => {
           <TouchableOpacity
             onPress={handleLogout}
             activeOpacity={0.7}
-            className="flex-row items-center justify-center bg-backgroundSecondary rounded-2xl p-4 mb-6 border border-red-200"
+            className="flex-row items-center justify-center bg-backgroundSecondary rounded-2xl p-4 mb-6 border border-border"
           >
             <Ionicons name="log-out-outline" size={22} color={errorColor} />
             <Text className={`ml-2 text-base font-semibold text-error`}>

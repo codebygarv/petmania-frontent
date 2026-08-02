@@ -35,10 +35,9 @@ const MyPets = () => {
 
   const accentColor = getColor("accent", isDark);
   const graySoftColor = getColor("graySoft", isDark);
-  const errorColor = getColor("error", isDark);
 
   const dispatch = useDispatch();
-  const { myPets, loading, myPetsLoading } = useSelector((state) => state.pet);
+  const { myPets, myPetsLoading } = useSelector((state) => state.pet);
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
@@ -130,10 +129,10 @@ const MyPets = () => {
           ) : !myPets || myPets.length === 0 ? (
             <View className="items-center justify-center mt-16">
               <Ionicons name="paw-outline" size={70} color={graySoftColor} />
-              <Text className="text-gray-500 mt-4 text-center font-medium text-base">
-                You haven't added any pets yet.
+              <Text className="color-textSecondary mt-4 text-center font-medium text-base">
+                You haven&apos;t added any pets yet.
               </Text>
-              <Text className="text-gray-400 mt-1 text-center text-sm">
+              <Text className="color-textSecondary opacity-80 mt-1 text-center text-sm">
                 Start by adding your first pet for adoption.
               </Text>
               <TouchableOpacity
@@ -150,7 +149,7 @@ const MyPets = () => {
 
               return (
                 <View key={pet._id} className="mb-4">
-                  <View className={`rounded-3xl p-4 ${getBackgroundColor(index, isDark)}`}>
+                  <View className={`rounded-3xl p-4 ${getBackgroundColor(index, isDark)} border border-border`}>
                     <View className="flex-row items-center">
                       <View className="w-24 h-24 rounded-2xl overflow-hidden mr-4">
                         <Image
@@ -180,25 +179,25 @@ const MyPets = () => {
                           )}
                         </View>
 
-                        <Text className="text-sm text-gray-600 mb-1 capitalize">
+                        <Text className="text-sm color-textSecondary mb-1 capitalize">
                           {pet.type} • {pet.breed}
                         </Text>
 
                         <View className="flex-row items-center mb-1">
                           <Ionicons name="time-outline" size={14} color={graySoftColor} />
-                          <Text className="text-xs ml-1 text-gray-500">
+                          <Text className="text-xs ml-1 color-textSecondary">
                             {pet.age} years
                           </Text>
                         </View>
 
                         <View className="flex-row items-center mb-1">
                           <Ionicons name="location-outline" size={14} color={accentColor} />
-                          <Text className="text-xs ml-1 text-gray-500">
+                          <Text className="text-xs ml-1 color-textSecondary">
                             {location || "Location not set"}
                           </Text>
                         </View>
 
-                        <Text className="text-xs text-gray-400 mt-1">
+                        <Text className="text-xs color-textSecondary opacity-80 mt-1">
                           Added {formatDate(pet.createdAt)}
                         </Text>
                       </View>
@@ -206,26 +205,26 @@ const MyPets = () => {
 
                     {/* Action buttons */}
                     {!pet.isAdopted && (
-                      <View className="flex-row justify-end mt-3 pt-3 border-t border-gray-200/50 gap-2">
+                      <View className="flex-row justify-end mt-3 pt-3 border-t border-border gap-2">
                         <TouchableOpacity
                           onPress={() => router.push(`/EditPets?id=${pet._id}`)}
                           className="px-4 py-2 bg-blue-500/10 rounded-xl flex-row items-center"
                         >
-                          <Ionicons name="create-outline" size={16} color="#3b82f6" />
+                          <Ionicons name="create-outline" size={16} color={getColor("link", isDark)} />
                           <Text className="text-xs text-blue-500 font-medium ml-1">Edit</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
                           onPress={() => handleDeletePet(pet._id)}
                           className="px-4 py-2 bg-red-500/10 rounded-xl flex-row items-center"
                         >
-                          <Ionicons name="trash-outline" size={16} color="#ef4444" />
+                          <Ionicons name="trash-outline" size={16} color={getColor("error", isDark)} />
                           <Text className="text-xs text-red-500 font-medium ml-1">Delete</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
                           onPress={() => handleMarkAdopted(pet._id)}
                           className="px-4 py-2 bg-green-500/10 rounded-xl flex-row items-center"
                         >
-                          <Ionicons name="checkmark-circle-outline" size={16} color="#22c55e" />
+                          <Ionicons name="checkmark-circle-outline" size={16} color={getColor("success", isDark)} />
                           <Text className="text-xs text-green-600 font-medium ml-1">Mark Adopted</Text>
                         </TouchableOpacity>
                       </View>

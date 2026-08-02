@@ -1,14 +1,12 @@
 import { Tabs } from "expo-router";
 import { useColorScheme } from "nativewind";
 import { TouchableOpacity } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { getColor } from "@/constants/color";
 
 export default function TabLayout() {
   const { colorScheme } = useColorScheme();
   const isDark = colorScheme === "dark";
-  const insets = useSafeAreaInsets();
 
   return (
     <Tabs
@@ -35,11 +33,9 @@ export default function TabLayout() {
           </TouchableOpacity>
         ),
 
-        tabBarActiveTintColor: isDark
-          ? "#E0583D"
-          : "#E0583D",
+        tabBarActiveTintColor: getColor("tabActive", isDark),
 
-        tabBarInactiveTintColor: isDark ? "#ffffff" : "#6B7280",
+        tabBarInactiveTintColor: getColor("tabInactive", isDark),
 
         tabBarIcon: ({ color, size }) => {
           let iconName;
@@ -67,19 +63,19 @@ export default function TabLayout() {
       <Tabs.Screen
         name="favourate"
         options={{
-          title: "favourate",
+          title: "Favorites",
         }}
       />
       <Tabs.Screen
         name="myPets"
         options={{
-          title: "my pets",
+          title: "My Pets",
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
-          title: "profile",
+          title: "Profile",
         }}
       />
       

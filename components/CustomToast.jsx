@@ -1,20 +1,20 @@
 import React from "react";
-import { View, Text, useColorScheme } from "react-native";
+import { View, Text } from "react-native";
+import { useColorScheme } from "nativewind";
+import { getColor } from "@/constants/color";
 
 const CustomToast = ({ text1, type }) => {
-    const colorScheme = useColorScheme();
+    const { colorScheme } = useColorScheme();
     const isDark = colorScheme === "dark";
 
     const background =
         type === "success"
-            ? isDark ? "#1B3A2F" : "#BBF7D0"
+            ? `${getColor("success", isDark)}20`
             : type === "error"
-                ? isDark ? "#3B1C1C" : "#FCA5A5"
-                : isDark
-                    ? "#1E293B"
-                    : "#ffffff";
+                ? `${getColor("error", isDark)}20`
+                : getColor("backgroundSecondary", isDark);
 
-    const color = isDark ? "#EDEDED" : "#1C1C1C";
+    const color = getColor("textPrimary", isDark);
 
     return (
         <View

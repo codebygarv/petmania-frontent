@@ -1,4 +1,4 @@
-import { View, Text, useColorScheme } from "react-native";
+import { View, Text } from "react-native";
 import React from "react";
 import BackButton from "@/components/BackButton";
 import Input from "@/components/Input";
@@ -22,9 +22,7 @@ const validationSchema = Yup.object().shape({
     .required("Confirm password is required"),
 });
 
-const resetPassword = () => {
-  const { colorScheme } = useColorScheme();
-  const isDark = colorScheme === "dark";
+const ResetPassword = () => {
   const dispatch = useDispatch();
 
   const handleSubmit = async (values) => {
@@ -54,15 +52,15 @@ const resetPassword = () => {
 
   return (
     <View className="flex gap-5 pt-7 pl-6 pr-6 h-screen bg-background">
-      <View className="flex flex-row align-center">
+      <View className="flex flex-row items-center mb-2">
         <BackButton />
-        <Text className="text-center mx-20 color-textPrimary my-auto color-textPrimary font-semibold text-xl">
-          Reset Password
+        <Text className="color-textPrimary font-semibold text-xl ml-4">
+          Change Password
         </Text>
       </View>
       <View className="gap-5">
         <Text className="color-textSecondary text-sm leading-6">
-          You can reset Password by enter old password and new passowrd .
+          You can update your password by entering your current password and your new password.
         </Text>
 
         <Formik
@@ -84,7 +82,7 @@ const resetPassword = () => {
                 onChangeText={handleChange("oldPassword")}
               />
               {touched.oldPassword && errors.oldPassword && (
-                <Text className="text-red-500 text-xs">{errors.oldPassword}</Text>
+                <Text className="text-error text-xs">{errors.oldPassword}</Text>
               )}
 
               <Input
@@ -95,7 +93,7 @@ const resetPassword = () => {
                 onChangeText={handleChange("newPassword")}
               />
               {touched.newPassword && errors.newPassword && (
-                <Text className="text-red-500 text-xs">{errors.newPassword}</Text>
+                <Text className="text-error text-xs">{errors.newPassword}</Text>
               )}
 
               <Input
@@ -106,7 +104,7 @@ const resetPassword = () => {
                 onChangeText={handleChange("confirmNewPassword")}
               />
               {touched.confirmNewPassword && errors.confirmNewPassword && (
-                <Text className="text-red-500 text-xs">
+                <Text className="text-error text-xs">
                   {errors.confirmNewPassword}
                 </Text>
               )}
@@ -130,4 +128,4 @@ const resetPassword = () => {
   );
 };
 
-export default resetPassword;
+export default ResetPassword;

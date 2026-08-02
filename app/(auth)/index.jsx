@@ -2,12 +2,10 @@ import {
   View,
   Image,
   Text,
-  Dimensions,
-  Alert,
   TouchableOpacity,
   ActivityIndicator,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { config } from "@/constants/config";
 import Input from "@/components/Input";
 import RememberMeToggle from "@/components/RememberMeToggle";
@@ -19,23 +17,9 @@ import { router } from "expo-router";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
-import { googleLoginAction, loginAction } from "@/redux/actions/userActions";
+import { loginAction } from "@/redux/actions/userActions";
 import Toast from "react-native-toast-message";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as Location from 'expo-location';
-
-import * as AuthSession from "expo-auth-session";
-
-// console.log("AuthSession.makeRedirectUri()", AuthSession.makeRedirectUri({ useProxy: true })); 
-
-const { width, height } = Dimensions.get("window");
-
-const getImageDimensions = () => {
-  const IMAGE_WIDTH = height > 850 ? width * 0.5 : width * 0.4;
-  const IMAGE_HEIGHT = IMAGE_WIDTH * 0.9;
-  return { IMAGE_WIDTH, IMAGE_HEIGHT };
-};
-
 
 const validationSchema = Yup.object().shape({
   email: Yup.string()
@@ -47,15 +31,10 @@ const validationSchema = Yup.object().shape({
 });
 
 const Index = () => {
-  const { colorScheme, setColorScheme } = useColorScheme();
-  const { IMAGE_WIDTH, IMAGE_HEIGHT } = getImageDimensions();
-
-
+  const { colorScheme } = useColorScheme();
   const dispatch = useDispatch();
   const loading = useSelector((state) => state.user.loading);
-
   const isDark = colorScheme === "dark";
-  // const activityIndicator = isDark ? "#EDEDED" : "#1C1C1C";
 
   const handleSubmit = async (values) => {
     const res = await dispatch(loginAction(values));
@@ -144,7 +123,7 @@ const Index = () => {
                 onChangeText={handleChange("email")}
               />
               {touched.email && errors.email && (
-                <Text className="text-red-500 text-xs">{errors.email}</Text>
+                <Text className="text-error text-xs">{errors.email}</Text>
               )}
 
               <Input
@@ -156,7 +135,7 @@ const Index = () => {
                 onChangeText={handleChange("password")}
               />
               {touched.password && errors.password && (
-                <Text className="text-red-500 text-xs">{errors.password}</Text>
+                <Text className="text-error text-xs">{errors.password}</Text>
               )}
 
               <RememberMeToggle />
@@ -170,11 +149,11 @@ const Index = () => {
               />
 
               <View className="flex flex-row items-center my-4">
-                <View className="flex-1 h-[1px] bg-textPrimary" />
-                <Text className="text-sm text-center color-textPrimary mx-3">
+                <View className="flex-1 h-[1px] bg-border" />
+                <Text className="text-xs text-center color-textSecondary font-semibold mx-3">
                   OR
                 </Text>
-                <View className="flex-1 h-[1px] bg-textPrimary" />
+                <View className="flex-1 h-[1px] bg-border" />
               </View>
 
               <SocialLoginButtons />
@@ -185,7 +164,7 @@ const Index = () => {
                 </Text>
                 <TouchableOpacity onPress={handleSignup}>
                   <Text
-                    className={`text-sm font-semibold text-orange-500 ml-1`}
+                    className="text-sm font-semibold color-buttonPrimary ml-1"
                   >
                     Signup
                   </Text>

@@ -1,5 +1,5 @@
-import { View, Text, TouchableOpacity, Platform } from "react-native";
-import React from "react";
+import { View, Text, TouchableOpacity } from "react-native";
+import React, { useCallback, useEffect, useRef } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useColorScheme } from "nativewind";
 import { useDispatch } from "react-redux";
@@ -9,6 +9,7 @@ import { googleLoginAction, facebookLoginAction } from "@/redux/actions/userActi
 import Toast from "react-native-toast-message";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
+import { getColor } from "@/constants/color";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -21,9 +22,9 @@ const SocialLoginButtons = () => {
   const isDark = colorScheme === "dark";
   const dispatch = useDispatch();
 
-  const isProcessingGoogle = React.useRef(false);
+  const isProcessingGoogle = useRef(false);
 
-  const handleAuthUrl = async (url) => {
+  const handleAuthUrl = useCallback(async (url) => {
     if (!url || isProcessingGoogle.current) return;
     try {
       const fragment = url.includes("#")
@@ -91,10 +92,10 @@ const SocialLoginButtons = () => {
     } finally {
       isProcessingGoogle.current = false;
     }
-  };
+  }, [dispatch]);
 
   // Deep linking listener for custom scheme fallback
-  React.useEffect(() => {
+  useEffect(() => {
     const handleUrlEvent = (event) => {
       if (event?.url) {
         handleAuthUrl(event.url);
@@ -110,7 +111,7 @@ const SocialLoginButtons = () => {
     return () => {
       subscription.remove();
     };
-  }, []);
+  }, [handleAuthUrl]);
 
   const handleGoogleLogin = async () => {
     try {
@@ -182,20 +183,19 @@ const SocialLoginButtons = () => {
     }
   };
 
-  const googleIconColor = isDark ? "#EDEDED" : "#1C1C1C";
-  const facebookIconColor = "#1877F2";
+  const googleIconColor = getColor("textPrimary", isDark);
 
   return (
-    <View className="flex w-full flex-wrap gap-3 flex-row justify-between">
+    <View className="flex w-full flex-row gap-3 justify-between">
       {/* Google Login Button */}
       <TouchableOpacity
         activeOpacity={0.8}
-        className="bg-SocialBg rounded-xl py-4 px-4 items-center justify-center w-[48%]"
+        className="bg-SocialBg rounded-xl py-3.5 px-4 items-center justify-center flex-1 border border-border"
         onPress={handleGoogleLogin}
       >
         <View className="flex flex-row items-center gap-2">
-          <Ionicons name="logo-google" size={22} color={googleIconColor} />
-          <Text className="text-textPrimary dark:text-textPrimaryDark text-base font-semibold">
+          <Ionicons name="logo-google" size={20} color={googleIconColor} />
+          <Text className="color-textPrimary text-sm font-semibold">
             Google
           </Text>
         </View>
@@ -204,12 +204,12 @@ const SocialLoginButtons = () => {
       {/* Facebook Login Button */}
       <TouchableOpacity
         activeOpacity={0.8}
-        className="bg-SocialBg rounded-xl py-4 px-4 items-center justify-center w-[48%]"
+        className="bg-SocialBg rounded-xl py-3.5 px-4 items-center justify-center flex-1 border border-border"
         onPress={handleFacebookLogin}
       >
         <View className="flex flex-row items-center gap-2">
-          <Ionicons name="logo-facebook" size={22} color={facebookIconColor} />
-          <Text className="text-textPrimary dark:text-textPrimaryDark text-base font-semibold">
+          <Ionicons name="logo-facebook" size={20} color="#1877F2" />
+          <Text className="color-textPrimary text-sm font-semibold">
             Facebook
           </Text>
         </View>

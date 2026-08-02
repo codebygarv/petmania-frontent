@@ -1,15 +1,14 @@
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, TouchableOpacity } from "react-native";
 import React from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useColorScheme } from "nativewind";
 import { router } from "expo-router";
-
-
+import { getColor } from "@/constants/color";
 
 const BackButton = ({ onPress }) => {
   const { colorScheme } = useColorScheme();
   const isDark = colorScheme === "dark";
-  const BackButtonColor = isDark ? "#EDEDED" : "#1C1C1C";
+  const BackButtonColor = getColor("textPrimary", isDark);
 
   const goToBack = () => {
     if (onPress) {

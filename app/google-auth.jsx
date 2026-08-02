@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useCallback } from "react";
 import { View, Text, ActivityIndicator } from "react-native";
 import { useColorScheme } from "nativewind";
 import { useDispatch } from "react-redux";
@@ -15,7 +15,7 @@ export default function GoogleAuthCallback() {
   const dispatch = useDispatch();
   const isProcessing = useRef(false);
 
-  const handleUrl = async (url) => {
+  const handleUrl = useCallback(async (url) => {
     if (!url || isProcessing.current) return;
 
     try {
@@ -69,34 +69,38 @@ export default function GoogleAuthCallback() {
           await AsyncStorage.setItem("token", res.data.token);
           Toast.show({
             type: "success",
-            text1: res.message || "Google Login Successful",
+            text1: "Google Login Successful",
           });
           router.replace("/(tab)");
         } else {
           Toast.show({
             type: "error",
-            text1: res?.error?.message || "Google Login Failed",
+            text1: "Google Login Failed",
+            text2: res?.message || "Authentication error",
           });
           router.replace("/(auth)");
         }
         return;
       }
 
-      // Check if already authenticated in storage
-      const savedToken = await AsyncStorage.getItem("token");
-      if (savedToken) {
-        router.replace("/(tab)");
-      } else {
-        setTimeout(() => router.replace("/(auth)"), 1500);
-      }
-    } catch (err) {
-      console.error("[Google Auth Callback] Error:", err);
-      Toast.show({ type: "error", text1: "Google Login Error" });
+      Toast.show({
+        type: "error",
+        text1: "Google Login Failed",
+        text2: "No authentication data received",
+      });
+      router.replace("/(auth)");
+    } catch (_error) {
+      console.error("Google auth handler error:", _error);
+      Toast.show({
+        type: "error",
+        text1: "Authentication Error",
+        text2: "An unexpected error occurred",
+      });
       router.replace("/(auth)");
     } finally {
       isProcessing.current = false;
     }
-  };
+  }, [dispatch]);
 
   useEffect(() => {
     Linking.getInitialURL().then(handleUrl);
@@ -108,12 +112,12 @@ export default function GoogleAuthCallback() {
     return () => {
       subscription.remove();
     };
-  }, []);
+  }, [handleUrl]);
 
   return (
     <View className="flex-1 justify-center items-center bg-background">
-      <ActivityIndicator size="large" color={getColor("orange", isDark)} />
-      <Text className="mt-4 text-base font-semibold text-textPrimary">
+      <ActivityIndicator size="large" color={getColor("accent", isDark)} />
+      <Text className="mt-4 text-base font-semibold color-textPrimary">
         Signing in with Google...
       </Text>
     </View>

@@ -7,7 +7,7 @@ import Button from "@/components/Button";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import Toast from "react-native-toast-message";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useDispatch, useSelector } from "react-redux";
 import {
   forgotPasswordOtpAction,
@@ -15,9 +15,7 @@ import {
   verifyOtpAction,
 } from "@/redux/actions/userActions";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useLocalSearchParams } from "expo-router";
-
-import { COLORS, getColor } from "@/constants/color";
+import { getColor } from "@/constants/color";
 
 const validationSchema = Yup.object().shape({
   otp: Yup.string()
@@ -169,9 +167,9 @@ const Verification = () => {
 
   return (
     <View className="flex gap-5 pt-7 pl-6 pr-6 h-screen bg-background">
-      <View className="flex flex-row items-center">
+      <View className="flex flex-row items-center mb-2">
         <BackButton />
-        <Text className="text-center mx-20 font-semibold text-xl color-textPrimary">
+        <Text className="font-semibold text-xl color-textPrimary ml-4">
           Verification
         </Text>
       </View>
@@ -205,20 +203,20 @@ const Verification = () => {
             <View className="gap-5">
               <OtpInputBox value={values.otp} onChange={handleChange("otp")} />
               {touched.otp && errors.otp && (
-                <Text className="text-red-500 text-xs text-center">
+                <Text className="text-error text-xs text-center">
                   {errors.otp}
                 </Text>
               )}
 
               <Button
-                text={loading ? <ActivityIndicator color={"#fff"} /> : "Verify"}
+                text={loading ? <ActivityIndicator color={getColor("white", isDark)} /> : "Verify"}
                 onPress={handleSubmit}
                 disabled={!!errors.otp || loading}
               />
 
               <View>
                 <Text className="color-textSecondary text-sm text-center">
-                  Didn't receive any code?
+                  Didn&apos;t receive any code?
                 </Text>
                 <TouchableOpacity
                   disabled={!canResend}

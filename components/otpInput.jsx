@@ -1,10 +1,5 @@
 import React, { useRef } from "react";
-import {
-  View,
-  TextInput,
-  NativeSyntheticEvent,
-  TextInputKeyPressEventData,
-} from "react-native";
+import { View, TextInput } from "react-native";
 
 
 

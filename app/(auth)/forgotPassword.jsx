@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, ActivityIndicator } from "react-native";
+import { View, Text, ActivityIndicator } from "react-native";
 import React from "react";
 import BackButton from "@/components/BackButton";
 import Input from "@/components/Input";
@@ -59,9 +59,9 @@ const ForgotPassword = () => {
 
   return (
     <View className="flex gap-4 pt-7 pl-6 pr-6 h-screen bg-background">
-      <View className="flex flex-row align-center">
+      <View className="flex flex-row items-center mb-2">
         <BackButton />
-        <Text className="text-center mx-20 color-textPrimary my-auto font-semibold text-xl">
+        <Text className="color-textPrimary font-semibold text-xl ml-4">
           Forgot Password
         </Text>
       </View>
@@ -69,10 +69,10 @@ const ForgotPassword = () => {
       <View className="flex gap-4">
         <View className="flex gap-3 mt-4">
           <Text className="color-textSecondary text-sm leading-6">
-            We'll send you a 4 digit code on your email to reset your password.
+            We&apos;ll send you a 4 digit code on your email to reset your password.
           </Text>
           <Text className="color-textSecondary text-sm leading-6">
-            If you don't receive an email within 5 minutes, please check your
+            If you don&apos;t receive an email within 5 minutes, please check your
             spam folder or contact our support team.
           </Text>
 
@@ -90,7 +90,7 @@ const ForgotPassword = () => {
                   onChangeText={handleChange("email")}
                 />
                 {touched.email && errors.email && (
-                  <Text className="text-red-500 text-xs ">
+                  <Text className="text-error text-xs ">
                     {errors.email}
                   </Text>
                 )}

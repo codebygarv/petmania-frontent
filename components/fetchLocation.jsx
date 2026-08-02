@@ -1,12 +1,12 @@
 import { View, Text } from 'react-native'
 import React from 'react'
 
-const fetchLocation = () => {
+const FetchLocation = () => {
   return (
     <View>
-      <Text>fetchLocation</Text>
+      <Text>FetchLocation</Text>
     </View>
   )
 }
 
-export default fetchLocation
+export default FetchLocation

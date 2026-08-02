@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity } from "react-native";
+import { View, TextInput, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useColorScheme } from "nativewind";
-
+import { getColor } from "@/constants/color";
 
 const Input = ({
   label = "Email or username",
@@ -16,8 +16,8 @@ const Input = ({
   const { colorScheme } = useColorScheme();
   const isDark = colorScheme === "dark";
 
-  const iconColor = isDark ? "#EDEDED" : "#1C1C1C";
-  const placeholderColor = isDark ? "#757575" : "#9A9A9A";
+  const iconColor = getColor("textPrimary", isDark);
+  const placeholderColor = getColor("inputPlaceholder", isDark);
 
   return (
     <View className="flex-row items-center rounded-2xl border border-inputBorder overflow-hidden w-full">

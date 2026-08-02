@@ -18,6 +18,7 @@ import BackButton from "@/components/BackButton";
 import { useColorScheme } from "nativewind";
 import { router } from "expo-router";
 import EmptyState from "@/components/EmptyState";
+import { getColor } from "@/constants/color";
 
 const sampleFaqs = [
     {
@@ -62,15 +63,16 @@ const sampleFaqs = [
     },
 ];
 
-const StatusPill = ({ status }) => {
+const StatusPill = ({ status, isDark }) => {
     const map = {
-        open: "bg-green-100 color-textPrimary",
-        closed: "bg-gray-200 color-textPrimary",
-        pending: "bg-yellow-100 color-textPrimary",
+        open: { bg: isDark ? "bg-emerald-950/60" : "bg-emerald-100", text: isDark ? "text-emerald-300" : "text-emerald-800" },
+        closed: { bg: "bg-backgroundSecondary border border-border", text: "text-textSecondary" },
+        pending: { bg: isDark ? "bg-amber-950/60" : "bg-amber-100", text: isDark ? "text-amber-300" : "text-amber-800" },
     };
+    const current = map[status] || map.open;
     return (
-        <View className={"px-3 py-1 rounded-full " + (map[status] || map.open)}>
-            <Text className="text-xs font-semibold">{status}</Text>
+        <View className={`px-3 py-1 rounded-full ${current.bg}`}>
+            <Text className={`text-xs font-semibold ${current.text} capitalize`}>{status}</Text>
         </View>
     );
 };
@@ -82,6 +84,9 @@ const SectionTitle = ({ children }) => (
 const HelpSupport = () => {
     const { colorScheme } = useColorScheme();
     const isDark = colorScheme === "dark";
+    const placeholderColor = getColor("inputPlaceholder", isDark);
+    const primaryTextColor = getColor("textPrimary", isDark);
+    const whiteColor = getColor("white", isDark);
 
     const [subject, setSubject] = useState("");
     const [description, setDescription] = useState("");
@@ -147,8 +152,7 @@ const HelpSupport = () => {
         setContact("");
         setImage(null);
 
-        Toast.show({ type: "success", text1: "Ticket Raised", text2: "We received your request." });
-        router.push("/app/(tab)/chat");
+        Toast.show({ type: "success", text1: "Ticket Raised", text2: "We received your request and will respond shortly." });
     };
 
     const handleDeleteTicket = (id) => {
@@ -181,23 +185,23 @@ const HelpSupport = () => {
                     <View className="px-6">
                         <View className="mb-4">
                             <Text className="text-sm color-textPrimary mb-1 font-semibold">Raise a Ticket</Text>
-                            <Text className="text-xs color-textPrimary opacity-80">Describe the issue clearly so we can help faster.</Text>
+                            <Text className="text-xs color-textSecondary">Describe the issue clearly so we can help faster.</Text>
                         </View>
 
                         <TextInput
                             value={subject}
                             onChangeText={setSubject}
                             placeholder="Subject"
-                            placeholderTextColor={isDark ? "#888" : "#1a1a1aff"}
-                            className="bg-backgroundSecondary rounded-xl h-12 px-3 mb-3"
+                            placeholderTextColor={placeholderColor}
+                            className="bg-backgroundSecondary text-textPrimary rounded-xl h-12 px-3 mb-3 border border-border"
                         />
 
                         <TextInput
                             value={description}
                             onChangeText={setDescription}
                             placeholder="Describe your issue"
-                            placeholderTextColor={isDark ? "#888" : "#1a1a1aff"}
-                            className="bg-backgroundSecondary rounded-xl h-28 px-3 py-3 mb-3 text-base"
+                            placeholderTextColor={placeholderColor}
+                            className="bg-backgroundSecondary text-textPrimary rounded-xl h-28 px-3 py-3 mb-3 text-base border border-border"
                             multiline
                         />
 
@@ -205,13 +209,13 @@ const HelpSupport = () => {
                             value={contact}
                             onChangeText={setContact}
                             placeholder="Contact (email or phone)"
-                            placeholderTextColor={isDark ? "#888" : "#1a1a1aff"}
-                            className="bg-backgroundSecondary rounded-xl h-12 px-3 mb-3"
+                            placeholderTextColor={placeholderColor}
+                            className="bg-backgroundSecondary text-textPrimary rounded-xl h-12 px-3 mb-3 border border-border"
                         />
 
                         <View className="flex-row items-center mb-4">
-                            <Pressable onPress={pickImage} className="flex-row items-center py-2 px-4 rounded-full bg-backgroundSecondary mr-3">
-                                <Ionicons name="attach" size={16} color={isDark ? "#fff" : "#111"} />
+                            <Pressable onPress={pickImage} className="flex-row items-center py-2 px-4 rounded-full bg-backgroundSecondary border border-border mr-3">
+                                <Ionicons name="attach" size={16} color={primaryTextColor} />
                                 <Text className="color-textPrimary ml-2">Attach Image</Text>
                             </Pressable>
                             {image ? <Image source={{ uri: image }} className="w-16 h-16 rounded-lg" resizeMode="cover" /> : null}
@@ -231,18 +235,18 @@ const HelpSupport = () => {
                             />
                         ) : (
                             tickets.map((t) => (
-                                <View key={t.id} className="bg-backgroundSecondary rounded-xl p-3 mb-3 shadow-sm">
+                                <View key={t.id} className="bg-backgroundSecondary rounded-xl p-3 mb-3 border border-border shadow-sm">
                                     <View className="flex-row justify-between items-start">
                                         <View className="flex-1 mr-3">
                                             <Text className="font-bold color-textPrimary text-base">{t.subject}</Text>
-                                            <Text className="color-textPrimary opacity-60 text-xs">{new Date(t.createdAt).toLocaleString()}</Text>
+                                            <Text className="color-textSecondary text-xs mt-1">{new Date(t.createdAt).toLocaleString()}</Text>
                                             <Text className="color-textPrimary mt-2">{t.description}</Text>
                                         </View>
                                         <View className="items-end">
-                                            <StatusPill status={t.status} />
-                                            <Pressable onPress={() => handleDeleteTicket(t.id)} className="mt-3 py-1 px-2 rounded bg-red-500 flex-row items-center">
-                                                <Ionicons name="trash" size={12} color="#fff" />
-                                                <Text className="text-white text-xs ml-2">Delete</Text>
+                                            <StatusPill status={t.status} isDark={isDark} />
+                                            <Pressable onPress={() => handleDeleteTicket(t.id)} className="mt-3 py-1 px-2.5 rounded-lg bg-error flex-row items-center">
+                                                <Ionicons name="trash" size={12} color={whiteColor} />
+                                                <Text className="text-white text-xs ml-1.5 font-medium">Delete</Text>
                                             </Pressable>
                                         </View>
                                     </View>
@@ -256,16 +260,16 @@ const HelpSupport = () => {
                             <Pressable
                                 key={i}
                                 onPress={() => setFaqOpen((s) => ({ ...s, [i]: !s[i] }))}
-                                className="bg-backgroundSecondary rounded-xl p-3 mb-3"
+                                className="bg-backgroundSecondary rounded-xl p-3.5 mb-3 border border-border"
                             >
                                 <View className="flex-row justify-between items-start">
                                     <Text className="font-bold color-textPrimary flex-1 flex-wrap">{f.q}</Text>
                                     <View className="flex-row items-center ml-3">
-                                        <Text className="color-textPrimary opacity-80 mr-2">{faqOpen[i] ? "Hide" : "Show"}</Text>
-                                        <Ionicons name={faqOpen[i] ? "chevron-up" : "chevron-down"} size={16} color={isDark ? "#fff" : "#111"} />
+                                        <Text className="color-textSecondary mr-2 text-xs">{faqOpen[i] ? "Hide" : "Show"}</Text>
+                                        <Ionicons name={faqOpen[i] ? "chevron-up" : "chevron-down"} size={16} color={primaryTextColor} />
                                     </View>
                                 </View>
-                                {faqOpen[i] ? <Text className="color-textPrimary mt-2 opacity-90">{f.a}</Text> : null}
+                                {faqOpen[i] ? <Text className="color-textSecondary mt-2.5 leading-5">{f.a}</Text> : null}
                             </Pressable>
                         ))}
                     </View>

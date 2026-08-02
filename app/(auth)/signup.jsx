@@ -1,4 +1,4 @@
-import { View, Text, Image, TouchableOpacity, Dimensions, ActivityIndicator } from "react-native";
+import { View, Text, Image, TouchableOpacity, ActivityIndicator } from "react-native";
 import React from "react";
 import { config } from "@/constants/config";
 import Input from "@/components/Input";
@@ -15,14 +15,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getColor } from "@/constants/color";
 
 
-const { width, height } = Dimensions.get("window");
-
-const getImageDimensions = () => {
-  const IMAGE_WIDTH = height > 850 ? width * 0.5 : width * 0.4;
-  const IMAGE_HEIGHT = IMAGE_WIDTH * 0.9;
-  return { IMAGE_WIDTH, IMAGE_HEIGHT };
-};
-
 const validationSchema = Yup.object().shape({
   email: Yup.string()
     .email("Invalid email format")
@@ -35,10 +27,8 @@ const validationSchema = Yup.object().shape({
     .required("Confirm Password is required"),
 });
 
-
 const Signup = () => {
   const { colorScheme } = useColorScheme();
-  const { IMAGE_WIDTH, IMAGE_HEIGHT } = getImageDimensions();
   const dispatch = useDispatch();
   const loading = useSelector((state) => state.user.loading);
 
@@ -122,7 +112,7 @@ const Signup = () => {
                 onChangeText={handleChange("email")}
               />
               {touched.email && errors.email && (
-                <Text className="text-red-500 text-xs">{errors.email}</Text>
+                <Text className="text-error text-xs">{errors.email}</Text>
               )}
 
               <Input
@@ -134,7 +124,7 @@ const Signup = () => {
                 onChangeText={handleChange("password")}
               />
               {touched.password && errors.password && (
-                <Text className="text-red-500 text-xs">{errors.password}</Text>
+                <Text className="text-error text-xs">{errors.password}</Text>
               )}
 
               <Input
@@ -146,7 +136,7 @@ const Signup = () => {
                 onChangeText={handleChange("confirmPassword")}
               />
               {touched.confirmPassword && errors.confirmPassword && (
-                <Text className="text-red-500 text-xs">
+                <Text className="text-error text-xs">
                   {errors.confirmPassword}
                 </Text>
               )}
@@ -162,11 +152,11 @@ const Signup = () => {
 
               {/* Divider */}
               <View className="flex flex-row items-center my-4">
-                <View className="flex-1 h-[1px] bg-textPrimary" />
-                <Text className="text-sm text-center color-textPrimary mx-3">
+                <View className="flex-1 h-[1px] bg-border" />
+                <Text className="text-xs text-center color-textSecondary font-semibold mx-3">
                   OR
                 </Text>
-                <View className="flex-1 h-[1px] bg-textPrimary" />
+                <View className="flex-1 h-[1px] bg-border" />
               </View>
 
               {/* Social Buttons */}
@@ -178,7 +168,7 @@ const Signup = () => {
                   Already have an account?
                 </Text>
                 <TouchableOpacity onPress={handleLogin}>
-                  <Text className="text-sm font-semibold text-orange-500 ml-1">
+                  <Text className="text-sm font-semibold color-buttonPrimary ml-1">
                     Sign In
                   </Text>
                 </TouchableOpacity>

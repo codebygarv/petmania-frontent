@@ -58,10 +58,10 @@ const ForgotPasswordChange = () => {
 
   return (
     <View className="flex gap-4 pt-7 pl-6 pr-6 h-screen bg-background">
-      <View className="flex flex-row align-center">
+      <View className="flex flex-row items-center mb-2">
         <BackButton />
-        <Text className="text-center mx-20 color-textPrimary my-auto font-semibold text-xl">
-          Forgot Password
+        <Text className="color-textPrimary font-semibold text-xl ml-4">
+          Reset Password
         </Text>
       </View>
 
@@ -90,7 +90,7 @@ const ForgotPasswordChange = () => {
               onChangeText={handleChange("password")}
             />
             {touched.password && errors.password && (
-              <Text className="text-red-500 text-xs">{errors.password}</Text>
+              <Text className="text-error text-xs">{errors.password}</Text>
             )}
 
             <Input
@@ -101,7 +101,7 @@ const ForgotPasswordChange = () => {
               onChangeText={handleChange("confirmPassword")}
             />
             {touched.confirmPassword && errors.confirmPassword && (
-              <Text className="text-red-500 text-xs">{errors.confirmPassword}</Text>
+              <Text className="text-error text-xs">{errors.confirmPassword}</Text>
             )}
 
             <Button

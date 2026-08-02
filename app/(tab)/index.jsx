@@ -1,11 +1,8 @@
-import { View, Text, Pressable, ScrollView, ActivityIndicator } from "react-native";
+import { View, Text, Pressable, ScrollView, ActivityIndicator, Image } from "react-native";
 import React, { useEffect, useState, useCallback } from "react";
-import BackButton from "@/components/BackButton";
-import { Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useColorScheme } from "nativewind";
 import { getColor } from "@/constants/color";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Location from "expo-location";
 import { config } from "@/constants/config";
 import { useFocusEffect, router } from "expo-router";
@@ -33,23 +30,22 @@ const Index = () => {
 
   const accentColor = getColor("accent", isDark);
   const whiteColor = getColor("white", isDark);
-  const blackColor = getColor("black", isDark);
 
-  const fetchUserDetails = async () => {
+  const fetchUserDetails = useCallback(async () => {
     await dispatch(getUserDetailsAction());
     await dispatch(getFavouritesAction());
-  };
+  }, [dispatch]);
 
   useEffect(() => {
     fetchUserDetails();
-  }, []);
+  }, [fetchUserDetails]);
 
   const handleToggleFavourite = (petId) => {
     dispatch(toggleFavouriteAction(petId));
   };
 
 
-  const fetchPets = async (city) => {
+  const fetchPets = useCallback(async (city) => {
     try {
       setPetsLoading(true);
 
@@ -77,7 +73,7 @@ const Index = () => {
     } finally {
       setPetsLoading(false);
     }
-  };
+  }, [dispatch]);
 
   useFocusEffect(
     useCallback(() => {
@@ -86,7 +82,7 @@ const Index = () => {
       } else if (!locationLoading && !location) {
         fetchPets('');
       }
-    }, [location?.city, locationLoading])
+    }, [location, locationLoading, fetchPets])
   );
 
   const categories = [
@@ -264,8 +260,8 @@ const Index = () => {
                         />
                       </View>
                       <Text
-                        className={`text-xs text-center mt-2
-                ${isActive ? "text-white" : "text-gray-600"}`}
+                        className={`text-xs text-center mt-2 font-semibold
+                ${isActive ? "text-white" : "color-textSecondary"}`}
                       >
                         {categ.name}
                       </Text>
@@ -292,7 +288,7 @@ const Index = () => {
                 ) : (
                   petData[activeCategory]?.map((pet) => (
                     <View key={pet.id} className="w-[48%] mb-4">
-                      <View className={`rounded-3xl p-2 ${pet.bg}`}>
+                      <View className={`rounded-3xl p-2 ${pet.bg} ${isDark ? 'opacity-90' : ''} border border-border`}>
                         <Pressable
                           className="absolute top-2 right-2 z-10 p-1"
                           onPress={() => handleToggleFavourite(pet.id)}
@@ -300,7 +296,7 @@ const Index = () => {
                           <Ionicons
                             name={favourites?.some(fav => fav._id === pet.id) ? "heart" : "heart-outline"}
                             size={20}
-                            color={favourites?.some(fav => fav._id === pet.id) ? accentColor : accentColor}
+                            color={accentColor}
                           />
                         </Pressable>
 
@@ -324,7 +320,7 @@ const Index = () => {
                             size={14}
                             color={accentColor}
                           />
-                          <Text className="text-xs ml-1 text-gray-500 overflow-hidden line-clamp-1 w-[80%]">
+                          <Text className="text-xs ml-1 color-textSecondary overflow-hidden line-clamp-1 w-[80%]">
                             {pet.distance}
                           </Text>
                         </View>
