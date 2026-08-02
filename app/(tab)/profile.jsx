@@ -18,6 +18,7 @@ const Profile = () => {
   const accentColor = getColor("accent", isDark);
   const graySoftColor = getColor("graySoft", isDark);
   const errorColor = getColor("error", isDark);
+  const textSecondaryColor = getColor("textSecondary", isDark);
 
   const getUserInitials = () => {
     if (!userInfo) return "U";
@@ -46,6 +47,9 @@ const Profile = () => {
   const getVerificationTag = () => {
     if (isIdentityVerified) {
       return { text: "Verified", variant: "success", icon: "checkmark-circle" };
+    }
+    if (userInfo?.verificationStatus === "recheck_requested" || (userInfo?.verificationRejectReason && !isIdentityVerified)) {
+      return { text: "Re-check Needed", variant: "danger", icon: "alert-circle" };
     }
     if (userInfo?.adharCardFrontImage) {
       return { text: "Pending Review", variant: "warning", icon: "time-outline" };
@@ -94,10 +98,13 @@ const Profile = () => {
       color: isIdentityVerified ? accentColor : graySoftColor,
       onPress: () => {
         if (!isIdentityVerified) {
+          const isRecheck = userInfo?.verificationStatus === "recheck_requested" || (userInfo?.verificationRejectReason && !isIdentityVerified);
           Toast.show({
             type: "error",
-            text1: "Identity Verification Required",
-            text2: userInfo?.adharCardFrontImage
+            text1: isRecheck ? "Re-check Required" : "Identity Verification Required",
+            text2: isRecheck
+              ? "Admin requested a re-check of your profile. Please check your email and update your details."
+              : userInfo?.adharCardFrontImage
               ? "Your Aadhaar is pending admin verification before you can add pets."
               : "Please verify your Aadhaar in Edit Profile to add pets for adoption.",
           });
@@ -203,6 +210,29 @@ const Profile = () => {
               <Text className="text-xs color-textSecondary mt-1">Adopted</Text>
             </View>
           </View> */}
+
+          {(userInfo?.verificationStatus === "recheck_requested" || (userInfo?.verificationRejectReason && !isIdentityVerified)) && (
+            <TouchableOpacity
+              onPress={() => router.push("/EditProfile")}
+              activeOpacity={0.8}
+              className="p-4 rounded-2xl mb-5 border flex-row items-center"
+              style={{
+                backgroundColor: `${getColor("error", isDark)}15`,
+                borderColor: `${getColor("error", isDark)}50`,
+              }}
+            >
+              <Ionicons name="alert-circle" size={24} color={getColor("error", isDark)} />
+              <View className="ml-3 flex-1">
+                <Text className="text-sm font-bold" style={{ color: getColor("error", isDark) }}>
+                  Action Needed: Verification Re-check
+                </Text>
+                <Text className="text-xs mt-0.5" style={{ color: textSecondaryColor }}>
+                  Admin requested profile updates. Tap here to view feedback and resubmit.
+                </Text>
+              </View>
+              <Ionicons name="chevron-forward" size={18} color={getColor("error", isDark)} />
+            </TouchableOpacity>
+          )}
 
           <View className="mb-6">
             <Text className="text-lg font-semibold color-textPrimary mb-4">

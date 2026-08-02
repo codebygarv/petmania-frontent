@@ -104,10 +104,16 @@ const MyPets = () => {
 
   const handleAddPet = () => {
     if (!isIdentityVerified) {
+      const isRecheck =
+        userInfo?.verificationStatus === "recheck_requested" ||
+        (userInfo?.verificationRejectReason && !isIdentityVerified);
+
       Toast.show({
         type: "error",
-        text1: "Identity Verification Required",
-        text2: userInfo?.adharCardFrontImage
+        text1: isRecheck ? "Re-check Required" : "Identity Verification Required",
+        text2: isRecheck
+          ? "Admin requested a re-check of your profile. Please check your email and update your details."
+          : userInfo?.adharCardFrontImage
           ? "Your Aadhaar is pending admin verification before you can add pets."
           : "Please verify your Aadhaar in Edit Profile before adding pets for adoption.",
       });

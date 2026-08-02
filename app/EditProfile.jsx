@@ -58,6 +58,11 @@ const EditProfile = () => {
     const [profileUri, setProfileUri] = useState(null);
     const [profileBase64, setProfileBase64] = useState(null);
 
+    const [adharFrontUri, setAdharFrontUri] = useState(null);
+    const [adharFrontBase64, setAdharFrontBase64] = useState(null);
+    const [adharBackUri, setAdharBackUri] = useState(null);
+    const [adharBackBase64, setAdharBackBase64] = useState(null);
+
     const [loading, setLoading] = useState(true);
     const [locationLoading, setLocationLoading] = useState(false);
     const [showDatePicker, setShowDatePicker] = useState(false);
@@ -94,6 +99,12 @@ const EditProfile = () => {
         if (type === "profile") {
             setProfileUri(uri);
             setProfileBase64(base64);
+        } else if (type === "adharFront") {
+            setAdharFrontUri(uri);
+            setAdharFrontBase64(base64);
+        } else if (type === "adharBack") {
+            setAdharBackUri(uri);
+            setAdharBackBase64(base64);
         }
     };
 
@@ -118,6 +129,8 @@ const EditProfile = () => {
                 });
 
                 if (u?.profileImage) setProfileUri(u.profileImage);
+                if (u?.adharCardFrontImage) setAdharFrontUri(u.adharCardFrontImage);
+                if (u?.adharCardBackImage) setAdharBackUri(u.adharCardBackImage);
             }
         } finally {
             setLoading(false);
@@ -229,7 +242,50 @@ const EditProfile = () => {
                     </View>
 
                     {/* Verification Status Banner */}
-                    {!userInfo?.isVerified ? (
+                    {userInfo?.verificationStatus === "recheck_requested" || (userInfo?.verificationRejectReason && !(userInfo?.isAdharVerified || userInfo?.isAadhaarVerified)) ? (
+                        <View
+                            className="rounded-2xl p-4 mb-5 border"
+                            style={{
+                                backgroundColor: `${getColor("error", isDark)}15`,
+                                borderColor: `${getColor("error", isDark)}50`,
+                            }}
+                        >
+                            <View className="flex-row items-center mb-2">
+                                <Ionicons name="alert-circle" size={22} color={getColor("error", isDark)} />
+                                <Text
+                                    className="ml-2 text-sm font-bold flex-1"
+                                    style={{ color: getColor("error", isDark) }}
+                                >
+                                    Action Required: Profile Re-check
+                                </Text>
+                            </View>
+                            {userInfo?.verificationRejectReason && (
+                                <View
+                                    className="p-2.5 rounded-xl mb-2.5"
+                                    style={{ backgroundColor: `${getColor("error", isDark)}20` }}
+                                >
+                                    <Text className="text-[11px] font-semibold uppercase tracking-wider mb-1" style={{ color: getColor("error", isDark) }}>
+                                        Admin Feedback:
+                                    </Text>
+                                    <Text
+                                        className="text-xs leading-5 italic font-medium"
+                                        style={{ color: textPrimaryColor }}
+                                    >
+                                        &ldquo;{userInfo.verificationRejectReason}&rdquo;
+                                    </Text>
+                                </View>
+                            )}
+                            <View className="flex-row items-center">
+                                <Ionicons name="mail-outline" size={16} color={getColor("error", isDark)} />
+                                <Text
+                                    className="ml-2 text-xs flex-1 font-semibold"
+                                    style={{ color: getColor("error", isDark) }}
+                                >
+                                    Please check your email for full instructions. Re-upload or edit your details below and tap &ldquo;Save Changes&rdquo; to resubmit for verification.
+                                </Text>
+                            </View>
+                        </View>
+                    ) : !userInfo?.isVerified ? (
                         <View
                             className="rounded-xl p-3 mb-5 flex-row items-center border"
                             style={{
@@ -348,6 +404,8 @@ const EditProfile = () => {
                                 UserManualAddress: values.UserManualAddress || null,
                                 adharCardNumber: values.adharCardNumber,
                                 profileImage: profileBase64 ? `data:image/jpeg;base64,${profileBase64}` : profileUri || null,
+                                adharCardFrontImage: adharFrontBase64 ? `data:image/jpeg;base64,${adharFrontBase64}` : adharFrontUri || null,
+                                adharCardBackImage: adharBackBase64 ? `data:image/jpeg;base64,${adharBackBase64}` : adharBackUri || null,
                             };
 
                             const res = await dispatch(updateUserProfileAction(payload));
@@ -355,9 +413,10 @@ const EditProfile = () => {
                             setSubmitting(false);
 
                             if (res?.success === true) {
-                                Toast.show({ type: "success", text1: "Profile Updated", text2: res?.message });
+                                Toast.show({ type: "success", text1: "Profile Updated", text2: "Submitted for verification" });
+                                dispatch(getUserDetailsAction());
                             } else {
-                                Toast.show({ type: "error", text1: "Update Failed", text2: res?.message });
+                                Toast.show({ type: "error", text1: "Update Failed", text2: res?.message || "Failed to update profile" });
                             }
                         }}
                     >
@@ -599,9 +658,79 @@ const EditProfile = () => {
                                     {touched.adharCardNumber && errors.adharCardNumber
                                         ? <Text style={{ color: errorColor, fontSize: 12, marginBottom: 8 }}>{errors.adharCardNumber}</Text>
                                         : <Text style={{ color: textSecondaryColor, fontSize: 11, marginBottom: 8 }}>
-                                            Your Aadhaar number is stored securely and will never be shared. Please ensure that you provide accurate information.
+                                            Your Aadhaar number is stored securely and will never be shared. Please ensure accurate information.
                                         </Text>
                                     }
+
+                                    {/* Aadhaar Front Card Image */}
+                                    <View style={{ marginTop: 8 }}>
+                                        <FieldLabel label="Aadhaar Front Side Photo" isDark={isDark} />
+                                        <TouchableOpacity
+                                            onPress={() => pickImage("adharFront")}
+                                            style={{
+                                                borderWidth: 1.5,
+                                                borderStyle: 'dashed',
+                                                borderColor: adharFrontUri ? accentColor : borderColor,
+                                                borderRadius: 12,
+                                                padding: 8,
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                backgroundColor: cardBg,
+                                                minHeight: 100,
+                                                marginBottom: 10,
+                                            }}
+                                        >
+                                            {adharFrontUri ? (
+                                                <Image
+                                                    source={{ uri: adharFrontUri }}
+                                                    style={{ width: '100%', height: 130, borderRadius: 8 }}
+                                                    resizeMode="cover"
+                                                />
+                                            ) : (
+                                                <View style={{ alignItems: 'center', gap: 4, paddingVertical: 12 }}>
+                                                    <Ionicons name="cloud-upload-outline" size={26} color={accentColor} />
+                                                    <Text style={{ color: textSecondaryColor, fontSize: 12, fontWeight: '500' }}>
+                                                        Upload Front Side of Aadhaar
+                                                    </Text>
+                                                </View>
+                                            )}
+                                        </TouchableOpacity>
+                                    </View>
+
+                                    {/* Aadhaar Back Card Image */}
+                                    <View style={{ marginTop: 4 }}>
+                                        <FieldLabel label="Aadhaar Back Side Photo" isDark={isDark} />
+                                        <TouchableOpacity
+                                            onPress={() => pickImage("adharBack")}
+                                            style={{
+                                                borderWidth: 1.5,
+                                                borderStyle: 'dashed',
+                                                borderColor: adharBackUri ? accentColor : borderColor,
+                                                borderRadius: 12,
+                                                padding: 8,
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                backgroundColor: cardBg,
+                                                minHeight: 100,
+                                                marginBottom: 4,
+                                            }}
+                                        >
+                                            {adharBackUri ? (
+                                                <Image
+                                                    source={{ uri: adharBackUri }}
+                                                    style={{ width: '100%', height: 130, borderRadius: 8 }}
+                                                    resizeMode="cover"
+                                                />
+                                            ) : (
+                                                <View style={{ alignItems: 'center', gap: 4, paddingVertical: 12 }}>
+                                                    <Ionicons name="cloud-upload-outline" size={26} color={accentColor} />
+                                                    <Text style={{ color: textSecondaryColor, fontSize: 12, fontWeight: '500' }}>
+                                                        Upload Back Side of Aadhaar
+                                                    </Text>
+                                                </View>
+                                            )}
+                                        </TouchableOpacity>
+                                    </View>
                                 </View>
 
                                 {/* Save Button */}

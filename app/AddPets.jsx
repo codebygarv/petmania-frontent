@@ -220,26 +220,62 @@ const AddPets = () => {
                             onPress={() => router.push("/EditProfile")}
                             className="rounded-2xl p-4 mb-4 flex-row items-center border"
                             style={{
-                                backgroundColor: `${getColor("warning", isDark)}15`,
-                                borderColor: `${getColor("warning", isDark)}40`,
+                                backgroundColor: userInfo?.verificationStatus === "recheck_requested"
+                                    ? `${getColor("error", isDark)}15`
+                                    : `${getColor("warning", isDark)}15`,
+                                borderColor: userInfo?.verificationStatus === "recheck_requested"
+                                    ? `${getColor("error", isDark)}40`
+                                    : `${getColor("warning", isDark)}40`,
                             }}
                         >
                             <Ionicons
-                                name={userInfo?.adharCardFrontImage ? "time-outline" : "shield-outline"}
+                                name={
+                                    userInfo?.verificationStatus === "recheck_requested"
+                                        ? "alert-circle"
+                                        : userInfo?.adharCardFrontImage
+                                        ? "time-outline"
+                                        : "shield-outline"
+                                }
                                 size={24}
-                                color={getColor("warning", isDark)}
+                                color={
+                                    userInfo?.verificationStatus === "recheck_requested"
+                                        ? getColor("error", isDark)
+                                        : getColor("warning", isDark)
+                                }
                             />
                             <View className="ml-3 flex-1">
-                                <Text className="text-sm font-bold" style={{ color: getColor("warning", isDark) }}>
-                                    {userInfo?.adharCardFrontImage ? "Verification Pending by Admin" : "Identity Verification Required"}
+                                <Text
+                                    className="text-sm font-bold"
+                                    style={{
+                                        color:
+                                            userInfo?.verificationStatus === "recheck_requested"
+                                                ? getColor("error", isDark)
+                                                : getColor("warning", isDark),
+                                    }}
+                                >
+                                    {userInfo?.verificationStatus === "recheck_requested"
+                                        ? "Re-check Requested by Admin"
+                                        : userInfo?.adharCardFrontImage
+                                        ? "Verification Pending by Admin"
+                                        : "Identity Verification Required"}
                                 </Text>
                                 <Text className="text-xs mt-0.5" style={{ color: secondaryTextColor }}>
-                                    {userInfo?.adharCardFrontImage
+                                    {userInfo?.verificationStatus === "recheck_requested"
+                                        ? "Admin requested a profile update. Tap here to check the reason and resubmit."
+                                        : userInfo?.adharCardFrontImage
                                         ? "Your Aadhaar is submitted and pending admin approval. You can create listings once verified."
                                         : "Your Aadhaar / Identity must be verified by admin before listing pets. Tap here to complete verification."}
                                 </Text>
                             </View>
-                            <Ionicons name="chevron-forward" size={18} color={getColor("warning", isDark)} />
+                            <Ionicons
+                                name="chevron-forward"
+                                size={18}
+                                color={
+                                    userInfo?.verificationStatus === "recheck_requested"
+                                        ? getColor("error", isDark)
+                                        : getColor("warning", isDark)
+                                }
+                            />
                         </Pressable>
                     )}
 
