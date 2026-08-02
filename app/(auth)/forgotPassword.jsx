@@ -35,24 +35,24 @@ const ForgotPassword = () => {
 
     console.log("Forgot Password Response:", res);
 
-    if (res?.error?.success === false) {
-      Toast.show({
-        type: 'error',
-        text1: 'Request Failed',
-        text2: res?.error?.error?.message
-      });
-    } else if (res?.success === true) {
+    if (res?.success === true) {
       Toast.show({
         type: 'success',
         text1: 'Code Sent',
-        text2: res?.message
+        text2: res?.message || 'Verification code sent to your email.'
       });
       router.push('/verification?type=forgot-password');
     } else {
+      const errorMsg =
+        res?.error?.message ||
+        res?.error?.error?.message ||
+        (typeof res?.error === 'string' && res.error) ||
+        res?.message ||
+        'User with this email was not found. Please check your email.';
       Toast.show({
         type: 'error',
         text1: 'Request Failed',
-        text2: 'An unexpected error occurred. Please try again.'
+        text2: errorMsg
       });
     }
   };
