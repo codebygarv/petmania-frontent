@@ -5,7 +5,7 @@ import { useColorScheme } from "nativewind";
 import { useDispatch } from "react-redux";
 import * as WebBrowser from "expo-web-browser";
 import * as Linking from "expo-linking";
-import { googleLoginAction, facebookLoginAction } from "@/redux/actions/userActions";
+import { googleLoginAction } from "@/redux/actions/userActions";
 import Toast from "react-native-toast-message";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
@@ -13,9 +13,11 @@ import { getColor } from "@/constants/color";
 
 WebBrowser.maybeCompleteAuthSession();
 
-const webClientId = process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID || "531711523042-6lbuv5loo95mgqej29slctctlk3i8h3q.apps.googleusercontent.com";
-const facebookAppId = process.env.EXPO_PUBLIC_FACEBOOK_APP_ID || "123456789012345";
-const GOOGLE_REDIRECT_URI = "https://petmania-backend-delta.vercel.app/api/user/auth/google/callback";
+const webClientId =
+  process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID ||
+  "531711523042-6lbuv5loo95mgqej29slctctlk3i8h3q.apps.googleusercontent.com";
+const GOOGLE_REDIRECT_URI =
+  "https://petmania-backend-delta.vercel.app/api/user/auth/google/callback";
 
 const SocialLoginButtons = () => {
   const { colorScheme } = useColorScheme();
@@ -24,75 +26,78 @@ const SocialLoginButtons = () => {
 
   const isProcessingGoogle = useRef(false);
 
-  const handleAuthUrl = useCallback(async (url) => {
-    if (!url || isProcessingGoogle.current) return;
-    try {
-      const fragment = url.includes("#")
-        ? url.split("#")[1]
-        : url.includes("?")
-        ? url.split("?")[1]
-        : "";
-      const urlParams = new URLSearchParams(fragment);
+  const handleAuthUrl = useCallback(
+    async (url) => {
+      if (!url || isProcessingGoogle.current) return;
+      try {
+        const fragment = url.includes("#")
+          ? url.split("#")[1]
+          : url.includes("?")
+          ? url.split("?")[1]
+          : "";
+        const urlParams = new URLSearchParams(fragment);
 
-      const token = urlParams.get("token");
-      const userParam = urlParams.get("user");
-      const accessToken = urlParams.get("access_token");
-      const error = urlParams.get("error");
+        const token = urlParams.get("token");
+        const userParam = urlParams.get("user");
+        const accessToken = urlParams.get("access_token");
+        const error = urlParams.get("error");
 
-      if (error) {
-        Toast.show({ type: "error", text1: "Google login failed: " + error });
-        return;
-      }
+        if (error) {
+          Toast.show({ type: "error", text1: "Google login failed: " + error });
+          return;
+        }
 
-      if (token) {
-        isProcessingGoogle.current = true;
-        let userData = null;
-        if (userParam) {
-          try {
-            userData = JSON.parse(decodeURIComponent(userParam));
-          } catch (e) {
-            console.error("User parse error:", e);
+        if (token) {
+          isProcessingGoogle.current = true;
+          let userData = null;
+          if (userParam) {
+            try {
+              userData = JSON.parse(decodeURIComponent(userParam));
+            } catch (e) {
+              console.error("User parse error:", e);
+            }
           }
-        }
 
-        await AsyncStorage.setItem("token", token);
-        if (userData) {
-          await AsyncStorage.setItem("userInfo", JSON.stringify(userData));
-        }
+          await AsyncStorage.setItem("token", token);
+          if (userData) {
+            await AsyncStorage.setItem("userInfo", JSON.stringify(userData));
+          }
 
-        Toast.show({
-          type: "success",
-          text1: "Google Login Successful",
-        });
-        router.replace("/(tab)");
-        return;
-      }
-
-      if (accessToken) {
-        isProcessingGoogle.current = true;
-        const res = await dispatch(googleLoginAction(accessToken));
-        if (res?.success) {
-          await AsyncStorage.setItem("userInfo", JSON.stringify(res.data.user));
-          await AsyncStorage.setItem("token", res.data.token);
           Toast.show({
             type: "success",
-            text1: res.message || "Google Login Successful",
+            text1: "Google Login Successful",
           });
           router.replace("/(tab)");
-        } else {
-          Toast.show({
-            type: "error",
-            text1: res?.error?.message || "Google Login Failed",
-          });
+          return;
         }
+
+        if (accessToken) {
+          isProcessingGoogle.current = true;
+          const res = await dispatch(googleLoginAction(accessToken));
+          if (res?.success) {
+            await AsyncStorage.setItem("userInfo", JSON.stringify(res.data.user));
+            await AsyncStorage.setItem("token", res.data.token);
+            Toast.show({
+              type: "success",
+              text1: res.message || "Google Login Successful",
+            });
+            router.replace("/(tab)");
+          } else {
+            Toast.show({
+              type: "error",
+              text1: res?.error?.message || "Google Login Failed",
+            });
+          }
+        }
+      } catch (err) {
+        console.error("[Google Auth Error]:", err);
+        Toast.show({ type: "error", text1: "Google Login Error" });
+      } finally {
+        isProcessingGoogle.current = false;
       }
-    } catch (err) {
-      console.error("[Google Auth Error]:", err);
-      Toast.show({ type: "error", text1: "Google Login Error" });
-    } finally {
-      isProcessingGoogle.current = false;
-    }
-  }, [dispatch]);
+    },
+    [dispatch]
+  );
 
   // Deep linking listener for custom scheme fallback
   useEffect(() => {
@@ -140,79 +145,20 @@ const SocialLoginButtons = () => {
     }
   };
 
-  const handleFacebookLogin = async () => {
-    try {
-      const redirectUri = "http://localhost:8081";
-
-      const authUrl =
-        `https://www.facebook.com/v18.0/dialog/oauth?` +
-        `client_id=${facebookAppId}` +
-        `&redirect_uri=${encodeURIComponent(redirectUri)}` +
-        `&response_type=token` +
-        `&scope=${encodeURIComponent("public_profile,email")}`;
-
-      console.log("[Facebook Auth] Redirect URI:", redirectUri);
-      const result = await WebBrowser.openAuthSessionAsync(authUrl, redirectUri);
-
-      if (result.type === "success" && result.url) {
-        const hash = result.url.includes("#") ? result.url.split("#")[1] : result.url.split("?")[1];
-        const urlParams = new URLSearchParams(hash || "");
-        const accessToken = urlParams.get("access_token");
-
-        if (accessToken) {
-          const res = await dispatch(facebookLoginAction(accessToken));
-          if (res?.success) {
-            await AsyncStorage.setItem("userInfo", JSON.stringify(res.data.user));
-            await AsyncStorage.setItem("token", res.data.token);
-            Toast.show({
-              type: "success",
-              text1: res.message || "Facebook Login Successful",
-            });
-            router.replace("/(tab)");
-          } else {
-            Toast.show({
-              type: "error",
-              text1: res?.error?.message || "Facebook Login Failed",
-            });
-          }
-        }
-      }
-    } catch (err) {
-      console.error("Facebook auth error:", err);
-      Toast.show({ type: "error", text1: "Facebook Login Error" });
-    }
-  };
-
   const googleIconColor = getColor("textPrimary", isDark);
 
   return (
-    <View className="flex w-full flex-row gap-3 justify-between">
+    <View className="flex w-full">
       {/* Google Login Button */}
       <TouchableOpacity
         activeOpacity={0.8}
-        className="bg-SocialBg rounded-xl py-3.5 px-4 items-center justify-center flex-1 border border-border"
+        className="bg-SocialBg rounded-xl py-3.5 px-4 items-center justify-center w-full border border-border flex-row gap-2"
         onPress={handleGoogleLogin}
       >
-        <View className="flex flex-row items-center gap-2">
-          <Ionicons name="logo-google" size={20} color={googleIconColor} />
-          <Text className="color-textPrimary text-sm font-semibold">
-            Google
-          </Text>
-        </View>
-      </TouchableOpacity>
-
-      {/* Facebook Login Button */}
-      <TouchableOpacity
-        activeOpacity={0.8}
-        className="bg-SocialBg rounded-xl py-3.5 px-4 items-center justify-center flex-1 border border-border"
-        onPress={handleFacebookLogin}
-      >
-        <View className="flex flex-row items-center gap-2">
-          <Ionicons name="logo-facebook" size={20} color="#1877F2" />
-          <Text className="color-textPrimary text-sm font-semibold">
-            Facebook
-          </Text>
-        </View>
+        <Ionicons name="logo-google" size={20} color={googleIconColor} />
+        <Text className="color-textPrimary text-sm font-semibold">
+          Continue with Google
+        </Text>
       </TouchableOpacity>
     </View>
   );
