@@ -76,6 +76,7 @@ export default function RootLayout() {
                 >
                   <Stack.Screen name="(auth)" />
                   <Stack.Screen name="(tab)" />
+                  <Stack.Screen name="google-auth" />
                   <Stack.Screen name="Onboarding" />
                   <Stack.Screen name="FinishProfile" />
                   <Stack.Screen name="AddPets" />
