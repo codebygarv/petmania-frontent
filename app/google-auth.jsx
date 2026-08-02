@@ -7,6 +7,7 @@ import * as Linking from "expo-linking";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-toast-message";
 import { googleLoginAction } from "@/redux/actions/userActions";
+import { getColor } from "@/constants/color";
 
 export default function GoogleAuthCallback() {
   const { colorScheme } = useColorScheme();
@@ -78,23 +79,9 @@ export default function GoogleAuthCallback() {
   }, []);
 
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: isDark ? "#000000" : "#ffffff",
-      }}
-    >
-      <ActivityIndicator size="large" color="#f97316" />
-      <Text
-        style={{
-          marginTop: 16,
-          fontSize: 16,
-          fontWeight: "600",
-          color: isDark ? "#EDEDED" : "#1C1C1C",
-        }}
-      >
+    <View className="flex-1 justify-center items-center bg-background">
+      <ActivityIndicator size="large" color={getColor("orange", isDark)} />
+      <Text className="mt-4 text-base font-semibold text-textPrimary">
         Signing in with Google...
       </Text>
     </View>
