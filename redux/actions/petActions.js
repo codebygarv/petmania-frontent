@@ -29,14 +29,24 @@ export const createPetAction = (petData) => {
     };
 };
 
-export const getPetsAction = (city) => {
+export const getPetsAction = (filters = {}) => {
     return async (dispatch) => {
         dispatch({ type: petConstants.GET_PETS_REQUEST });
         try {
             let url = '/pets/get-pets';
-            if (city) {
-                url += `?city=${encodeURIComponent(city)}`;
+            const queryParams = [];
+            
+            if (filters.city) queryParams.push(`city=${encodeURIComponent(filters.city)}`);
+            if (filters.type) queryParams.push(`type=${encodeURIComponent(filters.type)}`);
+            if (filters.gender) queryParams.push(`gender=${encodeURIComponent(filters.gender)}`);
+            if (filters.minAge !== undefined) queryParams.push(`minAge=${filters.minAge}`);
+            if (filters.maxAge !== undefined) queryParams.push(`maxAge=${filters.maxAge}`);
+            if (filters.search) queryParams.push(`search=${encodeURIComponent(filters.search)}`);
+
+            if (queryParams.length > 0) {
+                url += `?${queryParams.join('&')}`;
             }
+
             const res = await axiosInstance.get(url);
             if (res.status === 200) {
                 dispatch({

@@ -22,19 +22,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { createPetAction } from "@/redux/actions/petActions";
 import { getColor } from "@/constants/color";
 
-const DOG_BREEDS = [
-    "Labrador Retriever", "German Shepherd", "Golden Retriever", "Beagle",
-    "Bulldog", "Poodle", "Rottweiler", "Shih Tzu", "Pug", "Doberman",
-    "Siberian Husky", "Cocker Spaniel", "Pomeranian", "Great Dane",
-    "Indian Pariah", "Rajapalayam", "Mudhol Hound", "Chihuahua", "Boxer",
-    "Mixed Breed", "Other"
-];
-
-const CAT_BREEDS = [
-    "Persian", "Siamese", "Maine Coon", "British Shorthair", "Ragdoll",
-    "Bengal", "Sphynx", "Abyssinian", "Scottish Fold", "Russian Blue",
-    "Himalayan", "Burmese", "Indian Domestic", "Mixed Breed", "Other"
-];
+import { PET_CATEGORIES, PET_BREEDS } from "@/constants/petTypes";
+import CustomDropdown from "@/components/CustomDropdown";
 
 const AddPets = () => {
     const { colorScheme } = useColorScheme();
@@ -199,7 +188,7 @@ const AddPets = () => {
         }
     };
 
-    const currentBreeds = petType === "dog" ? DOG_BREEDS : CAT_BREEDS;
+    const currentBreeds = PET_BREEDS[petType] || PET_BREEDS["other"];
 
     return (
         <KeyboardAvoidingView
@@ -321,58 +310,30 @@ const AddPets = () => {
                         className="bg-backgroundSecondary color-textPrimary rounded-xl h-12 px-3 mb-4 border border-border"
                     />
 
-                    <Text className="text-sm color-textPrimary mb-2 font-semibold">Pet Type</Text>
-                    <View className="flex-row mb-4">
-                        <Pressable
-                            onPress={() => {
-                                setPetType("dog");
-                                setBreed("");
-                                setCustomBreed("");
-                            }}
-                            className={`px-4 py-2 mr-3 rounded-2xl ${petType === "dog" ? "bg-buttonPrimary" : "bg-backgroundSecondary border border-border"}`}
-                        >
-                            <Text className={petType === "dog" ? "text-white font-semibold" : "color-textPrimary"}>Dog</Text>
-                        </Pressable>
+                    <CustomDropdown
+                        label="Pet Type"
+                        value={petType}
+                        placeholder="Select pet type"
+                        options={PET_CATEGORIES.filter(c => c.id !== "all").map(c => ({ label: c.name, value: c.id }))}
+                        onSelect={(val) => {
+                            setPetType(val);
+                            setBreed("");
+                            setCustomBreed("");
+                        }}
+                    />
 
-                        <Pressable
-                            onPress={() => {
-                                setPetType("cat");
-                                setBreed("");
+                    <CustomDropdown
+                        label="Breed"
+                        value={breed}
+                        placeholder="Select breed"
+                        options={currentBreeds.map(b => ({ label: b, value: b }))}
+                        onSelect={(val) => {
+                            setBreed(val);
+                            if (val !== "Other") {
                                 setCustomBreed("");
-                            }}
-                            className={`px-4 py-2 rounded-2xl ${petType === "cat" ? "bg-buttonPrimary" : "bg-backgroundSecondary border border-border"}`}
-                        >
-                            <Text className={petType === "cat" ? "text-white font-semibold" : "color-textPrimary"}>Cat</Text>
-                        </Pressable>
-                    </View>
-
-                    <Text className="text-sm color-textPrimary mb-2 font-semibold">Breed</Text>
-                    <ScrollView
-                        horizontal
-                        showsHorizontalScrollIndicator={false}
-                        className="mb-3"
-                        contentContainerStyle={{ gap: 8, paddingRight: 8 }}
-                    >
-                        {currentBreeds.map((b) => {
-                            const isSelected = breed === b;
-                            return (
-                                <Pressable
-                                    key={b}
-                                    onPress={() => {
-                                        setBreed(b);
-                                        if (b !== "Other") {
-                                            setCustomBreed("");
-                                        }
-                                    }}
-                                    className={`px-3.5 py-2 rounded-full border ${isSelected ? "bg-buttonPrimary border-buttonPrimary" : "bg-backgroundSecondary border-border"}`}
-                                >
-                                    <Text className={`text-xs font-semibold ${isSelected ? "text-white" : "color-textPrimary"}`}>
-                                        {b}
-                                    </Text>
-                                </Pressable>
-                            );
-                        })}
-                    </ScrollView>
+                            }
+                        }}
+                    />
 
                     {breed === "Other" && (
                         <TextInput
