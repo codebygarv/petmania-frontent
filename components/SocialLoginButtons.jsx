@@ -12,7 +12,7 @@ import { router } from "expo-router";
 
 WebBrowser.maybeCompleteAuthSession();
 
-const webClientId = process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID || "531711523042-6lbuv5loo95mgqej29slctctlk3i8h3q.apps.googleusercontent.com";
+const webClientId = process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID || "425077338248-3c06vuh15ppqblnb3gm32aru289v89eb.apps.googleusercontent.com";
 const facebookAppId = process.env.EXPO_PUBLIC_FACEBOOK_APP_ID || "123456789012345";
 const GOOGLE_REDIRECT_URI = "https://petmania-backend-delta.vercel.app/api/user/auth/google/callback";
 
