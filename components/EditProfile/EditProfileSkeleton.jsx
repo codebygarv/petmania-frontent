@@ -7,11 +7,8 @@ import Animated, {
   withTiming,
   withSequence,
 } from "react-native-reanimated";
-import { useColorScheme } from "nativewind";
 
-const Shimmer = ({ className }: { className?: string }) => {
-  const { colorScheme } = useColorScheme();
-  const isDark = colorScheme === "dark";
+const Shimmer = ({ className = "" }) => {
   const opacity = useSharedValue(0.3);
 
   useEffect(() => {
@@ -23,7 +20,7 @@ const Shimmer = ({ className }: { className?: string }) => {
       -1,
       true
     );
-  }, []);
+  }, [opacity]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,
@@ -32,13 +29,13 @@ const Shimmer = ({ className }: { className?: string }) => {
   return (
     <Animated.View
       style={animatedStyle}
-      className={`${className} ${isDark ? "bg-gray-800" : "bg-gray-200"} rounded-md`}
+      className={`${className} bg-skeletonItem rounded-md`}
     />
   );
 };
 
-const SectionSkeleton = ({ isDark }: { isDark: boolean }) => (
-  <View className={`p-4 mb-4 rounded-2xl border ${isDark ? "bg-[#1a1a1a] border-[#2a2a2a]" : "bg-[#fafafa] border-[#ededed]"}`}>
+const SectionSkeleton = () => (
+  <View className="p-4 mb-4 rounded-2xl border bg-backgroundSecondary border-border">
     <Shimmer className="w-32 h-5 mb-4" />
     <View className="mb-4">
       <Shimmer className="w-20 h-3 mb-2" />
@@ -56,12 +53,9 @@ const SectionSkeleton = ({ isDark }: { isDark: boolean }) => (
 );
 
 const EditProfileSkeleton = () => {
-  const { colorScheme } = useColorScheme();
-  const isDark = colorScheme === "dark";
-
   return (
     <ScrollView 
-      className={`flex-1 ${isDark ? "bg-[#121212]" : "bg-white"}`} 
+      className="flex-1 bg-background" 
       showsVerticalScrollIndicator={false}
     >
       <View className="px-5 pt-6">
@@ -81,9 +75,9 @@ const EditProfileSkeleton = () => {
         </View>
 
         {/* Sections */}
-        <SectionSkeleton isDark={isDark} />
-        <SectionSkeleton isDark={isDark} />
-        <SectionSkeleton isDark={isDark} />
+        <SectionSkeleton />
+        <SectionSkeleton />
+        <SectionSkeleton />
 
         {/* Save Button */}
         <Shimmer className="w-full h-14 rounded-xl mt-4 mb-10" />

@@ -11,7 +11,6 @@ import { useSelector } from "react-redux";
 
 const Profile = () => {
   const userInfo = useSelector((state) => state.user.userInfo);
-  const userVerified = userInfo?.isVerified;
 
   const { colorScheme } = useColorScheme();
   const isDark = colorScheme === "dark";
@@ -19,6 +18,7 @@ const Profile = () => {
   const accentColor = getColor("accent", isDark);
   const graySoftColor = getColor("graySoft", isDark);
   const errorColor = getColor("error", isDark);
+  const textSecondaryColor = getColor("textSecondary", isDark);
 
   const getUserInitials = () => {
     if (!userInfo) return "U";
@@ -40,6 +40,26 @@ const Profile = () => {
     return firstChar + firstChar2;
   };
 
+  const isIdentityVerified = Boolean(
+    userInfo?.userVerified || userInfo?.isAdharVerified || userInfo?.isAadhaarVerified
+  );
+
+  const getVerificationTag = () => {
+    if (isIdentityVerified) {
+      return { text: "Verified", variant: "success", icon: "checkmark-circle" };
+    }
+    if (userInfo?.verificationStatus === "recheck_requested" || (userInfo?.verificationRejectReason && !isIdentityVerified)) {
+      return { text: "Re-check Needed", variant: "danger", icon: "alert-circle" };
+    }
+    if (userInfo?.adharCardFrontImage) {
+      return { text: "Pending Review", variant: "warning", icon: "time-outline" };
+    }
+    if (userInfo?.isVerified) {
+      return { text: "Email Verified", variant: "default", icon: "mail-outline" };
+    }
+    return { text: "Not Verified", variant: "warning", icon: "alert-circle-outline" };
+  };
+
   const handleLogout = async () => {
     try {
       await AsyncStorage.removeItem("token");
@@ -52,7 +72,7 @@ const Profile = () => {
         text2: "You have been successfully logged out",
       });
       router.replace("/(auth)");
-    } catch (error) {
+    } catch (_error) {
       Toast.show({
         type: "error",
         text1: "Logout Failed",
@@ -74,9 +94,23 @@ const Profile = () => {
     {
       id: 2,
       title: "Add Pet Profile",
-      icon: "paw-outline",
-      color: accentColor,
+      icon: isIdentityVerified ? "paw-outline" : "lock-closed-outline",
+      color: isIdentityVerified ? accentColor : graySoftColor,
       onPress: () => {
+        if (!isIdentityVerified) {
+          const isRecheck = userInfo?.verificationStatus === "recheck_requested" || (userInfo?.verificationRejectReason && !isIdentityVerified);
+          Toast.show({
+            type: "error",
+            text1: isRecheck ? "Re-check Required" : "Identity Verification Required",
+            text2: isRecheck
+              ? "Admin requested a re-check of your profile. Please check your email and update your details."
+              : userInfo?.adharCardFrontImage
+              ? "Your Aadhaar is pending admin verification before you can add pets."
+              : "Please verify your Aadhaar in Edit Profile to add pets for adoption.",
+          });
+          router.push("/EditProfile");
+          return;
+        }
         router.push("/AddPets");
       },
     },
@@ -127,6 +161,8 @@ const Profile = () => {
     },
   ];
 
+  const verificationTag = getVerificationTag();
+
   return (
     <View className="flex-1 bg-background">
       <ScrollView
@@ -148,21 +184,55 @@ const Profile = () => {
                 </Text>
               </View>
             )}
-            <Text className="text-2xl font-bold color-textPrimary mb-1">
-              {userInfo?.name || userInfo?.email?.split("@")[0]?.split("+")[0]?.trim() || "User"}
-            </Text>
-            <Text className="text-sm text-gray-500 mb-4">
-              {userInfo?.email || "No email available"}
-            </Text>
+            <View className="flex-row items-center justify-center gap-1.5 mb-1">
+              <Text className="text-2xl font-bold color-textPrimary">
+                {userInfo?.name || userInfo?.email?.split("@")[0]?.split("+")[0]?.trim() || "User"}
+              </Text>
+              {isIdentityVerified && (
+                <Ionicons
+                  name="checkmark-circle"
+                  size={20}
+                  color={getColor("success", isDark)}
+                />
+              )}
+            </View>
+            <View className="flex-row items-center justify-center gap-1.5 mb-4">
+              <Text className="text-sm color-textSecondary">
+                {userInfo?.email || "No email available"}
+              </Text>
+            </View>
           </View>
 
           {/* <View className="flex-row justify-between mb-6">
             <View className="flex-1 items-center bg-backgroundSecondary rounded-2xl p-4 mx-1">
               <Ionicons name="paw-outline" size={24} color={accentColor} />
               <Text className="text-2xl font-bold color-textPrimary mt-2">2</Text>
-              <Text className="text-xs text-gray-500 mt-1">Adopted</Text>
+              <Text className="text-xs color-textSecondary mt-1">Adopted</Text>
             </View>
           </View> */}
+
+          {(userInfo?.verificationStatus === "recheck_requested" || (userInfo?.verificationRejectReason && !isIdentityVerified)) && (
+            <TouchableOpacity
+              onPress={() => router.push("/EditProfile")}
+              activeOpacity={0.8}
+              className="p-4 rounded-2xl mb-5 border flex-row items-center"
+              style={{
+                backgroundColor: `${getColor("error", isDark)}15`,
+                borderColor: `${getColor("error", isDark)}50`,
+              }}
+            >
+              <Ionicons name="alert-circle" size={24} color={getColor("error", isDark)} />
+              <View className="ml-3 flex-1">
+                <Text className="text-sm font-bold" style={{ color: getColor("error", isDark) }}>
+                  Action Needed: Verification Re-check
+                </Text>
+                <Text className="text-xs mt-0.5" style={{ color: textSecondaryColor }}>
+                  Admin requested profile updates. Tap here to view feedback and resubmit.
+                </Text>
+              </View>
+              <Ionicons name="chevron-forward" size={18} color={getColor("error", isDark)} />
+            </TouchableOpacity>
+          )}
 
           <View className="mb-6">
             <Text className="text-lg font-semibold color-textPrimary mb-4">
@@ -173,7 +243,7 @@ const Profile = () => {
                 key={item.id}
                 onPress={item.onPress}
                 activeOpacity={0.7}
-                className="flex-row items-center bg-backgroundSecondary rounded-2xl p-4 mb-3"
+                className="flex-row items-center bg-backgroundSecondary border border-border rounded-2xl p-4 mb-3"
               >
                 <View
                   className="w-10 h-10 rounded-xl items-center justify-center mr-4"
@@ -186,7 +256,20 @@ const Profile = () => {
                 </Text>
                 {
                   item.id === 1 && (
-                    <Tags text={userVerified === true ? "Verified" : "Not Verified"} variant={userVerified === true ? "success" : "warning"} icon={userVerified === true ? "" : "alert-circle-outline"} />
+                    <Tags
+                      text={verificationTag.text}
+                      variant={verificationTag.variant}
+                      icon={verificationTag.icon}
+                    />
+                  )
+                }
+                {
+                  item.id === 2 && !isIdentityVerified && (
+                    <Tags
+                      text="Locked"
+                      variant="warning"
+                      icon="lock-closed-outline"
+                    />
                   )
                 }
                 <Ionicons
@@ -202,7 +285,7 @@ const Profile = () => {
           <TouchableOpacity
             onPress={handleLogout}
             activeOpacity={0.7}
-            className="flex-row items-center justify-center bg-backgroundSecondary rounded-2xl p-4 mb-6 border border-red-200"
+            className="flex-row items-center justify-center bg-backgroundSecondary rounded-2xl p-4 mb-6 border border-border"
           >
             <Ionicons name="log-out-outline" size={22} color={errorColor} />
             <Text className={`ml-2 text-base font-semibold text-error`}>

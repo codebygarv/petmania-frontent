@@ -18,7 +18,7 @@ const Button = ({ text, onPress, disabled = false }) => {
       activeOpacity={0.8}
       disabled={disabled}
       className={`rounded-xl py-4 px-8 shadow-md items-center justify-center ${
-        disabled ? "bg-gray-400 dark:bg-gray-600 opacity-60" : "bg-buttonPrimary"
+        disabled ? "bg-border opacity-60" : "bg-buttonPrimary"
       }`}
     >
       <Text className="text-white text-base font-semibold">{text}</Text>

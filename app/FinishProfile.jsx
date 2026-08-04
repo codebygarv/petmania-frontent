@@ -9,29 +9,25 @@ import {
   KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
-  Dimensions,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import * as Haptics from "expo-haptics";
-import { Camera, User, BadgeCheck, ArrowRight, Plus } from "lucide-react-native";
+import { User, BadgeCheck, ArrowRight, Plus } from "lucide-react-native";
 import { router } from "expo-router";
 import { useDispatch } from "react-redux";
 import { updateUserProfileAction } from "@/redux/actions/userActions";
 import Toast from "react-native-toast-message";
 import { useColorScheme } from "nativewind";
-import { COLORS, getColor } from "@/constants/color";
+import { getColor } from "@/constants/color";
 import Animated, { 
   FadeInDown, 
   FadeInUp, 
-  Layout, 
   useAnimatedStyle, 
   useSharedValue, 
   withSpring 
 } from "react-native-reanimated";
 import { Formik } from "formik";
 import * as Yup from "yup";
-
-const { width } = Dimensions.get("window");
 
 const validationSchema = Yup.object().shape({
   name: Yup.string()
@@ -177,7 +173,7 @@ const FinishProfile = () => {
                           className="w-36 h-36 rounded-full border-4 border-buttonPrimary"
                         />
                       ) : (
-                        <View className="w-36 h-36 rounded-full bg-backgroundSecondary items-center justify-center border-2 border-dashed border-gray-400 dark:border-gray-700">
+                        <View className="w-36 h-36 rounded-full bg-backgroundSecondary items-center justify-center border-2 border-dashed border-border">
                           <User
                             size={48}
                             color={getColor("textSecondary", isDark)}
@@ -187,9 +183,9 @@ const FinishProfile = () => {
                       )}
                       <View 
                         className="absolute bottom-1 right-1 bg-buttonPrimary p-3 rounded-full border-4 border-background"
-                        style={{ elevation: 5, shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.2, shadowRadius: 3 }}
+                        style={{ elevation: 5, shadowColor: getColor("shadow", isDark), shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.2, shadowRadius: 3 }}
                       >
-                        <Plus size={20} color="white" strokeWidth={3} />
+                        <Plus size={20} color={getColor("white", isDark)} strokeWidth={3} />
                       </View>
                     </Animated.View>
                   </TouchableOpacity>
@@ -206,8 +202,8 @@ const FinishProfile = () => {
                     </Text>
                     <View 
                       className={`flex-row items-center bg-backgroundSecondary rounded-2xl px-4 border ${
-                        touched.name && errors.name ? "border-red-500" : "border-transparent"
-                      } dark:bg-[#1E1E1E]`}
+                        touched.name && errors.name ? "border-error" : "border-border"
+                      }`}
                     >
                        <User size={20} color={getColor("textSecondary", isDark)} strokeWidth={2} />
                        <TextInput
@@ -220,7 +216,7 @@ const FinishProfile = () => {
                       />
                     </View>
                     {touched.name && errors.name && (
-                      <Text className="text-red-500 text-xs mt-1 ml-1">{errors.name}</Text>
+                      <Text className="text-error text-xs mt-1 ml-1">{errors.name}</Text>
                     )}
                   </Animated.View>
 
@@ -242,11 +238,11 @@ const FinishProfile = () => {
                       multiline
                       numberOfLines={4}
                       maxLength={200}
-                      className="bg-backgroundSecondary color-textPrimary px-4 py-4 rounded-2xl text-base font-medium border border-transparent dark:bg-[#1E1E1E] h-32 text-top"
+                      className={`bg-backgroundSecondary color-textPrimary px-4 py-4 rounded-2xl text-base font-medium border ${touched.bio && errors.bio ? "border-error" : "border-border"} h-32 text-top`}
                       textAlignVertical="top"
                     />
                     {touched.bio && errors.bio && (
-                      <Text className="text-red-500 text-xs mt-1 ml-1">{errors.bio}</Text>
+                      <Text className="text-error text-xs mt-1 ml-1">{errors.bio}</Text>
                     )}
                   </Animated.View>
                 </View>

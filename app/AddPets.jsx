@@ -17,17 +17,27 @@ import * as Location from "expo-location";
 import { router } from "expo-router";
 import BackButton from "@/components/BackButton";
 import { useColorScheme } from "nativewind";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-toast-message";
-import { config } from "@/constants/config";
 import { useDispatch, useSelector } from "react-redux";
 import { createPetAction } from "@/redux/actions/petActions";
+import { getColor } from "@/constants/color";
+
+import { PET_CATEGORIES, PET_BREEDS } from "@/constants/petTypes";
+import CustomDropdown from "@/components/CustomDropdown";
 
 const AddPets = () => {
+    const { colorScheme } = useColorScheme();
+    const isDark = colorScheme === "dark";
+    const accentColor = getColor("accent", isDark);
+    const placeholderColor = getColor("inputPlaceholder", isDark);
+    const primaryTextColor = getColor("textPrimary", isDark);
+    const secondaryTextColor = getColor("textSecondary", isDark);
+
     const [images, setImages] = useState([]);
     const [name, setName] = useState("");
     const [petType, setPetType] = useState("dog");
     const [breed, setBreed] = useState("");
+    const [customBreed, setCustomBreed] = useState("");
     const [gender, setGender] = useState("unknown");
     const [color, setColor] = useState("");
     const [age, setAge] = useState("");
@@ -40,8 +50,9 @@ const AddPets = () => {
     const dispatch = useDispatch();
     const userInfo = useSelector((state) => state.user.userInfo);
 
-    const { colorScheme } = useColorScheme();
-    const isDark = colorScheme === "dark";
+    const isIdentityVerified = Boolean(
+        userInfo?.isAdharVerified || userInfo?.isAadhaarVerified || userInfo?.userVerified
+    );
 
     // Pick the Profile Image
     const pickImage = async () => {
@@ -104,8 +115,27 @@ const AddPets = () => {
 
     // Submit the Pet Data to the Backend
     const onSubmit = async () => {
-        if (!name || !breed || !location) {
-            Toast.show({ type: "error", text1: "Validation Error", text2: "Please fill all required fields" });
+        if (!userInfo?.isVerified) {
+            Toast.show({
+                type: "error",
+                text1: "Email Not Verified",
+                text2: "Please verify your email address first"
+            });
+            return;
+        }
+
+        if (!isIdentityVerified) {
+            Toast.show({
+                type: "error",
+                text1: "Identity Verification Required",
+                text2: "Please complete Aadhaar/identity verification in your profile before adding a pet"
+            });
+            return;
+        }
+
+        const selectedBreed = breed === "Other" ? customBreed.trim() : breed;
+        if (!name.trim() || !selectedBreed || !location.trim()) {
+            Toast.show({ type: "error", text1: "Validation Error", text2: "Please fill all required fields (Name, Breed, Location)" });
             return;
         }
         if (images.length === 0) {
@@ -120,14 +150,6 @@ const AddPets = () => {
         try {
             setIsSubmitting(true);
 
-            if (userInfo) {
-                if (!userInfo.isVerified) {
-                    Toast.show({ type: "error", text1: "Error", text2: "Please verify first" });
-                    setIsSubmitting(false);
-                    return;
-                }
-            }
-
             const base64Images = images.map(img => `data:image/jpeg;base64,${img.base64}`);
 
             const locationParts = location.split(',').map(p => p.trim());
@@ -136,9 +158,9 @@ const AddPets = () => {
 
             const payload = {
                 images: base64Images,
-                name,
+                name: name.trim(),
                 type: petType,
-                breed,
+                breed: selectedBreed,
                 gender: gender,
                 color: color || "Unknown",
                 age: age ? Number(age) : 0,
@@ -151,7 +173,6 @@ const AddPets = () => {
             };
 
             const res = await dispatch(createPetAction(payload));
-            console.log(res)
 
             if (res && res.pet) {
                 Toast.show({ type: "success", text1: "Success", text2: "Pet added successfully!" });
@@ -167,6 +188,8 @@ const AddPets = () => {
         }
     };
 
+    const currentBreeds = PET_BREEDS[petType] || PET_BREEDS["other"];
+
     return (
         <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -180,15 +203,80 @@ const AddPets = () => {
                 </View>
 
                 <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 40 }}>
+                    {/* Verification Warning Banner if identity is not verified */}
+                    {!isIdentityVerified && (
+                        <Pressable
+                            onPress={() => router.push("/EditProfile")}
+                            className="rounded-2xl p-4 mb-4 flex-row items-center border"
+                            style={{
+                                backgroundColor: userInfo?.verificationStatus === "recheck_requested"
+                                    ? `${getColor("error", isDark)}15`
+                                    : `${getColor("warning", isDark)}15`,
+                                borderColor: userInfo?.verificationStatus === "recheck_requested"
+                                    ? `${getColor("error", isDark)}40`
+                                    : `${getColor("warning", isDark)}40`,
+                            }}
+                        >
+                            <Ionicons
+                                name={
+                                    userInfo?.verificationStatus === "recheck_requested"
+                                        ? "alert-circle"
+                                        : userInfo?.adharCardFrontImage
+                                        ? "time-outline"
+                                        : "shield-outline"
+                                }
+                                size={24}
+                                color={
+                                    userInfo?.verificationStatus === "recheck_requested"
+                                        ? getColor("error", isDark)
+                                        : getColor("warning", isDark)
+                                }
+                            />
+                            <View className="ml-3 flex-1">
+                                <Text
+                                    className="text-sm font-bold"
+                                    style={{
+                                        color:
+                                            userInfo?.verificationStatus === "recheck_requested"
+                                                ? getColor("error", isDark)
+                                                : getColor("warning", isDark),
+                                    }}
+                                >
+                                    {userInfo?.verificationStatus === "recheck_requested"
+                                        ? "Re-check Requested by Admin"
+                                        : userInfo?.adharCardFrontImage
+                                        ? "Verification Pending by Admin"
+                                        : "Identity Verification Required"}
+                                </Text>
+                                <Text className="text-xs mt-0.5" style={{ color: secondaryTextColor }}>
+                                    {userInfo?.verificationStatus === "recheck_requested"
+                                        ? "Admin requested a profile update. Tap here to check the reason and resubmit."
+                                        : userInfo?.adharCardFrontImage
+                                        ? "Your Aadhaar is submitted and pending admin approval. You can create listings once verified."
+                                        : "Your Aadhaar / Identity must be verified by admin before listing pets. Tap here to complete verification."}
+                                </Text>
+                            </View>
+                            <Ionicons
+                                name="chevron-forward"
+                                size={18}
+                                color={
+                                    userInfo?.verificationStatus === "recheck_requested"
+                                        ? getColor("error", isDark)
+                                        : getColor("warning", isDark)
+                                }
+                            />
+                        </Pressable>
+                    )}
+
                     <Text className="text-sm color-textPrimary mb-2">Photos</Text>
 
                     <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-4">
                         {images.length === 0 ? (
                             <Pressable
                                 onPress={pickImage}
-                                className="h-40 w-40 rounded-2xl bg-backgroundSecondary items-center justify-center mr-3"
+                                className="h-40 w-40 rounded-2xl bg-backgroundSecondary items-center justify-center mr-3 border border-border"
                             >
-                                <Ionicons name="image-outline" size={36} color={isDark ? "#e0e0e0" : "#1a1a1a"} />
+                                <Ionicons name="image-outline" size={36} color={primaryTextColor} />
                                 <Text className="text-xs mt-2 color-textSecondary">Add Photo</Text>
                             </Pressable>
                         ) : (
@@ -197,17 +285,17 @@ const AddPets = () => {
                                     <Image source={{ uri: img.uri }} className="h-40 w-40 rounded-2xl" resizeMode="cover" />
                                     <Pressable
                                         onPress={() => setImages((prev) => prev.filter((_, idx) => idx !== i))}
-                                        className="absolute top-1 right-1 bg-white rounded-full p-1"
+                                        className="absolute top-1 right-1 bg-backgroundSecondary rounded-full p-1 border border-border"
                                     >
-                                        <Ionicons name="close" size={16} color="#E0583D" />
+                                        <Ionicons name="close" size={16} color={accentColor} />
                                     </Pressable>
                                 </View>
                             ))
                         )}
 
                         {images.length < 2 && (
-                            <Pressable onPress={pickImage} className="h-40 w-40 rounded-2xl bg-backgroundSecondary items-center justify-center border border-dashed border-gray-400">
-                                <Ionicons name="add" size={28} color={isDark ? "#e0e0e0" : "#1a1a1a"} />
+                            <Pressable onPress={pickImage} className="h-40 w-40 rounded-2xl bg-backgroundSecondary items-center justify-center border border-dashed border-border">
+                                <Ionicons name="add" size={28} color={primaryTextColor} />
                                 <Text className="text-xs mt-2 color-textSecondary opacity-70">Add Photo</Text>
                             </Pressable>
                         )}
@@ -218,65 +306,80 @@ const AddPets = () => {
                         value={name}
                         onChangeText={setName}
                         placeholder="Enter pet name"
-                        placeholderTextColor="#9ca3af"
-                        className="bg-backgroundSecondary text-textPrimary rounded-xl h-12 px-3 mb-4 border border-gray-200 dark:border-gray-800"
+                        placeholderTextColor={placeholderColor}
+                        className="bg-backgroundSecondary color-textPrimary rounded-xl h-12 px-3 mb-4 border border-border"
                     />
 
-                    <Text className="text-sm color-textPrimary mb-2 font-semibold">Pet Type</Text>
-                    <View className="flex-row mb-4">
-                        <Pressable
-                            onPress={() => setPetType("dog")}
-                            className={`px-4 py-2 mr-3 rounded-2xl ${petType === "dog" ? "bg-buttonPrimary" : "bg-backgroundSecondary"}`}
-                        >
-                            <Text className={"text-black dark:text-white"}>Dog</Text>
-                        </Pressable>
+                    <CustomDropdown
+                        label="Pet Type"
+                        value={petType}
+                        placeholder="Select pet type"
+                        options={PET_CATEGORIES.filter(c => c.id !== "all").map(c => ({ label: c.name, value: c.id }))}
+                        onSelect={(val) => {
+                            setPetType(val);
+                            setBreed("");
+                            setCustomBreed("");
+                        }}
+                    />
 
-                        <Pressable
-                            onPress={() => setPetType("cat")}
-                            className={`px-4 py-2 rounded-2xl ${petType === "cat" ? "bg-buttonPrimary" : "bg-backgroundSecondary"}`}
-                        >
-                            <Text className={"text-black dark:text-white"}>Cat</Text>
-                        </Pressable>
-                    </View>
-
-                    <Text className="text-sm color-textPrimary mb-2 font-semibold">Breed</Text>
-                    <TextInput
+                    <CustomDropdown
+                        label="Breed"
                         value={breed}
-                        onChangeText={setBreed}
-                        placeholder="Enter breed"
-                        placeholderTextColor="#9ca3af"
-                        className="bg-backgroundSecondary text-textPrimary rounded-xl h-12 px-3 mb-4 border border-gray-200 dark:border-gray-800"
+                        placeholder="Select breed"
+                        options={currentBreeds.map(b => ({ label: b, value: b }))}
+                        onSelect={(val) => {
+                            setBreed(val);
+                            if (val !== "Other") {
+                                setCustomBreed("");
+                            }
+                        }}
                     />
+
+                    {breed === "Other" && (
+                        <TextInput
+                            value={customBreed}
+                            onChangeText={setCustomBreed}
+                            placeholder="Type custom breed name"
+                            placeholderTextColor={placeholderColor}
+                            className="bg-backgroundSecondary color-textPrimary rounded-xl h-12 px-3 mb-4 border border-border"
+                        />
+                    )}
+
+                    {breed !== "" && breed !== "Other" && (
+                        <Text className="text-xs mb-3 font-medium" style={{ color: accentColor }}>
+                            Selected Breed: {breed}
+                        </Text>
+                    )}
 
                     <Text className="text-sm color-textPrimary mb-2 font-semibold">Age (years)</Text>
                     <TextInput
                         value={age}
                         onChangeText={setAge}
                         placeholder="Enter age in years"
-                        placeholderTextColor="#9ca3af"
+                        placeholderTextColor={placeholderColor}
                         keyboardType="numeric"
-                        className="bg-backgroundSecondary text-textPrimary rounded-xl h-12 px-3 mb-4 border border-gray-200 dark:border-gray-800"
+                        className="bg-backgroundSecondary color-textPrimary rounded-xl h-12 px-3 mb-4 border border-border"
                     />
 
                     <Text className="text-sm color-textPrimary mb-2 font-semibold">Gender</Text>
                     <View className="flex-row mb-4">
                         <Pressable
                             onPress={() => setGender("male")}
-                            className={`px-4 py-2 mr-3 rounded-2xl ${gender === "male" ? "bg-buttonPrimary" : "bg-backgroundSecondary"}`}
+                            className={`px-4 py-2 mr-3 rounded-2xl ${gender === "male" ? "bg-buttonPrimary" : "bg-backgroundSecondary border border-border"}`}
                         >
-                            <Text className={"text-black dark:text-white"}>Male</Text>
+                            <Text className={gender === "male" ? "text-white font-semibold" : "color-textPrimary"}>Male</Text>
                         </Pressable>
                         <Pressable
                             onPress={() => setGender("female")}
-                            className={`px-4 py-2 mr-3 rounded-2xl ${gender === "female" ? "bg-buttonPrimary" : "bg-backgroundSecondary"}`}
+                            className={`px-4 py-2 mr-3 rounded-2xl ${gender === "female" ? "bg-buttonPrimary" : "bg-backgroundSecondary border border-border"}`}
                         >
-                            <Text className={"text-black dark:text-white"}>Female</Text>
+                            <Text className={gender === "female" ? "text-white font-semibold" : "color-textPrimary"}>Female</Text>
                         </Pressable>
                         <Pressable
                             onPress={() => setGender("unknown")}
-                            className={`px-4 py-2 rounded-2xl ${gender === "unknown" ? "bg-buttonPrimary" : "bg-backgroundSecondary"}`}
+                            className={`px-4 py-2 rounded-2xl ${gender === "unknown" ? "bg-buttonPrimary" : "bg-backgroundSecondary border border-border"}`}
                         >
-                            <Text className={"text-black dark:text-white"}>Unknown</Text>
+                            <Text className={gender === "unknown" ? "text-white font-semibold" : "color-textPrimary"}>Unknown</Text>
                         </Pressable>
                     </View>
 
@@ -285,8 +388,8 @@ const AddPets = () => {
                         value={color}
                         onChangeText={setColor}
                         placeholder="Enter color"
-                        placeholderTextColor="#9ca3af"
-                        className="bg-backgroundSecondary text-textPrimary rounded-xl h-12 px-3 mb-4 border border-gray-200 dark:border-gray-800"
+                        placeholderTextColor={placeholderColor}
+                        className="bg-backgroundSecondary color-textPrimary rounded-xl h-12 px-3 mb-4 border border-border"
                     />
 
                     <Text className="text-sm color-textPrimary mb-2 font-semibold">Description</Text>
@@ -294,16 +397,16 @@ const AddPets = () => {
                         value={description}
                         onChangeText={setDescription}
                         placeholder="Enter description"
-                        placeholderTextColor="#9ca3af"
+                        placeholderTextColor={placeholderColor}
                         multiline
                         numberOfLines={3}
-                        className="bg-backgroundSecondary text-textPrimary rounded-xl h-20 px-3 mb-4 border border-gray-200 dark:border-gray-800"
+                        className="bg-backgroundSecondary color-textPrimary rounded-xl h-20 px-3 mb-4 border border-border"
                     />
 
                     <Text className="text-sm color-textPrimary mb-2 font-semibold">Last Vaccination Date</Text>
                     <Pressable
                         onPress={() => setShowDatePicker(true)}
-                        className="bg-backgroundSecondary border border-gray-200 dark:border-gray-800"
+                        className="bg-backgroundSecondary border border-border"
                         style={{
                             borderRadius: 12,
                             paddingHorizontal: 14,
@@ -316,12 +419,12 @@ const AddPets = () => {
                     >
                         <Text style={{
                             fontSize: 14,
-                            color: lastVaccinationDate ? (isDark ? '#e0e0e0' : '#1a1a1a') : '#9ca3af',
+                            color: lastVaccinationDate ? primaryTextColor : placeholderColor,
                             flex: 1
                         }}>
                             {lastVaccinationDate || "Select date"}
                         </Text>
-                        <Ionicons name="calendar-outline" size={20} color={isDark ? '#888' : '#999'} />
+                        <Ionicons name="calendar-outline" size={20} color={secondaryTextColor} />
                     </Pressable>
 
                     {showDatePicker && (
@@ -345,32 +448,36 @@ const AddPets = () => {
                         />
                     )}
 
-                    <Text className="text-sm color-textPrimary mb-2 font-semibold">Tags</Text>
+                    <Text className="text-sm color-textPrimary mb-2 font-semibold mt-4">Tags</Text>
                     <View className="flex-row items-center mb-4">
-                        <View className="px-3 py-1 rounded-full bg-gray-200 mr-3 opacity-60">
-                            <Text className="text-xs">Adoption</Text>
+                        <View className="px-3 py-1 rounded-full bg-backgroundSecondary border border-border mr-3">
+                            <Text className="text-xs color-textSecondary">Adoption</Text>
                         </View>
                     </View>
 
                     <Text className="text-sm color-textPrimary mb-2 font-semibold">Location</Text>
-                    <View className="flex-row items-center bg-backgroundSecondary rounded-xl h-12 mb-4 border border-gray-200 dark:border-gray-800">
+                    <View className="flex-row items-center bg-backgroundSecondary rounded-xl h-12 mb-4 border border-border">
                         <TextInput
                             value={location}
                             onChangeText={setLocation}
                             placeholder="City, State"
-                            placeholderTextColor={isDark ? "#888" : "#999"}
-                            color={isDark ? "#e0e0e0ff" : "#1a1a1aff"}
+                            placeholderTextColor={placeholderColor}
+                            style={{ color: primaryTextColor }}
                             className="flex-1 px-3 h-12"
                         />
                         <Pressable onPress={getLocation} className="px-4 justify-center items-center h-full" disabled={locationLoading}>
-                            {locationLoading ? <ActivityIndicator size="small" color="#E0583D" /> : <Ionicons name="locate" size={20} color="#E0583D" />}
+                            {locationLoading ? <ActivityIndicator size="small" color={accentColor} /> : <Ionicons name="locate" size={20} color={accentColor} />}
                         </Pressable>
                     </View>
 
-                    <Pressable onPress={onSubmit} disabled={isSubmitting} className={`h-12 rounded-xl py-3 ${isSubmitting ? 'bg-gray-400' : 'bg-buttonPrimary shadow-sm'} items-center justify-center mb-8 flex-row`}>
+                    <Pressable
+                        onPress={onSubmit}
+                        disabled={isSubmitting}
+                        className={`h-12 rounded-xl py-3 ${isSubmitting ? 'bg-buttonDisabled' : 'bg-buttonPrimary shadow-sm'} items-center justify-center mb-8 flex-row`}
+                    >
                         {isSubmitting ? (
                             <>
-                                <ActivityIndicator size="small" color="#ffffff" />
+                                <ActivityIndicator size="small" color={getColor("white", isDark)} />
                                 <Text className="text-white font-bold ml-2">Saving Pet...</Text>
                             </>
                         ) : (

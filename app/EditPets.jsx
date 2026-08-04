@@ -1,7 +1,6 @@
-import { View, Text, ScrollView, Image, TouchableOpacity, ActivityIndicator, KeyboardAvoidingView, Platform, TextInput, Alert } from "react-native";
+import { View, Text, ScrollView, Image, TouchableOpacity, ActivityIndicator, KeyboardAvoidingView, Platform, TextInput } from "react-native";
 import React, { useState, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import * as ImagePicker from "expo-image-picker";
 import { useColorScheme } from "nativewind";
 import { getColor } from "@/constants/color";
 import { useDispatch, useSelector } from "react-redux";
@@ -17,6 +16,8 @@ const EditPets = () => {
 
   const accentColor = getColor("accent", isDark);
   const graySoftColor = getColor("graySoft", isDark);
+  const placeholderColor = getColor("inputPlaceholder", isDark);
+  const whiteColor = getColor("white", isDark);
 
   const dispatch = useDispatch();
   const { myPets } = useSelector((state) => state.pet);
@@ -40,7 +41,7 @@ const EditPets = () => {
     } else {
       setLoading(false);
     }
-  }, []);
+  }, [dispatch, myPets]);
 
   useEffect(() => {
     if (myPets && myPets.length > 0 && id) {
@@ -74,7 +75,7 @@ const EditPets = () => {
         text2: "Your pet details are being updated...",
       });
       router.back();
-    } catch (error) {
+    } catch (_error) {
       Toast.show({ type: "error", text1: "Error", text2: "Failed to update pet" });
     } finally {
       setIsSubmitting(false);
@@ -98,7 +99,7 @@ const EditPets = () => {
         </View>
         <View className="flex-1 items-center justify-center">
           <Ionicons name="paw-outline" size={60} color={graySoftColor} />
-          <Text className="text-gray-500 mt-4">Pet not found</Text>
+          <Text className="color-textSecondary mt-4">Pet not found</Text>
           <TouchableOpacity onPress={() => router.back()} className="mt-4 px-6 py-3 bg-buttonPrimary rounded-xl">
             <Text className="text-white font-semibold">Go Back</Text>
           </TouchableOpacity>
@@ -123,12 +124,12 @@ const EditPets = () => {
           <View className="px-4 gap-4">
             {/* Pet Image Preview */}
             <View className="items-center">
-              <View className="w-32 h-32 rounded-2xl overflow-hidden bg-neutral-200">
+              <View className="w-32 h-32 rounded-2xl overflow-hidden bg-backgroundSecondary border border-border">
                 {pet.images?.[0] ? (
                   <Image source={{ uri: pet.images[0] }} className="w-full h-full" resizeMode="cover" />
                 ) : (
                   <View className="w-full h-full items-center justify-center">
-                    <Ionicons name="image-outline" size={40} color="#9ca3af" />
+                    <Ionicons name="image-outline" size={40} color={placeholderColor} />
                   </View>
                 )}
               </View>
@@ -139,8 +140,8 @@ const EditPets = () => {
               value={name}
               onChangeText={setName}
               placeholder="Enter pet name"
-              placeholderTextColor="#9ca3af"
-              className="bg-backgroundSecondary text-textPrimary rounded-xl h-12 px-3 mb-4 border border-gray-200 dark:border-gray-800"
+              placeholderTextColor={placeholderColor}
+              className="bg-backgroundSecondary color-textPrimary rounded-xl h-12 px-3 mb-4 border border-border"
             />
 
             <Text className="text-sm color-textPrimary mb-2 font-semibold">Breed</Text>
@@ -148,8 +149,8 @@ const EditPets = () => {
               value={breed}
               onChangeText={setBreed}
               placeholder="Enter breed"
-              placeholderTextColor="#9ca3af"
-              className="bg-backgroundSecondary text-textPrimary rounded-xl h-12 px-3 mb-4 border border-gray-200 dark:border-gray-800"
+              placeholderTextColor={placeholderColor}
+              className="bg-backgroundSecondary color-textPrimary rounded-xl h-12 px-3 mb-4 border border-border"
             />
 
             <Text className="text-sm color-textPrimary mb-2 font-semibold">Age (years)</Text>
@@ -157,9 +158,9 @@ const EditPets = () => {
               value={age}
               onChangeText={setAge}
               placeholder="Enter age"
-              placeholderTextColor="#9ca3af"
+              placeholderTextColor={placeholderColor}
               keyboardType="numeric"
-              className="bg-backgroundSecondary text-textPrimary rounded-xl h-12 px-3 mb-4 border border-gray-200 dark:border-gray-800"
+              className="bg-backgroundSecondary color-textPrimary rounded-xl h-12 px-3 mb-4 border border-border"
             />
 
             <Text className="text-sm color-textPrimary mb-2 font-semibold">Gender</Text>
@@ -168,9 +169,9 @@ const EditPets = () => {
                 <TouchableOpacity
                   key={g}
                   onPress={() => setGender(g)}
-                  className={`px-4 py-2 mr-3 rounded-2xl ${gender === g ? "bg-buttonPrimary" : "bg-backgroundSecondary"}`}
+                  className={`px-4 py-2 mr-3 rounded-2xl ${gender === g ? "bg-buttonPrimary" : "bg-backgroundSecondary border border-border"}`}
                 >
-                  <Text className="text-black dark:text-white capitalize">{g}</Text>
+                  <Text className={gender === g ? "text-white font-semibold capitalize" : "color-textPrimary capitalize"}>{g}</Text>
                 </TouchableOpacity>
               ))}
             </View>
@@ -180,8 +181,8 @@ const EditPets = () => {
               value={color}
               onChangeText={setColor}
               placeholder="Enter color"
-              placeholderTextColor="#9ca3af"
-              className="bg-backgroundSecondary text-textPrimary rounded-xl h-12 px-3 mb-4 border border-gray-200 dark:border-gray-800"
+              placeholderTextColor={placeholderColor}
+              className="bg-backgroundSecondary color-textPrimary rounded-xl h-12 px-3 mb-4 border border-border"
             />
 
             <Text className="text-sm color-textPrimary mb-2 font-semibold">Description</Text>
@@ -189,10 +190,10 @@ const EditPets = () => {
               value={description}
               onChangeText={setDescription}
               placeholder="Enter description"
-              placeholderTextColor="#9ca3af"
+              placeholderTextColor={placeholderColor}
               multiline
               numberOfLines={3}
-              className="bg-backgroundSecondary text-textPrimary rounded-xl h-20 px-3 mb-4 border border-gray-200 dark:border-gray-800"
+              className="bg-backgroundSecondary color-textPrimary rounded-xl h-20 px-3 mb-4 border border-border"
             />
 
             <Text className="text-sm color-textPrimary mb-2 font-semibold">City</Text>
@@ -200,8 +201,8 @@ const EditPets = () => {
               value={city}
               onChangeText={setCity}
               placeholder="City"
-              placeholderTextColor="#9ca3af"
-              className="bg-backgroundSecondary text-textPrimary rounded-xl h-12 px-3 mb-4 border border-gray-200 dark:border-gray-800"
+              placeholderTextColor={placeholderColor}
+              className="bg-backgroundSecondary color-textPrimary rounded-xl h-12 px-3 mb-4 border border-border"
             />
 
             <Text className="text-sm color-textPrimary mb-2 font-semibold">State</Text>
@@ -209,18 +210,18 @@ const EditPets = () => {
               value={state}
               onChangeText={setState}
               placeholder="State"
-              placeholderTextColor="#9ca3af"
-              className="bg-backgroundSecondary text-textPrimary rounded-xl h-12 px-3 mb-6 border border-gray-200 dark:border-gray-800"
+              placeholderTextColor={placeholderColor}
+              className="bg-backgroundSecondary color-textPrimary rounded-xl h-12 px-3 mb-6 border border-border"
             />
 
             <TouchableOpacity
               onPress={handleSave}
               disabled={isSubmitting}
-              className={`h-12 rounded-xl py-3 ${isSubmitting ? "bg-gray-400" : "bg-buttonPrimary shadow-sm"} items-center justify-center flex-row`}
+              className={`h-12 rounded-xl py-3 ${isSubmitting ? "bg-buttonDisabled" : "bg-buttonPrimary shadow-sm"} items-center justify-center flex-row`}
             >
               {isSubmitting ? (
                 <>
-                  <ActivityIndicator size="small" color="#ffffff" />
+                  <ActivityIndicator size="small" color={whiteColor} />
                   <Text className="text-white font-bold ml-2">Saving...</Text>
                 </>
               ) : (

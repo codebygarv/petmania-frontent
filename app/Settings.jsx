@@ -12,10 +12,10 @@ import { getColor } from "@/constants/color";
 
 const SettingsItem = ({ icon, title, type = "switch", value, onValueChange, isDark, danger }) => {
     const textColor = danger ? "text-error" : "text-textPrimary";
-    const iconColor = danger ? getColor("error", isDark) : getColor("graySoft", isDark);
+    const iconColor = danger ? getColor("error", isDark) : getColor("textSecondary", isDark);
 
     return (
-        <View className="flex-row items-center justify-between py-3.5 px-4 bg-backgroundSecondary rounded-xl mb-2.5">
+        <View className="flex-row items-center justify-between py-3.5 px-4 bg-backgroundSecondary border border-border rounded-xl mb-2.5">
             <View className="flex-row items-center">
                 <Ionicons name={icon} size={22} color={iconColor} style={{ marginRight: 12 }} />
                 <Text className={`text-base font-medium ${textColor}`}>{title}</Text>
@@ -24,8 +24,8 @@ const SettingsItem = ({ icon, title, type = "switch", value, onValueChange, isDa
                 <Switch
                     value={value}
                     onValueChange={onValueChange}
-                    trackColor={{ false: isDark ? "#444" : "#ccc", true: getColor("accent", isDark) }}
-                    thumbColor={"#f4f3f4"}
+                    trackColor={{ false: getColor("border", isDark), true: getColor("accent", isDark) }}
+                    thumbColor={getColor("white", isDark)}
                 />
             )}
             {type === "arrow" && (
@@ -82,10 +82,10 @@ const Settings = () => {
 
     return (
         <ScrollView className="flex-1 bg-background" showsVerticalScrollIndicator={false}>
-            <View className="flex gap-4 pt-7 pl-6 pr-6 h-screen bg-background">
-                <View className="flex flex-row align-center">
+            <View className="flex gap-4 pt-7 pl-6 pr-6 bg-background pb-12">
+                <View className="flex flex-row items-center mb-2">
                     <BackButton />
-                    <Text className="text-center ml-24 color-textPrimary my-auto font-semibold text-xl">
+                    <Text className="color-textPrimary font-semibold text-xl ml-4">
                         Settings
                     </Text>
                 </View>
@@ -102,7 +102,7 @@ const Settings = () => {
                                 <TouchableOpacity
                                     key={th}
                                     onPress={() => handleThemeChange(th)}
-                                    className={`flex-1 py-3 rounded-xl items-center ${isSelected ? 'bg-buttonPrimary' : 'bg-backgroundSecondary'}`}
+                                    className={`flex-1 py-3 rounded-xl items-center border ${isSelected ? 'bg-buttonPrimary border-buttonPrimary' : 'bg-backgroundSecondary border-border'}`}
                                 >
                                     <Text className={`text-sm font-semibold capitalize ${isSelected ? 'text-white' : 'text-textSecondary'}`}>
                                         {th}

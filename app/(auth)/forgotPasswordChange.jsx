@@ -29,39 +29,36 @@ const ForgotPasswordChange = () => {
   const loading = useSelector((state) => state.user.loading);
 
   const handlePasswordChange = async (values) => {
-    console.log("Password Change Data:", values);  // remove in production
-
     const res = await dispatch(updatePasswordAction(values));
 
-    if (res?.error?.success === false) {
-      Toast.show({
-        type: 'error',
-        text1: 'Password Update Failed',
-        text2: res?.error?.error?.message,
-      });
-    } else if (res?.success === true) {
+    if (res?.success === true) {
       Toast.show({
         type: 'success',
         text1: 'Password Updated',
         text2: 'Your password has been successfully updated.',
       });
-      // redirect to login or home
-      router.push("/(auth)");
+      router.replace("/(auth)");
     } else {
+      const errorMsg =
+        res?.error?.message ||
+        res?.error?.error?.message ||
+        (typeof res?.error === 'string' && res.error) ||
+        res?.message ||
+        'Password update failed. Please try again.';
       Toast.show({
         type: 'error',
         text1: 'Password Update Failed',
-        text2: 'An unexpected error occurred. Please try again.',
+        text2: errorMsg,
       });
     }
   };
 
   return (
     <View className="flex gap-4 pt-7 pl-6 pr-6 h-screen bg-background">
-      <View className="flex flex-row align-center">
+      <View className="flex flex-row items-center mb-2">
         <BackButton />
-        <Text className="text-center mx-20 color-textPrimary my-auto font-semibold text-xl">
-          Forgot Password
+        <Text className="color-textPrimary font-semibold text-xl ml-4">
+          Reset Password
         </Text>
       </View>
 
@@ -90,7 +87,7 @@ const ForgotPasswordChange = () => {
               onChangeText={handleChange("password")}
             />
             {touched.password && errors.password && (
-              <Text className="text-red-500 text-xs">{errors.password}</Text>
+              <Text className="text-error text-xs">{errors.password}</Text>
             )}
 
             <Input
@@ -101,7 +98,7 @@ const ForgotPasswordChange = () => {
               onChangeText={handleChange("confirmPassword")}
             />
             {touched.confirmPassword && errors.confirmPassword && (
-              <Text className="text-red-500 text-xs">{errors.confirmPassword}</Text>
+              <Text className="text-error text-xs">{errors.confirmPassword}</Text>
             )}
 
             <Button

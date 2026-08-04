@@ -84,7 +84,7 @@ const PetDetails = () => {
         </View>
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color={accentColor} />
-          <Text className="text-gray-500 mt-4">Loading pet details...</Text>
+          <Text className="color-textSecondary mt-4">Loading pet details...</Text>
         </View>
       </View>
     );
@@ -100,7 +100,7 @@ const PetDetails = () => {
         </View>
 
         {/* Pet Images */}
-        <View className="h-80 bg-neutral-200">
+        <View className="h-80 bg-backgroundSecondary">
           {pet.images && pet.images.length > 0 ? (
             <Image
               source={{ uri: pet.images[0] }}
@@ -108,8 +108,8 @@ const PetDetails = () => {
               resizeMode="cover"
             />
           ) : (
-            <View className="w-full h-full bg-neutral-300 items-center justify-center">
-              <Ionicons name="image-outline" size={60} color="#9ca3af" />
+            <View className="w-full h-full bg-backgroundSecondary items-center justify-center">
+              <Ionicons name="image-outline" size={60} color={getColor("inputPlaceholder", isDark)} />
             </View>
           )}
         </View>
@@ -127,7 +127,7 @@ const PetDetails = () => {
               <Ionicons
                 name={isFavorite ? "heart" : "heart-outline"}
                 size={28}
-                color={isFavorite ? "#E0583D" : "#6b7280"}
+                color={isFavorite ? getColor("accent", isDark) : getColor("textSecondary", isDark)}
               />
             </TouchableOpacity>
           </View>
@@ -151,19 +151,19 @@ const PetDetails = () => {
 
           {/* Quick Info Grid */}
           <View className="flex flex-row flex-wrap gap-3 mt-5">
-            <View className="flex items-center bg-backgroundSecondary rounded-xl px-4 py-3 min-w-[100px]">
+            <View className="flex items-center bg-backgroundSecondary border border-border rounded-xl px-4 py-3 min-w-[100px]">
               <Ionicons name="time-outline" size={20} color={accentColor} />
-              <Text className="text-xs text-gray-500 mt-1">Age</Text>
+              <Text className="text-xs color-textSecondary mt-1">Age</Text>
               <Text className="text-base font-semibold color-textPrimary">{pet.age} yrs</Text>
             </View>
-            <View className="flex items-center bg-backgroundSecondary rounded-xl px-4 py-3 min-w-[100px]">
+            <View className="flex items-center bg-backgroundSecondary border border-border rounded-xl px-4 py-3 min-w-[100px]">
               <Ionicons name="male-female-outline" size={20} color={accentColor} />
-              <Text className="text-xs text-gray-500 mt-1">Gender</Text>
+              <Text className="text-xs color-textSecondary mt-1">Gender</Text>
               <Text className="text-base font-semibold color-textPrimary capitalize">{pet.gender}</Text>
             </View>
-            <View className="flex items-center bg-backgroundSecondary rounded-xl px-4 py-3 min-w-[100px]">
+            <View className="flex items-center bg-backgroundSecondary border border-border rounded-xl px-4 py-3 min-w-[100px]">
               <Ionicons name="location-outline" size={20} color={accentColor} />
-              <Text className="text-xs text-gray-500 mt-1">Location</Text>
+              <Text className="text-xs color-textSecondary mt-1">Location</Text>
               <Text className="text-base font-semibold color-textPrimary capitalize">{pet.city || "-"}</Text>
             </View>
           </View>
@@ -178,12 +178,12 @@ const PetDetails = () => {
 
           {/* Vaccination Info */}
           {pet.lastVaccinationDate && (
-            <View className="mt-5 bg-backgroundSecondary rounded-xl p-4">
+            <View className="mt-5 bg-backgroundSecondary border border-border rounded-xl p-4">
               <View className="flex flex-row items-center gap-2">
                 <Ionicons name="shield-checkmark-outline" size={20} color={accentColor} />
                 <Text className="text-sm font-medium color-textPrimary">Vaccination Up to Date</Text>
               </View>
-              <Text className="text-xs text-gray-500 mt-1">
+              <Text className="text-xs color-textSecondary mt-1">
                 Last vaccinated: {formatDate(pet.lastVaccinationDate)}
               </Text>
             </View>
@@ -192,7 +192,7 @@ const PetDetails = () => {
           {/* Owner Info */}
           <View className="mt-5">
             <Text className="text-base font-semibold color-textPrimary mb-3">Owner Information</Text>
-            <View className="bg-backgroundSecondary rounded-xl p-4">
+            <View className="bg-backgroundSecondary border border-border rounded-xl p-4">
               <View className="flex flex-row items-center gap-3">
                 {pet.userId?.profileImage ? (
                   <Image
@@ -212,7 +212,7 @@ const PetDetails = () => {
                     {pet.userId?.name || "Unknown"}
                   </Text>
                   {pet.userId?.phoneNumber && (
-                    <Text className="text-xs text-gray-500 mt-0.5">
+                    <Text className="text-xs color-textSecondary mt-0.5">
                       {pet.userId.phoneNumber}
                     </Text>
                   )}
@@ -223,7 +223,7 @@ const PetDetails = () => {
 
           {/* Listed Date */}
           <View className="mt-4">
-            <Text className="text-xs text-gray-400">
+            <Text className="text-xs color-textSecondary opacity-80">
               Listed on {formatDate(pet.createdAt)}
             </Text>
           </View>
@@ -232,12 +232,12 @@ const PetDetails = () => {
 
       {/* Bottom Action Bar */}
       {!pet.isAdopted && !isOwnPet && (
-        <View className="p-4 bg-background border-t border-neutral-200">
+        <View className="p-4 bg-background border-t border-border">
           <TouchableOpacity
             onPress={handleContactOwner}
             className="bg-buttonPrimary rounded-xl py-4 flex-row items-center justify-center"
           >
-            <Ionicons name="chatbubble-ellipses-outline" size={20} color="white" />
+            <Ionicons name="chatbubble-ellipses-outline" size={20} color={getColor("white", isDark)} />
             <Text className="text-white font-semibold ml-2 text-base">Contact Owner</Text>
           </TouchableOpacity>
         </View>

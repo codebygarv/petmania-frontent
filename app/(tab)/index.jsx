@@ -1,11 +1,8 @@
-import { View, Text, Pressable, ScrollView, ActivityIndicator } from "react-native";
+import { View, Text, Pressable, ScrollView, ActivityIndicator, Image } from "react-native";
 import React, { useEffect, useState, useCallback } from "react";
-import BackButton from "@/components/BackButton";
-import { Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useColorScheme } from "nativewind";
 import { getColor } from "@/constants/color";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Location from "expo-location";
 import { config } from "@/constants/config";
 import { useFocusEffect, router } from "expo-router";
@@ -16,49 +13,62 @@ import { getPetsAction } from "@/redux/actions/petActions";
 import { getUserDetailsAction, toggleFavouriteAction, getFavouritesAction } from "@/redux/actions/userActions";
 import HomeSkeleton from "@/components/HomeSkeleton/HomeSkeleton";
 import EmptyState from "@/components/EmptyState";
+import { PET_CATEGORIES } from "@/constants/petTypes";
+import { Modal } from "react-native";
+import DogIcon from "@/components/icons/DogIcon";
+import CatIcon from "@/components/icons/CatIcon";
+import BirdIcon from "@/components/icons/BirdIcon";
+import RabbitIcon from "@/components/icons/RabbitIcon";
+import FishIcon from "@/components/icons/FishIcon";
+import HamsterIcon from "@/components/icons/HamsterIcon";
+import HorseIcon from "@/components/icons/HorseIcon";
 
 const Index = () => {
   const { colorScheme } = useColorScheme();
   const isDark = colorScheme === "dark";
   const { userInfo: user, favourites } = useSelector((state) => state.user);
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [activeCategory, setActiveCategory] = useState("dog");
+  const [activeCategory, setActiveCategory] = useState("all");
   const [showSearch, setShowSearch] = useState(false);
   const [location, setLocation] = useState(null);
   const [locationLoading, setLocationLoading] = useState(false);
   const [locationPermissionDenied, setLocationPermissionDenied] = useState(false);
-  const [petData, setPetData] = useState({ dog: [], cat: [] });
+  const [petData, setPetData] = useState([]);
   const [petsLoading, setPetsLoading] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
+  const [filterGender, setFilterGender] = useState("all");
+  const [filterAge, setFilterAge] = useState("all");
   const dispatch = useDispatch();
 
   const accentColor = getColor("accent", isDark);
   const whiteColor = getColor("white", isDark);
-  const blackColor = getColor("black", isDark);
 
-  const fetchUserDetails = async () => {
+  const fetchUserDetails = useCallback(async () => {
     await dispatch(getUserDetailsAction());
     await dispatch(getFavouritesAction());
-  };
+  }, [dispatch]);
 
   useEffect(() => {
     fetchUserDetails();
-  }, []);
+  }, [fetchUserDetails]);
 
   const handleToggleFavourite = (petId) => {
     dispatch(toggleFavouriteAction(petId));
   };
 
 
-  const fetchPets = async (city) => {
+  const fetchPets = useCallback(async (city, category = activeCategory, gender = filterGender, age = filterAge) => {
     try {
       setPetsLoading(true);
 
-      const res = await dispatch(getPetsAction(city));
+      let minAge = undefined;
+      let maxAge = undefined;
+      if (age === "baby") { minAge = 0; maxAge = 1; }
+      else if (age === "young") { minAge = 1; maxAge = 3; }
+      else if (age === "adult") { minAge = 3; maxAge = 30; }
+
+      const res = await dispatch(getPetsAction({ city, type: category, gender, minAge, maxAge }));
 
       if (res && res.pets) {
-        const fetchedDogs = res.pets.filter(p => (p.type || '').toLowerCase() === 'dog');
-        const fetchedCats = res.pets.filter(p => (p.type || '').toLowerCase() === 'cat');
-
         const mapPet = (p, idx) => ({
           id: p._id,
           name: p.name,
@@ -67,17 +77,14 @@ const Index = () => {
           bg: ['bg-pink-100', 'bg-blue-100', 'bg-orange-100', 'bg-green-100'][idx % 4]
         });
 
-        setPetData({
-          dog: fetchedDogs.map(mapPet),
-          cat: fetchedCats.map(mapPet)
-        });
+        setPetData(res.pets.map(mapPet));
       }
     } catch (err) {
       console.error("Error fetching pets", err);
     } finally {
       setPetsLoading(false);
     }
-  };
+  }, [dispatch, activeCategory, filterGender, filterAge]);
 
   useFocusEffect(
     useCallback(() => {
@@ -86,13 +93,10 @@ const Index = () => {
       } else if (!locationLoading && !location) {
         fetchPets('');
       }
-    }, [location?.city, locationLoading])
+    }, [location, locationLoading, fetchPets])
   );
 
-  const categories = [
-    { name: "dog", ImageSrc: config.categoryDogImage },
-    { name: "Cat", ImageSrc: config.categoryCatImage },
-  ];
+
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -219,12 +223,20 @@ const Index = () => {
                 </View>
               )
             }
-            <Pressable
-              onPress={() => setShowSearch(true)}
-              className="flex justify-center items-center w-10 h-10 p-1 rounded-2xl overflow-hidden bg-loginSigcnupImageBg"
-            >
-              <Ionicons name="search-outline" size={20} color={whiteColor} />
-            </Pressable>
+            <View className="flex-row items-center">
+              <Pressable
+                onPress={() => setShowFilters(true)}
+                className="flex justify-center items-center w-10 h-10 p-1 rounded-2xl overflow-hidden bg-backgroundSecondary border border-border mr-2"
+              >
+                <Ionicons name="options" size={20} color={accentColor} />
+              </Pressable>
+              <Pressable
+                onPress={() => setShowSearch(true)}
+                className="flex justify-center items-center w-10 h-10 p-1 rounded-2xl overflow-hidden bg-loginSigcnupImageBg"
+              >
+                <Ionicons name="search-outline" size={20} color={whiteColor} />
+              </Pressable>
+            </View>
           </View>
 
           <ScrollView
@@ -239,40 +251,52 @@ const Index = () => {
                 {getGreeting()}
               </Text>
             </View>
-            <View className="flex flex-row">
-              {categories.map((categ, index) => {
-                const isActive = index === activeIndex;
-
-                return (
-                  <Pressable
-                    key={index}
-                    onPress={() => {
-                      setActiveIndex(index);
-                      setActiveCategory(categ.name.toLowerCase());
-                    }}
-                    className="mr-6 items-center"
-                  >
-                    <View
-                      className={`h-24 w-16 rounded-full items-center justify-center
-              ${isActive ? "bg-buttonPrimary" : "bg-backgroundSecondary"}`}
+            <View className="flex flex-row mb-4">
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                {PET_CATEGORIES.map((categ, index) => {
+                  const isActive = activeCategory === categ.id;
+                  return (
+                    <Pressable
+                      key={index}
+                      onPress={() => {
+                        setActiveCategory(categ.id);
+                        if (location?.city) fetchPets(location.city, categ.id);
+                        else fetchPets('', categ.id);
+                      }}
+                      className="mr-4 items-center"
                     >
-                      <View className="h-10 w-10 bg-white rounded-full items-center justify-center">
-                        <Image
-                          source={categ.ImageSrc}
-                          className="h-6 w-6"
-                          resizeMode="contain"
-                        />
+                      <View
+                        className={`h-16 w-16 rounded-3xl items-center justify-center
+                ${isActive ? "bg-buttonPrimary" : "bg-backgroundSecondary border border-border"}`}
+                      >
+                        {categ.id === "dog" ? (
+                          <DogIcon width={32} height={32} color={isActive ? whiteColor : accentColor} />
+                        ) : categ.id === "cat" ? (
+                          <CatIcon width={32} height={32} color={isActive ? whiteColor : accentColor} />
+                        ) : categ.id === "bird" ? (
+                          <BirdIcon width={32} height={32} color={isActive ? whiteColor : accentColor} />
+                        ) : categ.id === "rabbit" ? (
+                          <RabbitIcon width={32} height={32} color={isActive ? whiteColor : accentColor} />
+                        ) : categ.id === "fish" ? (
+                          <FishIcon width={32} height={32} color={isActive ? whiteColor : accentColor} />
+                        ) : categ.id === "hamster" ? (
+                          <HamsterIcon width={32} height={32} color={isActive ? whiteColor : accentColor} />
+                        ) : categ.id === "horse" ? (
+                          <HorseIcon width={32} height={32} color={isActive ? whiteColor : accentColor} />
+                        ) : (
+                           <Ionicons name={categ.icon} size={28} color={isActive ? whiteColor : accentColor} />
+                        )}
                       </View>
                       <Text
-                        className={`text-xs text-center mt-2
-                ${isActive ? "text-white" : "text-gray-600"}`}
+                        className={`text-xs text-center mt-2 font-semibold
+                ${isActive ? "color-textPrimary" : "color-textSecondary"}`}
                       >
                         {categ.name}
                       </Text>
-                    </View>
-                  </Pressable>
-                );
-              })}
+                    </Pressable>
+                  );
+                })}
+              </ScrollView>
             </View>
 
             <View className="flex flex-row flex-wrap justify-between mt-6">
@@ -283,16 +307,16 @@ const Index = () => {
               ) :
                 (petsLoading ? (
                   <HomeSkeleton />
-                ) : petData[activeCategory]?.length === 0 ? (
+                ) : petData?.length === 0 ? (
                   <EmptyState
                     title="No Pets Found"
-                    description="There are no pets available in your area yet. Try changing your category or check back later!"
+                    description="There are no pets available matching your criteria. Try changing your category or filters!"
                     icon="paw-outline"
                   />
                 ) : (
-                  petData[activeCategory]?.map((pet) => (
+                  petData?.map((pet) => (
                     <View key={pet.id} className="w-[48%] mb-4">
-                      <View className={`rounded-3xl p-2 ${pet.bg}`}>
+                      <View className={`rounded-3xl p-2 ${pet.bg} ${isDark ? 'opacity-90' : ''} border border-border`}>
                         <Pressable
                           className="absolute top-2 right-2 z-10 p-1"
                           onPress={() => handleToggleFavourite(pet.id)}
@@ -300,7 +324,7 @@ const Index = () => {
                           <Ionicons
                             name={favourites?.some(fav => fav._id === pet.id) ? "heart" : "heart-outline"}
                             size={20}
-                            color={favourites?.some(fav => fav._id === pet.id) ? accentColor : accentColor}
+                            color={accentColor}
                           />
                         </Pressable>
 
@@ -324,7 +348,7 @@ const Index = () => {
                             size={14}
                             color={accentColor}
                           />
-                          <Text className="text-xs ml-1 text-gray-500 overflow-hidden line-clamp-1 w-[80%]">
+                          <Text className="text-xs ml-1 color-textSecondary overflow-hidden line-clamp-1 w-[80%]">
                             {pet.distance}
                           </Text>
                         </View>
@@ -336,6 +360,80 @@ const Index = () => {
           </ScrollView>
         </View>
       )}
+
+      {/* Filter Modal */}
+      <Modal
+        visible={showFilters}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowFilters(false)}
+      >
+        <View className="flex-1 justify-end bg-black/50">
+          <View className="bg-background rounded-t-3xl p-6 h-[60%]">
+            <View className="flex-row justify-between items-center mb-6">
+              <Text className="text-xl font-bold color-textPrimary">Filters</Text>
+              <Pressable onPress={() => setShowFilters(false)}>
+                <Ionicons name="close" size={24} color={getColor("textSecondary", isDark)} />
+              </Pressable>
+            </View>
+
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <Text className="text-sm font-semibold color-textPrimary mb-3">Gender</Text>
+              <View className="flex-row gap-3 mb-6">
+                {["all", "male", "female"].map((g) => (
+                  <Pressable
+                    key={g}
+                    onPress={() => setFilterGender(g)}
+                    className={`px-4 py-2 rounded-2xl ${filterGender === g ? "bg-buttonPrimary" : "bg-backgroundSecondary border border-border"}`}
+                  >
+                    <Text className={`font-semibold capitalize ${filterGender === g ? "text-white" : "color-textPrimary"}`}>{g}</Text>
+                  </Pressable>
+                ))}
+              </View>
+
+              <Text className="text-sm font-semibold color-textPrimary mb-3">Age</Text>
+              <View className="flex-row flex-wrap gap-3 mb-6">
+                {[
+                  { id: "all", label: "Any Age" },
+                  { id: "baby", label: "Baby (< 1 yr)" },
+                  { id: "young", label: "Young (1-3 yrs)" },
+                  { id: "adult", label: "Adult (3+ yrs)" },
+                ].map((a) => (
+                  <Pressable
+                    key={a.id}
+                    onPress={() => setFilterAge(a.id)}
+                    className={`px-4 py-2 rounded-2xl mb-2 ${filterAge === a.id ? "bg-buttonPrimary" : "bg-backgroundSecondary border border-border"}`}
+                  >
+                    <Text className={`font-semibold ${filterAge === a.id ? "text-white" : "color-textPrimary"}`}>{a.label}</Text>
+                  </Pressable>
+                ))}
+              </View>
+            </ScrollView>
+
+            <View className="flex-row gap-4 mt-auto">
+              <Pressable
+                onPress={() => {
+                  setFilterGender("all");
+                  setFilterAge("all");
+                }}
+                className="flex-1 py-3 rounded-2xl bg-backgroundSecondary border border-border items-center"
+              >
+                <Text className="font-bold color-textPrimary">Reset</Text>
+              </Pressable>
+              <Pressable
+                onPress={() => {
+                  setShowFilters(false);
+                  if (location?.city) fetchPets(location.city);
+                  else fetchPets('');
+                }}
+                className="flex-1 py-3 rounded-2xl bg-buttonPrimary items-center"
+              >
+                <Text className="font-bold text-white">Apply</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };

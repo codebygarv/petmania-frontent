@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, ActivityIndicator } from "react-native";
+import { View, Text, ActivityIndicator } from "react-native";
 import React from "react";
 import BackButton from "@/components/BackButton";
 import Input from "@/components/Input";
@@ -35,33 +35,33 @@ const ForgotPassword = () => {
 
     console.log("Forgot Password Response:", res);
 
-    if (res?.error?.success === false) {
-      Toast.show({
-        type: 'error',
-        text1: 'Request Failed',
-        text2: res?.error?.error?.message
-      });
-    } else if (res?.success === true) {
+    if (res?.success === true) {
       Toast.show({
         type: 'success',
         text1: 'Code Sent',
-        text2: res?.message
+        text2: res?.message || 'Verification code sent to your email.'
       });
       router.push('/verification?type=forgot-password');
     } else {
+      const errorMsg =
+        res?.error?.message ||
+        res?.error?.error?.message ||
+        (typeof res?.error === 'string' && res.error) ||
+        res?.message ||
+        'User with this email was not found. Please check your email.';
       Toast.show({
         type: 'error',
         text1: 'Request Failed',
-        text2: 'An unexpected error occurred. Please try again.'
+        text2: errorMsg
       });
     }
   };
 
   return (
     <View className="flex gap-4 pt-7 pl-6 pr-6 h-screen bg-background">
-      <View className="flex flex-row align-center">
+      <View className="flex flex-row items-center mb-2">
         <BackButton />
-        <Text className="text-center mx-20 color-textPrimary my-auto font-semibold text-xl">
+        <Text className="color-textPrimary font-semibold text-xl ml-4">
           Forgot Password
         </Text>
       </View>
@@ -69,10 +69,10 @@ const ForgotPassword = () => {
       <View className="flex gap-4">
         <View className="flex gap-3 mt-4">
           <Text className="color-textSecondary text-sm leading-6">
-            We'll send you a 4 digit code on your email to reset your password.
+            We&apos;ll send you a 4 digit code on your email to reset your password.
           </Text>
           <Text className="color-textSecondary text-sm leading-6">
-            If you don't receive an email within 5 minutes, please check your
+            If you don&apos;t receive an email within 5 minutes, please check your
             spam folder or contact our support team.
           </Text>
 
@@ -90,7 +90,7 @@ const ForgotPassword = () => {
                   onChangeText={handleChange("email")}
                 />
                 {touched.email && errors.email && (
-                  <Text className="text-red-500 text-xs ">
+                  <Text className="text-error text-xs ">
                     {errors.email}
                   </Text>
                 )}

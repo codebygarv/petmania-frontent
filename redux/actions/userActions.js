@@ -1,13 +1,6 @@
-import axiosInstance from '../../api/axiosInstance'
+import axiosInstance from '../../api/axiosInstance';
 import { userConstants } from '../constants/usersConstants';
-import * as WebBrowser from "expo-web-browser";
-import * as Google from "expo-auth-session/providers/google";
-
-WebBrowser.maybeCompleteAuthSession();
-
-const discovery = {
-    authorizationEndpoint: "https://accounts.google.com/o/oauth2/v2/auth",
-};
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const loginAction = (userData) => {
     return async (dispatch) => {
@@ -61,35 +54,6 @@ export const googleLoginAction = (accessToken) => {
         } catch (error) {
             dispatch({
                 type: userConstants.USER_GOOGLE_LOGIN_FAILURE,
-                payload: { error: error?.response?.data }
-            });
-
-            return { error: { message: error?.response?.data?.message || error?.response?.data } };
-        }
-    };
-};
-
-export const facebookLoginAction = (accessToken) => {
-    return async (dispatch) => {
-        dispatch({ type: userConstants.USER_FACEBOOK_LOGIN_REQUEST });
-        try {
-            const res = await axiosInstance.post('/user/facebook', { accessToken });
-            if (res.status === 200) {
-                dispatch({
-                    type: userConstants.USER_FACEBOOK_LOGIN_ACCEPT,
-                    payload: { user: res.data.data.user },
-                });
-                return res.data;
-            } else {
-                dispatch({
-                    type: userConstants.USER_FACEBOOK_LOGIN_FAILURE,
-                    payload: { error: res.data },
-                });
-                return { error: res.data };
-            }
-        } catch (error) {
-            dispatch({
-                type: userConstants.USER_FACEBOOK_LOGIN_FAILURE,
                 payload: { error: error?.response?.data }
             });
 
@@ -284,9 +248,12 @@ export const updatePasswordAction = (passwordData) => {
     return async (dispatch) => {
         dispatch({ type: userConstants.USER_UPDATE_PASSWORD_REQUEST });
         try {
-            const res = await axiosInstance.post('/user/forgotPassword/changePassword', passwordData
-            );
+            const tempToken = await AsyncStorage.getItem("verifyChangePassword");
+            const config = tempToken ? { headers: { Authorization: `Bearer ${tempToken}` } } : {};
+            const res = await axiosInstance.post('/user/forgotPassword/changePassword', passwordData, config);
             if (res.status === 200) {
+                await AsyncStorage.removeItem("verifyChangePassword");
+                await AsyncStorage.removeItem("forgotPasswordemail");
                 dispatch({
                     type: userConstants.USER_UPDATE_PASSWORD_ACCEPT,
                     payload: { message: res.data.message },
@@ -299,14 +266,14 @@ export const updatePasswordAction = (passwordData) => {
                     type: userConstants.USER_UPDATE_PASSWORD_FAILURE,
                     payload: { error: res.data?.error },
                 });
-                return { error: res.data?.errors };
+                return { error: res.data?.errors || res.data?.error };
             }
         } catch (error) {
             dispatch({
                 type: userConstants.USER_UPDATE_PASSWORD_FAILURE,
                 payload: { error: error?.response?.data }
             });
-            return { error: { message: error?.response?.data?.message || error?.response?.data } };
+            return { error: { message: error?.response?.data?.message || error?.response?.data?.error?.message || error?.message || "Password update failed" } };
         }
     };
 }
@@ -335,7 +302,7 @@ export const resetPasswordAction = (passwordData) => {
                 type: userConstants.USER_UPDATE_PASSWORD_FAILURE,
                 payload: { error: error?.response?.data }
             });
-            return { error: { message: error?.response?.data?.message || error?.response?.data } };
+            return { error: { message: error?.response?.data?.message || error?.response?.data?.error?.message || error?.message || "Password reset failed" } };
         }
     };
 };
@@ -351,7 +318,7 @@ export const resendOtpAction = (emailData) => {
                 return { error: res.data };
             }
         } catch (error) {
-            return { error: { message: error?.response?.data?.message || error?.response?.data } };
+            return { error: { message: error?.response?.data?.message || error?.response?.data?.error?.message || error?.message || "Failed to resend OTP" } };
         }
     };
 };

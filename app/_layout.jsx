@@ -14,6 +14,7 @@ import Toast from "react-native-toast-message";
 import { toastConfig } from "../config/toastConfig";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as WebBrowser from "expo-web-browser";
+import { getColor } from "@/constants/color";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -22,7 +23,7 @@ export default function RootLayout() {
   const isDark = colorScheme === "dark";
 
   useEffect(() => {
-    SystemUI.setBackgroundColorAsync(isDark ? "#000000" : "#ffffff");
+    SystemUI.setBackgroundColorAsync(getColor("background", isDark));
   }, [isDark]);
 
   const navigationState = useRootNavigationState();
@@ -60,17 +61,17 @@ export default function RootLayout() {
             <SafeAreaView style={{ flex: 1 }} edges={["top", "bottom"]}>
               <StatusBar
                 barStyle={isDark ? "light-content" : "dark-content"}
-                backgroundColor={isDark ? "#000000" : "#ffffff"}
+                backgroundColor={getColor("background", isDark)}
               />
 
               <View
-                className={`${isDark ? "dark bg-black" : "bg-white"} flex-1`}
+                className={`${isDark ? "dark" : ""} flex-1 bg-background`}
               >
                 <Stack
                   screenOptions={{
                     headerShown: false,
                     contentStyle: {
-                      backgroundColor: isDark ? "#000000" : "#ffffff",
+                      backgroundColor: getColor("background", isDark),
                     },
                   }}
                 >

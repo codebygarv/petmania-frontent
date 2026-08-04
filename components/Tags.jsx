@@ -1,29 +1,34 @@
 import React, { memo, useMemo } from 'react'
 import { View, Text, Pressable } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
+import { useColorScheme } from 'nativewind'
+import { getColor } from '@/constants/color'
 
 const VARIANT_CLASSES = {
-  default: 'px-2 py-1 border rounded-full ml-2 dark:bg-red-900/30 dark:border-red-500 bg-red-200 border-red-500',
-  outline: 'px-2 py-1 border rounded-full ml-2 dark:bg-transparent dark:border-gray-600 bg-transparent border-gray-300',
-  success: 'px-2 py-1 border rounded-full ml-2 dark:bg-green-900/30 dark:border-green-500 bg-green-200 border-green-500',
-  warning: 'px-2 py-1 border rounded-full ml-2 dark:bg-yellow-900/30 dark:border-yellow-500 bg-yellow-200 border-yellow-500',
+  default: 'px-2.5 py-1 border rounded-full ml-2 dark:bg-buttonPrimary/20 dark:border-buttonPrimary bg-buttonPrimary/10 border-buttonPrimary',
+  outline: 'px-2.5 py-1 border rounded-full ml-2 bg-transparent border-border',
+  success: 'px-2.5 py-1 border rounded-full ml-2 dark:bg-green-900/30 dark:border-green-500 bg-green-100 border-green-500',
+  warning: 'px-2.5 py-1 border rounded-full ml-2 dark:bg-yellow-900/30 dark:border-yellow-500 bg-yellow-100 border-yellow-500',
 }
 
 const TEXT_CLASSES = {
-  default: 'dark:text-red-400 text-red-700',
-  outline: 'dark:text-gray-400 text-gray-700',
-  success: 'dark:text-green-400 text-green-700',
-  warning: 'dark:text-yellow-400 text-yellow-800',
-}
-
-const ICON_COLORS = {
-  default: '#E0583D',
-  outline: '#9ca3af',
-  success: '#2F855A',
-  warning: '#D97706',
+  default: 'color-buttonPrimary font-medium text-xs',
+  outline: 'color-textSecondary font-medium text-xs',
+  success: 'color-success font-medium text-xs',
+  warning: 'color-warning font-medium text-xs',
 }
 
 const Tags = ({ text = '', variant = 'default', icon = null, onPress = null, maxLength = 20, style }) => {
+  const { colorScheme } = useColorScheme()
+  const isDark = colorScheme === 'dark'
+
+  const iconColors = {
+    default: getColor('accent', isDark),
+    outline: getColor('textSecondary', isDark),
+    success: getColor('success', isDark),
+    warning: getColor('warning', isDark),
+  }
+
   const displayText = useMemo(() => {
     if (!text) return ''
     if (text.length <= maxLength) return text
@@ -46,7 +51,7 @@ const Tags = ({ text = '', variant = 'default', icon = null, onPress = null, max
           <Ionicons
             name={icon}
             size={14}
-            color={ICON_COLORS[variant] || ICON_COLORS.default}
+            color={iconColors[variant] || iconColors.default}
             style={{ marginRight: 6 }}
           />
         ) : null}

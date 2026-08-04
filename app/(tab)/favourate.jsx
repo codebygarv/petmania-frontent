@@ -28,7 +28,7 @@ const formatDate = (dateString) => {
   return date.toLocaleDateString('en-US', options);
 };
 
-const favourate = () => {
+const Favourate = () => {
   const { colorScheme } = useColorScheme();
   const isDark = colorScheme === "dark";
 
@@ -72,8 +72,8 @@ const favourate = () => {
           ) : !favourites || favourites.filter(p => !p.isAdopted).length === 0 ? (
             <View className="items-center justify-center mt-10">
               <Ionicons name="heart-dislike-outline" size={60} color={graySoftColor} />
-              <Text className="text-gray-500 mt-4 text-center">
-                You haven't favorited any pets yet.
+              <Text className="color-textSecondary mt-4 text-center">
+                You haven&apos;t favorited any pets yet.
               </Text>
             </View>
           ) : (
@@ -83,7 +83,7 @@ const favourate = () => {
 
               return (
                 <View key={pet._id} className="mb-4">
-                  <View className={`rounded-3xl p-4 ${getBackgroundColor(index, isDark)} flex-row items-center`}>
+                  <View className={`rounded-3xl p-4 ${getBackgroundColor(index, isDark)} flex-row items-center border border-border`}>
                     <View className="w-24 h-24 rounded-2xl overflow-hidden mr-4">
                       <Image
                         source={petImage}
@@ -102,26 +102,26 @@ const favourate = () => {
                         </TouchableOpacity>
                       </View>
                       
-                      <Text className="text-sm text-gray-600 mb-1 capitalize">
+                      <Text className="text-sm color-textSecondary mb-1 capitalize">
                         {pet.type} • {pet.breed}
                       </Text>
                       
                       <View className="flex-row items-center mb-1">
                         <Ionicons name="time-outline" size={14} color={graySoftColor} />
-                        <Text className="text-xs ml-1 text-gray-500">
+                        <Text className="text-xs ml-1 color-textSecondary">
                           {pet.age} years
                         </Text>
                       </View>
                       
                       <View className="flex-row items-center mb-1">
                         <Ionicons name="location-outline" size={14} color={accentColor} />
-                        <Text className="text-xs ml-1 text-gray-500">
+                        <Text className="text-xs ml-1 color-textSecondary">
                           {location}
                         </Text>
                       </View>
                       
                       <View className="flex-row items-center justify-between mt-2">
-                        <Text className="text-xs text-gray-400">
+                        <Text className="text-xs color-textSecondary opacity-80">
                           {formatDate(pet.createdAt)}
                         </Text>
                       </View>
@@ -137,4 +137,4 @@ const favourate = () => {
   );
 };
 
-export default favourate;
+export default Favourate;
